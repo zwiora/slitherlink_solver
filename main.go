@@ -1,7 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"slytherlink_solver/utils"
+)
 
 func main() {
-	fmt.Println("Hello")
+	utils.ReadPuzzleStructure("data/test.sav")
 }
