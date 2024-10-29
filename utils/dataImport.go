@@ -46,6 +46,9 @@ func ConstructBoardFromData(fileName string) *Graph {
 	}
 	lastLineNode := thisNode
 	board.root = thisNode
+	board.maxCost = 0
+	board.sizeX = puzzleSizeX
+	board.sizeY = puzzleSizeY
 
 	if puzzleType == "0de" {
 		m := 0
@@ -79,6 +82,7 @@ func ConstructBoardFromData(fileName string) *Graph {
 			nodesCounter := 1
 			if err == nil {
 				thisNode.value = int8(characterVal)
+				board.maxCost += characterVal
 			} else {
 				nodesCounter = int(character[0]) - int('a') + 1
 			}
@@ -102,6 +106,11 @@ func ConstructBoardFromData(fileName string) *Graph {
 					}
 				}
 
+				for _, v := range thisNode.neighbours {
+					if v != nil {
+						thisNode.deg++
+					}
+				}
 				fmt.Println(thisNode)
 
 				/* Calculating next position */

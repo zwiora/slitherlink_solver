@@ -5,5 +5,6 @@ import (
 )
 
 func main() {
-	utils.ConstructBoardFromData("data/test.sav")
+	g := utils.ConstructBoardFromData("data/test.sav")
+	g.PrintEmptyBoard()
 }
