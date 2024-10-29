@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	utils.ReadPuzzleStructure("data/test.sav")
+	utils.ConstructBoardFromData("data/test.sav")
 }
