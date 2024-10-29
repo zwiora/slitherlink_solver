@@ -21,12 +21,22 @@ Extracting data about the puzzle from the file:
 - size of slitherlink board
 - content of slitherlink board (encoded as string)
 */
-func ReadPuzzleStructure(fileName string) (string, int, string) {
+func ReadPuzzleStructure(fileName string) (string, int, int, string) {
 	fileContent := readFile(fileName)
 	puzzleCode := strings.Split(strings.Split(fileContent, "\n")[3], ":")[2]
-	puzzleType := strings.Split(puzzleCode, "t")[1]
-	puzzleSize, err := strconv.Atoi(strings.Split(puzzleCode, "x")[0])
+	puzzleCodeArr := strings.Split(puzzleCode, "t")
+	puzzleType := puzzleCodeArr[1]
+	puzzleSizeArr := strings.Split(puzzleCodeArr[0], "x")
+	puzzleSizeX, err := strconv.Atoi(puzzleSizeArr[0])
+	Check(err)
+	puzzleSizeY, err := strconv.Atoi(puzzleSizeArr[1])
 	Check(err)
 	puzzleContent := strings.Split(strings.Split(fileContent, "\n")[6], ":")[2]
-	return puzzleType, puzzleSize, puzzleContent
+	return puzzleType, puzzleSizeX, puzzleSizeY, puzzleContent
 }
+
+// func ConstructBoardFromData(fileName string) {
+// 	// puzzleType, puzzleSize, puzzleContent := ReadPuzzleStructure(fileName)
+// 	_, _, puzzleContent := ReadPuzzleStructure(fileName)
+
+// }
