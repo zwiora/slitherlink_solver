@@ -1,21 +1,47 @@
 package utils
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+)
 
 type Node struct {
-	neighbours []*Node
-	value      int8
-	isInLoop   bool
-	isVisited  bool
+	Neighbours []*Node
+	Value      int8
+	IsInLoop   bool
+	IsVisited  bool
 }
 
 type Graph struct {
 	Root              *Node
-	maxNeighbourCount int8
+	MaxNeighbourCount int8
 	maxCost           int
 	sizeX             int
 	sizeY             int
 	shape             string
+}
+
+func (n *Node) GetDegree() int {
+	count := 0
+	for _, v := range n.Neighbours {
+		if v != nil && v.IsInLoop {
+			count++
+		}
+	}
+
+	return count
+}
+
+func (n *Node) GetLinesAround(maxNeighbourCount int) int {
+	if n.IsInLoop {
+		return maxNeighbourCount - n.GetDegree()
+	}
+	return n.GetDegree()
+}
+
+func (n *Node) GetCostOfField(maxNeighbourCount int) int {
+	linesAround := n.GetLinesAround(int(maxNeighbourCount))
+	return int(math.Abs(float64(linesAround) - float64(n.Value)))
 }
 
 func (g *Graph) PrintSquaresBoard() {
@@ -31,15 +57,15 @@ func (g *Graph) PrintSquaresBoard() {
 	for n := 0; n < g.sizeY; n++ {
 		fmt.Printf("|")
 		for m := 0; m < g.sizeX; m++ {
-			if thisNode.isInLoop {
+			if thisNode.IsInLoop {
 				fmt.Printf("\033[42m")
 			}
-			if thisNode.value == -1 {
+			if thisNode.Value == -1 {
 				fmt.Printf("   \033[49m|")
 			} else {
-				fmt.Printf(" %d \033[49m|", thisNode.value)
+				fmt.Printf(" %d \033[49m|", thisNode.Value)
 			}
-			thisNode = thisNode.neighbours[0]
+			thisNode = thisNode.Neighbours[0]
 		}
 		fmt.Println()
 		fmt.Printf("-")
@@ -48,7 +74,7 @@ func (g *Graph) PrintSquaresBoard() {
 			fmt.Printf("----")
 		}
 		fmt.Println()
-		thisNode = lastLineNode.neighbours[1]
+		thisNode = lastLineNode.Neighbours[1]
 		lastLineNode = thisNode
 	}
 }
@@ -59,11 +85,11 @@ Change isVisited value from true to false in all nodes in the graph. Should be u
 func (g *Graph) clearIsVisited() {
 	thisNode := g.Root
 	for {
-		thisNode.isVisited = false
+		thisNode.IsVisited = false
 
 		isNewNode := false
-		for _, v := range thisNode.neighbours {
-			if v != nil && v.isVisited {
+		for _, v := range thisNode.Neighbours {
+			if v != nil && v.IsVisited {
 				thisNode = v
 				isNewNode = true
 				break
@@ -85,23 +111,32 @@ func (g *Graph) calculatePerimeter() int {
 }
 
 /*
-Calculates sum of all visible values on the board
+Calculates sum of all visible values on the board and starting cost assuming there's a loop around whole board
 */
 func (g *Graph) CalculateCost() (int, int) {
 	fullCost := 0
 	startCost := 0
 	thisNode := g.Root
+	countVisited := 0
+	perimiter := g.calculatePerimeter()
 
 	for {
-		thisNode.isVisited = true
+		thisNode.IsVisited = true
+		countVisited++
 
-		if thisNode.value > 0 {
-			fullCost += int(thisNode.value)
+		if thisNode.Value > 0 {
+			fullCost += int(thisNode.Value)
+
+			if countVisited <= perimiter {
+				startCost += thisNode.GetCostOfField(int(g.MaxNeighbourCount))
+			} else {
+				startCost += int(thisNode.Value)
+			}
 		}
 
 		isNewNode := false
-		for _, v := range thisNode.neighbours {
-			if v != nil && !v.isVisited {
+		for _, v := range thisNode.Neighbours {
+			if v != nil && !v.IsVisited {
 				thisNode = v
 				isNewNode = true
 				break

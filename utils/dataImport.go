@@ -42,8 +42,8 @@ func ConstructBoardFromData(fileName string) *Graph {
 	var board Graph
 	var thisNode *Node
 	thisNode = &Node{
-		value:    -1,
-		isInLoop: true,
+		Value:    -1,
+		IsInLoop: true,
 	}
 	lastLineNode := thisNode
 	board.Root = thisNode
@@ -56,20 +56,20 @@ func ConstructBoardFromData(fileName string) *Graph {
 		m := 0
 		n := 0
 
-		board.maxNeighbourCount = 4
-		thisNode.neighbours = make([]*Node, board.maxNeighbourCount)
+		board.MaxNeighbourCount = 4
+		thisNode.Neighbours = make([]*Node, board.MaxNeighbourCount)
 
 		/* Preparing first row */
 		for m := 0; m < puzzleSizeX-1; m++ {
 
 			nextNode := &Node{
-				value:    -1,
-				isInLoop: true,
+				Value:    -1,
+				IsInLoop: true,
 			}
-			nextNode.neighbours = make([]*Node, board.maxNeighbourCount)
+			nextNode.Neighbours = make([]*Node, board.MaxNeighbourCount)
 
-			thisNode.neighbours[0] = nextNode
-			nextNode.neighbours[2] = thisNode
+			thisNode.Neighbours[0] = nextNode
+			nextNode.Neighbours[2] = thisNode
 
 			thisNode = nextNode
 
@@ -84,7 +84,7 @@ func ConstructBoardFromData(fileName string) *Graph {
 			/* Setting value of the node */
 			nodesCounter := 1
 			if err == nil {
-				thisNode.value = int8(characterVal)
+				thisNode.Value = int8(characterVal)
 				board.maxCost += characterVal
 			} else {
 				nodesCounter = int(character[0]) - int('a') + 1
@@ -96,17 +96,17 @@ func ConstructBoardFromData(fileName string) *Graph {
 
 					/* Connect this node with bottom one and vice versa*/
 					bottomNode := &Node{
-						value:    -1,
-						isInLoop: true,
+						Value:    -1,
+						IsInLoop: true,
 					}
-					bottomNode.neighbours = make([]*Node, board.maxNeighbourCount)
-					thisNode.neighbours[1] = bottomNode
-					bottomNode.neighbours[3] = thisNode
+					bottomNode.Neighbours = make([]*Node, board.MaxNeighbourCount)
+					thisNode.Neighbours[1] = bottomNode
+					bottomNode.Neighbours[3] = thisNode
 
 					/* Connect bottom node with its left neighbour and vice versa */
 					if m > 0 {
-						bottomNode.neighbours[2] = thisNode.neighbours[2].neighbours[1]
-						thisNode.neighbours[2].neighbours[1].neighbours[0] = bottomNode
+						bottomNode.Neighbours[2] = thisNode.Neighbours[2].Neighbours[1]
+						thisNode.Neighbours[2].Neighbours[1].Neighbours[0] = bottomNode
 					}
 				}
 
@@ -121,10 +121,10 @@ func ConstructBoardFromData(fileName string) *Graph {
 				if m >= puzzleSizeX {
 					m = 0
 					n++
-					thisNode = lastLineNode.neighbours[1]
-					lastLineNode = lastLineNode.neighbours[1]
+					thisNode = lastLineNode.Neighbours[1]
+					lastLineNode = lastLineNode.Neighbours[1]
 				} else {
-					thisNode = thisNode.neighbours[0]
+					thisNode = thisNode.Neighbours[0]
 				}
 
 				_ = puzzleSizeY
