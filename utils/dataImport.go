@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -19,7 +18,8 @@ func readFile(fileName string) string {
 /*
 Extracting data about the puzzle from the file:
 - type of slitherlink board (by its code)
-- size of slitherlink board (width and height)
+- size of slitherlink board (width)
+- size of slitherlink board (height)
 - content of slitherlink board (encoded as string)
 */
 func readPuzzleStructure(fileName string) (string, int, int, string) {
@@ -46,10 +46,11 @@ func ConstructBoardFromData(fileName string) *Graph {
 		isInLoop: true,
 	}
 	lastLineNode := thisNode
-	board.root = thisNode
+	board.Root = thisNode
 	board.maxCost = 0
 	board.sizeX = puzzleSizeX
 	board.sizeY = puzzleSizeY
+	board.shape = "square"
 
 	if puzzleType == "0de" {
 		m := 0
@@ -74,7 +75,7 @@ func ConstructBoardFromData(fileName string) *Graph {
 
 		}
 
-		thisNode = board.root
+		thisNode = board.Root
 
 		/* Setting content and preparing rest of the nodes */
 		for _, character := range strings.Split(puzzleContent, "") {
@@ -109,19 +110,17 @@ func ConstructBoardFromData(fileName string) *Graph {
 					}
 				}
 
-				for _, v := range thisNode.neighbours {
-					if v != nil {
-						thisNode.deg++
-					}
-				}
-				fmt.Println(thisNode)
+				// for _, v := range thisNode.neighbours {
+				// 	if v != nil {
+				// 		thisNode.deg++
+				// 	}
+				// }
 
 				/* Calculating next position */
 				m++
 				if m >= puzzleSizeX {
 					m = 0
 					n++
-					fmt.Println()
 					thisNode = lastLineNode.neighbours[1]
 					lastLineNode = lastLineNode.neighbours[1]
 				} else {

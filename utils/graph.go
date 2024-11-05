@@ -5,21 +5,22 @@ import "fmt"
 type Node struct {
 	neighbours []*Node
 	value      int8
-	deg        int8
 	isInLoop   bool
+	isVisited  bool
 }
 
 type Graph struct {
-	root              *Node
+	Root              *Node
 	maxNeighbourCount int8
 	maxCost           int
 	sizeX             int
 	sizeY             int
+	shape             string
 }
 
 func (g *Graph) PrintSquaresBoard() {
-	lastLineNode := g.root
-	thisNode := g.root
+	lastLineNode := g.Root
+	thisNode := g.Root
 
 	fmt.Printf("-")
 
@@ -50,5 +51,71 @@ func (g *Graph) PrintSquaresBoard() {
 		thisNode = lastLineNode.neighbours[1]
 		lastLineNode = thisNode
 	}
+}
 
+/*
+Change isVisited value from true to false in all nodes in the graph. Should be used after traversing the whole graph.
+*/
+func (g *Graph) clearIsVisited() {
+	thisNode := g.Root
+	for {
+		thisNode.isVisited = false
+
+		isNewNode := false
+		for _, v := range thisNode.neighbours {
+			if v != nil && v.isVisited {
+				thisNode = v
+				isNewNode = true
+				break
+			}
+		}
+
+		if !isNewNode {
+			break
+		}
+	}
+}
+
+func (g *Graph) calculatePerimeter() int {
+	if g.shape == "square" {
+		return g.sizeX*2 + g.sizeY*2 - 4
+	}
+
+	return 0
+}
+
+/*
+Calculates sum of all visible values on the board
+*/
+func (g *Graph) CalculateCost() (int, int) {
+	fullCost := 0
+	startCost := 0
+	thisNode := g.Root
+
+	for {
+		thisNode.isVisited = true
+
+		if thisNode.value > 0 {
+			fullCost += int(thisNode.value)
+		}
+
+		isNewNode := false
+		for _, v := range thisNode.neighbours {
+			if v != nil && !v.isVisited {
+				thisNode = v
+				isNewNode = true
+				break
+			}
+		}
+
+		if !isNewNode {
+			break
+		}
+	}
+
+	/* Clear isVisited parameters */
+
+	g.clearIsVisited()
+
+	return fullCost, startCost
 }
