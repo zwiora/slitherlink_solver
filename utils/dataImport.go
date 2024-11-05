@@ -42,7 +42,8 @@ func ConstructBoardFromData(fileName string) *Graph {
 	var board Graph
 	var thisNode *Node
 	thisNode = &Node{
-		value: -1,
+		value:    -1,
+		isInLoop: true,
 	}
 	lastLineNode := thisNode
 	board.root = thisNode
@@ -61,7 +62,8 @@ func ConstructBoardFromData(fileName string) *Graph {
 		for m := 0; m < puzzleSizeX-1; m++ {
 
 			nextNode := &Node{
-				value: -1,
+				value:    -1,
+				isInLoop: true,
 			}
 			nextNode.neighbours = make([]*Node, board.maxNeighbourCount)
 
@@ -93,7 +95,8 @@ func ConstructBoardFromData(fileName string) *Graph {
 
 					/* Connect this node with bottom one and vice versa*/
 					bottomNode := &Node{
-						value: -1,
+						value:    -1,
+						isInLoop: true,
 					}
 					bottomNode.neighbours = make([]*Node, board.maxNeighbourCount)
 					thisNode.neighbours[1] = bottomNode

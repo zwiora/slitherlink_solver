@@ -6,5 +6,5 @@ import (
 
 func main() {
 	g := utils.ConstructBoardFromData("data/test.sav")
-	g.PrintEmptyBoard()
+	g.PrintSquaresBoard()
 }
