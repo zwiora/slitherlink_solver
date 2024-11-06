@@ -7,7 +7,7 @@ import (
 
 func main() {
 	g := utils.ConstructBoardFromData("data/test.sav")
-	g.PrintSquaresBoard()
+	// g.PrintSquaresBoard()
 	// fmt.Println(g.CalculateCost())
 	solvers.LoopSolve(g, false)
 }

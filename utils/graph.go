@@ -16,8 +16,8 @@ type Graph struct {
 	Root              *Node
 	MaxNeighbourCount int8
 	maxCost           int
-	sizeX             int
-	sizeY             int
+	SizeX             int
+	SizeY             int
 	shape             string
 }
 
@@ -50,13 +50,13 @@ func (g *Graph) PrintSquaresBoard() {
 
 	fmt.Printf("-")
 
-	for m := 0; m < g.sizeX; m++ {
+	for m := 0; m < g.SizeX; m++ {
 		fmt.Printf("----")
 	}
 	fmt.Println()
-	for n := 0; n < g.sizeY; n++ {
+	for n := 0; n < g.SizeY; n++ {
 		fmt.Printf("|")
-		for m := 0; m < g.sizeX; m++ {
+		for m := 0; m < g.SizeX; m++ {
 			if thisNode.IsInLoop {
 				fmt.Printf("\033[42m")
 			}
@@ -70,7 +70,7 @@ func (g *Graph) PrintSquaresBoard() {
 		fmt.Println()
 		fmt.Printf("-")
 
-		for m := 0; m < g.sizeX; m++ {
+		for m := 0; m < g.SizeX; m++ {
 			fmt.Printf("----")
 		}
 		fmt.Println()
@@ -104,7 +104,7 @@ func (g *Graph) clearIsVisited() {
 
 func (g *Graph) calculatePerimeter() int {
 	if g.shape == "square" {
-		return g.sizeX*2 + g.sizeY*2 - 4
+		return g.SizeX*2 + g.SizeY*2 - 4
 	}
 
 	return 0

@@ -48,8 +48,8 @@ func ConstructBoardFromData(fileName string) *Graph {
 	lastLineNode := thisNode
 	board.Root = thisNode
 	board.maxCost = 0
-	board.sizeX = puzzleSizeX
-	board.sizeY = puzzleSizeY
+	board.SizeX = puzzleSizeX
+	board.SizeY = puzzleSizeY
 	board.shape = "square"
 
 	if puzzleType == "0de" {

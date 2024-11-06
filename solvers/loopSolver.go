@@ -1,32 +1,74 @@
 package solvers
 
 import (
-	"fmt"
 	"slytherlink_solver/utils"
 )
 
 func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int) {
-	fmt.Println("New repetition", n)
+	// fmt.Println("New repetition", n)
+	nodeDegree := n.GetDegree()
 
 	/* Checking if removal would create loop inside the loop */
-	if n.GetDegree() != int(g.MaxNeighbourCount) {
-		fmt.Println("Degree ok")
+	if nodeDegree != 0 && nodeDegree != int(g.MaxNeighbourCount) {
+		// fmt.Println("Degree ok")
 
-		/* Checking if removal would break the graph */
 		isBridge := false
-		for _, v := range n.Neighbours {
-			if v != nil && v.IsInLoop {
-				if v.GetDegree() == 1 {
-					isBridge = true
-					break
-				}
 
+		/* It's not a bridge if  it's a leaf */
+		if n.GetDegree() > 1 {
+
+			// fmt.Println("Not a leaf")
+
+			/* Checking if its neighbour is leaf */
+			for _, v := range n.Neighbours {
+				if v != nil && v.IsInLoop {
+					if v.GetDegree() == 1 {
+						isBridge = true
+						break
+					}
+				}
+			}
+
+			/* Checking if is between two sides of graph*/
+			if !isBridge {
+				// fmt.Println("Checking sides")
+				sidesCounter := 0
+				for i := 0; i < len(n.Neighbours); i++ {
+					// fmt.Println(i, " ", sidesCounter)
+					thisNeighbour := n.Neighbours[i]
+					nextNeighbour := n.Neighbours[(i+1)%int(g.MaxNeighbourCount)]
+					if ((thisNeighbour == nil || !thisNeighbour.IsInLoop) && (nextNeighbour != nil && nextNeighbour.IsInLoop)) || ((nextNeighbour == nil || !nextNeighbour.IsInLoop) && (thisNeighbour != nil && thisNeighbour.IsInLoop)) {
+						sidesCounter++
+					}
+					if sidesCounter == 3 {
+						isBridge = true
+						break
+					}
+				}
+			}
+
+			/* Checking if is connected via edge*/
+			if !isBridge {
+				// fmt.Println("Checking diagonals")
+				for k, v := range n.Neighbours {
+					if v != nil && v.IsInLoop {
+						diagonalNode := v.Neighbours[(k+1)%int(g.MaxNeighbourCount)]
+						if diagonalNode != nil && !diagonalNode.IsInLoop {
+							nextNeighbour := diagonalNode.Neighbours[(k+2)%int(g.MaxNeighbourCount)]
+							if nextNeighbour.IsInLoop {
+								isBridge = true
+								break
+							}
+						}
+					}
+				}
 			}
 		}
 
-		if !isBridge || n.GetDegree() == 1 {
+		/* Removing node from the loop*/
+		if !isBridge {
 
-			fmt.Println("Graph ok")
+			// fmt.Println("Graph ok")
 
 			/* Calculating new cost */
 			newCost := cost
@@ -54,12 +96,19 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int) {
 				}
 			}
 
-			g.PrintSquaresBoard()
-			fmt.Println(newCost)
+			if newCost == 0 {
+				g.PrintSquaresBoard()
+			}
 
-			for _, v := range n.Neighbours {
-				if v != nil && !v.IsVisited {
+			// time.Sleep(100 * time.Millisecond)
+			// fmt.Println(newCost)
+
+			for i := 0; i < len(n.Neighbours); i++ {
+				v := n.Neighbours[i]
+				if v != nil && !v.IsVisited && v.IsInLoop {
+					// fmt.Println("i: ", i)
 					loopSolveRecursion(v, g, newCost)
+					// fmt.Println("Powrót")
 					v.IsVisited = false
 					v.IsInLoop = true
 				}
@@ -76,6 +125,7 @@ func LoopSolve(g *utils.Graph, isCheckingAllSolutions bool) {
 	_, cost := g.CalculateCost()
 
 	loopSolveRecursion(g.Root, g, cost)
+
 	// for true {
 
 	// 	thisNode := g.Root
