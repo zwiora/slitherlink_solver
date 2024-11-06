@@ -2,6 +2,7 @@ package solvers
 
 import (
 	"slytherlink_solver/utils"
+	"time"
 )
 
 func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int) {
@@ -96,11 +97,11 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int) {
 				}
 			}
 
-			if newCost == 0 {
-				g.PrintSquaresBoard()
-			}
+			// if newCost == 0 {
+			g.PrintSquaresBoard()
+			// }
 
-			// time.Sleep(100 * time.Millisecond)
+			time.Sleep(250 * time.Millisecond)
 			// fmt.Println(newCost)
 
 			for i := 0; i < len(n.Neighbours); i++ {
@@ -125,6 +126,32 @@ func LoopSolve(g *utils.Graph, isCheckingAllSolutions bool) {
 	_, cost := g.CalculateCost()
 
 	loopSolveRecursion(g.Root, g, cost)
+
+	// lastLineNode := g.Root
+	// thisNode := g.Root
+
+	// for n := 0; n < g.SizeY; n++ {
+	// 	for m := 0; m < g.SizeX; m++ {
+	// 		if thisNode.IsInLoop {
+	// 			fmt.Printf("\033[42m")
+	// 		}
+	// 		if thisNode.Value == -1 {
+	// 			fmt.Printf("   \033[49m|")
+	// 		} else {
+	// 			fmt.Printf(" %d \033[49m|", thisNode.Value)
+	// 		}
+	// 		thisNode = thisNode.Neighbours[0]
+	// 	}
+	// 	fmt.Println()
+	// 	fmt.Printf("-")
+
+	// 	for m := 0; m < g.SizeX; m++ {
+	// 		fmt.Printf("----")
+	// 	}
+	// 	fmt.Println()
+	// 	thisNode = lastLineNode.Neighbours[1]
+	// 	lastLineNode = thisNode
+	// }
 
 	// for true {
 

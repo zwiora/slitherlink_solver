@@ -82,7 +82,7 @@ func (g *Graph) PrintSquaresBoard() {
 /*
 Change isVisited value from true to false in all nodes in the graph. Should be used after traversing the whole graph.
 */
-func (g *Graph) clearIsVisited() {
+func (g *Graph) ClearIsVisited() {
 	thisNode := g.Root
 	for {
 		thisNode.IsVisited = false
@@ -150,7 +150,7 @@ func (g *Graph) CalculateCost() (int, int) {
 
 	/* Clear isVisited parameters */
 
-	g.clearIsVisited()
+	g.ClearIsVisited()
 
 	return fullCost, startCost
 }
