@@ -3,15 +3,14 @@ package solvers
 import (
 	"fmt"
 	"slytherlink_solver/utils"
-	"time"
 )
 
 func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int) {
 	n.IsVisited = true
 
-	fmt.Println("New repetition", n)
-	g.PrintSquaresBoard()
-	time.Sleep(500 * time.Millisecond)
+	// fmt.Println("New repetition", n)
+	// g.PrintSquaresBoard()
+	// time.Sleep(500 * time.Millisecond)
 
 	var newNode *utils.Node
 	isNewFound := false
@@ -24,10 +23,10 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int) {
 	}
 
 	if isNewFound {
-		fmt.Println("Skipping")
+		// fmt.Println("Skipping")
 		loopSolveRecursion(newNode, g, cost)
 		newNode.IsVisited = false
-		g.PrintSquaresBoard()
+		// g.PrintSquaresBoard()
 	}
 
 	nodeDegree := n.GetDegree()
@@ -41,7 +40,7 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int) {
 		/* It's not a bridge if  it's a leaf */
 		if n.GetDegree() > 1 {
 
-			fmt.Println("Not a leaf")
+			// fmt.Println("Not a leaf")
 
 			/* Checking if its neighbour is leaf */
 			for _, v := range n.Neighbours {
@@ -55,7 +54,7 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int) {
 
 			/* Checking if is between two sides of graph*/
 			if !isBridge {
-				fmt.Println("Checking sides")
+				// fmt.Println("Checking sides")
 				sidesCounter := 0
 				for i := 0; i < len(n.Neighbours); i++ {
 					// fmt.Println(i, " ", sidesCounter)
@@ -73,7 +72,7 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int) {
 
 			/* Checking if is connected via edge*/
 			if !isBridge {
-				fmt.Println("Checking diagonals")
+				// fmt.Println("Checking diagonals")
 				for k, v := range n.Neighbours {
 					if v != nil && v.IsInLoop {
 						diagonalNode := v.Neighbours[(k+1)%int(g.MaxNeighbourCount)]
@@ -92,7 +91,7 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int) {
 		/* Removing node from the loop*/
 		if !isBridge {
 
-			fmt.Println("Graph ok")
+			// fmt.Println("Graph ok")
 
 			/* Calculating new cost */
 			newCost := cost
@@ -119,15 +118,18 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int) {
 				}
 			}
 
-			g.PrintSquaresBoard()
+			if newCost == 0 {
+				g.PrintSquaresBoard()
+
+			}
 
 			if isNewFound {
 				newNode.IsVisited = false
-				fmt.Println("After deleting", n)
+				// fmt.Println("After deleting", n)
 				loopSolveRecursion(newNode, g, newCost)
 				newNode.IsVisited = false
 				newNode.IsInLoop = true
-				g.PrintSquaresBoard()
+				// g.PrintSquaresBoard()
 			}
 			// if n.IsInLoop {
 			// 	n.IsInLoop = false
