@@ -60,10 +60,15 @@ func (g *Graph) PrintSquaresBoard() {
 			if thisNode.IsInLoop {
 				fmt.Printf("\033[42m")
 			}
-			if thisNode.Value == -1 {
-				fmt.Printf("   \033[49m|")
+			if thisNode.IsVisited {
+				fmt.Printf("x")
 			} else {
-				fmt.Printf(" %d \033[49m|", thisNode.Value)
+				fmt.Printf(" ")
+			}
+			if thisNode.Value == -1 {
+				fmt.Printf("  \033[49m|")
+			} else {
+				fmt.Printf("%d \033[49m|", thisNode.Value)
 			}
 			thisNode = thisNode.Neighbours[0]
 		}
@@ -124,7 +129,7 @@ func (g *Graph) CalculateCost() (int, int) {
 		thisNode.IsVisited = true
 		countVisited++
 
-		if thisNode.Value > 0 {
+		if thisNode.Value >= 0 {
 			fullCost += int(thisNode.Value)
 
 			if countVisited <= perimiter {
