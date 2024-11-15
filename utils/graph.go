@@ -2,15 +2,7 @@ package utils
 
 import (
 	"fmt"
-	"math"
 )
-
-type Node struct {
-	Neighbours []*Node
-	Value      int8
-	IsInLoop   bool
-	IsVisited  bool
-}
 
 type Graph struct {
 	Root              *Node
@@ -21,30 +13,7 @@ type Graph struct {
 	shape             string
 }
 
-func (n *Node) GetDegree() int {
-	count := 0
-	for _, v := range n.Neighbours {
-		if v != nil && v.IsInLoop {
-			count++
-		}
-	}
-
-	return count
-}
-
-func (n *Node) GetLinesAround(maxNeighbourCount int) int {
-	if n.IsInLoop {
-		return maxNeighbourCount - n.GetDegree()
-	}
-	return n.GetDegree()
-}
-
-func (n *Node) GetCostOfField(maxNeighbourCount int) int {
-	linesAround := n.GetLinesAround(int(maxNeighbourCount))
-	return int(math.Abs(float64(linesAround) - float64(n.Value)))
-}
-
-func (g *Graph) PrintSquaresBoard() {
+func (g *Graph) PrintSquaresBoard(isDebugMode bool) {
 	lastLineNode := g.Root
 	thisNode := g.Root
 
@@ -60,7 +29,7 @@ func (g *Graph) PrintSquaresBoard() {
 			if thisNode.IsInLoop {
 				fmt.Printf("\033[42m")
 			}
-			if thisNode.IsVisited {
+			if isDebugMode && thisNode.IsVisited {
 				fmt.Printf("x")
 			} else {
 				fmt.Printf(" ")

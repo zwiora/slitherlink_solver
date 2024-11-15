@@ -1,25 +1,27 @@
-package utils
+package debug
 
 import (
 	"fmt"
 	"time"
+
+	"slytherlink_solver/utils"
 )
 
 var IsDebugMode bool
 
-func DebugPrint(message string) {
+func Print(message any) {
 	if IsDebugMode {
 		fmt.Println(message)
 	}
 }
 
-func DebugPrintBoard(g Graph) {
+func PrintBoard(g *utils.Graph) {
 	if IsDebugMode {
-		g.PrintSquaresBoard()
+		g.PrintSquaresBoard(true)
 	}
 }
 
-func DebugSleep(t int) {
+func Sleep(t int) {
 	if IsDebugMode {
 		time.Sleep(time.Duration(t) * time.Millisecond)
 	}

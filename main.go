@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"slytherlink_solver/debug"
 	"slytherlink_solver/solvers"
 	"slytherlink_solver/utils"
 )
@@ -9,9 +10,9 @@ import (
 func main() {
 	args := os.Args
 	if len(args) > 1 && args[1] == "d" {
-		utils.IsDebugMode = true
+		debug.IsDebugMode = true
 	}
-	g := utils.ConstructBoardFromData("data/test3.sav")
+	g := utils.ConstructBoardFromData("data/test7.sav")
 	// g.PrintSquaresBoard()
 	// fmt.Println(g.CalculateCost())
 	solvers.LoopSolve(g, false)
