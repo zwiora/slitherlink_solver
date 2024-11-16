@@ -1,12 +1,15 @@
 package utils
 
-import "math"
+import (
+	"math"
+)
 
 type Node struct {
-	Neighbours []*Node
-	Value      int8
-	IsInLoop   bool
-	IsVisited  bool
+	Neighbours   []*Node
+	Value        int8
+	IsInLoop     bool
+	IsVisited    bool
+	CanBeRemoved bool
 }
 
 func (n *Node) GetDegree() int {
@@ -16,7 +19,6 @@ func (n *Node) GetDegree() int {
 			count++
 		}
 	}
-
 	return count
 }
 

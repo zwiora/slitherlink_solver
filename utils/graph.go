@@ -3,6 +3,8 @@ package utils
 import (
 	"container/list"
 	"fmt"
+
+	"github.com/golang-collections/collections/stack"
 )
 
 type Graph struct {
@@ -12,14 +14,16 @@ type Graph struct {
 	SizeX             int
 	SizeY             int
 	shape             string
-	AvaliableMoves    *list.List
+	AvailableMoves    *list.List
+	VisitedNodes      *stack.Stack
 }
 
 func (g *Graph) CalculateStartingMoves() {
-	g.AvaliableMoves = list.New()
+	g.AvailableMoves = list.New()
 	thisNode := g.Root
 	for {
-		g.AvaliableMoves.PushBack(thisNode)
+		g.AvailableMoves.PushBack(thisNode)
+		thisNode.CanBeRemoved = true
 		if thisNode.Neighbours[0] != nil {
 			thisNode = thisNode.Neighbours[0]
 		} else {
@@ -27,7 +31,8 @@ func (g *Graph) CalculateStartingMoves() {
 		}
 	}
 	for {
-		g.AvaliableMoves.PushBack(thisNode)
+		g.AvailableMoves.PushBack(thisNode)
+		thisNode.CanBeRemoved = true
 		if thisNode.Neighbours[1] != nil {
 			thisNode = thisNode.Neighbours[1]
 		} else {
@@ -35,7 +40,8 @@ func (g *Graph) CalculateStartingMoves() {
 		}
 	}
 	for {
-		g.AvaliableMoves.PushBack(thisNode)
+		g.AvailableMoves.PushBack(thisNode)
+		thisNode.CanBeRemoved = true
 		if thisNode.Neighbours[2] != nil {
 			thisNode = thisNode.Neighbours[2]
 		} else {
@@ -43,16 +49,17 @@ func (g *Graph) CalculateStartingMoves() {
 		}
 	}
 	for {
-		g.AvaliableMoves.PushBack(thisNode)
+		g.AvailableMoves.PushBack(thisNode)
+		thisNode.CanBeRemoved = true
 		if thisNode.Neighbours[3] != g.Root {
 			thisNode = thisNode.Neighbours[3]
 		} else {
 			break
 		}
 	}
-	for e := g.AvaliableMoves.Front(); e != nil; e = e.Next() {
-		fmt.Println(e.Value)
-	}
+	// for e := g.AvaliableMoves.Front(); e != nil; e = e.Next() {
+	// 	fmt.Println(e.Value)
+	// }
 }
 
 func (g *Graph) PrintSquaresBoard(isDebugMode bool) {

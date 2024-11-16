@@ -1,12 +1,13 @@
 package solvers
 
 import (
-	"fmt"
 	"slytherlink_solver/debug"
 	"slytherlink_solver/utils"
+
+	"github.com/golang-collections/collections/stack"
 )
 
-func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int) {
+func loopSolveRecursionOld(n *utils.Node, g *utils.Graph, cost int) {
 	n.IsVisited = true
 
 	debug.Print("New repetition, testing cell:")
@@ -138,7 +139,7 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int) {
 			if isNewFound {
 				newNode.IsVisited = false
 				debug.Print("Checking variant with deletion")
-				loopSolveRecursion(newNode, g, newCost)
+				loopSolveRecursionOld(newNode, g, newCost)
 				newNode.IsVisited = false
 				newNode.IsInLoop = true
 			}
@@ -150,14 +151,130 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int) {
 
 }
 
+func checkIfCanBeRemoved(n *utils.Node, g *utils.Graph) bool {
+	debug.Print(n)
+	debug.Print("Checking if can be removed: ")
+
+	/* Checking if removal would create loop inside the loop */
+	nodeDegree := n.GetDegree()
+	debug.Print(nodeDegree)
+	if nodeDegree == 0 || nodeDegree == int(g.MaxNeighbourCount) {
+		debug.Print("\t- SKIP: removal would create loop inside the loop")
+		return false
+	}
+	debug.Print("\t- degree ok")
+
+	/* It can be removed if it's a leaf */
+	if n.GetDegree() == 1 {
+		debug.Print("\t- it's a leaf")
+		return true
+	}
+	debug.Print("\t- not a leaf")
+
+	/* Checking if its neighbour is leaf */
+	for _, v := range n.Neighbours {
+		if v != nil && v.IsInLoop {
+			if v.GetDegree() == 1 {
+				debug.Print("\t- SKIP: neighbour is a leaf")
+				return false
+			}
+		}
+	}
+	debug.Print("\t- neighbour isn't a leaf")
+
+	/* Checking if is between two sides of graph*/
+	sidesCounter := 0
+	for i := 0; i < len(n.Neighbours); i++ {
+		thisNeighbour := n.Neighbours[i]
+		nextNeighbour := n.Neighbours[(i+1)%int(g.MaxNeighbourCount)]
+		if ((thisNeighbour == nil || !thisNeighbour.IsInLoop) && (nextNeighbour != nil && nextNeighbour.IsInLoop)) || ((nextNeighbour == nil || !nextNeighbour.IsInLoop) && (thisNeighbour != nil && thisNeighbour.IsInLoop)) {
+			sidesCounter++
+		}
+		if sidesCounter == 3 {
+			debug.Print("\t- SKIP: deletion would create two separate graphs")
+			return false
+		}
+	}
+	debug.Print("\t- deletion wouldn't create two separate graphs")
+
+	/* Checking if is connected via corner*/
+	for k, v := range n.Neighbours {
+		if v != nil && v.IsInLoop {
+			diagonalNode := v.Neighbours[(k+1)%int(g.MaxNeighbourCount)]
+			if diagonalNode != nil && !diagonalNode.IsInLoop {
+				nextNeighbour := diagonalNode.Neighbours[(k+2)%int(g.MaxNeighbourCount)]
+				if nextNeighbour.IsInLoop {
+
+					debug.Print("\t- SKIP: deletion would create two graphs with common corner")
+					return false
+				}
+			}
+		}
+	}
+
+	return true
+}
+
+func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int) {
+	n.IsInLoop = false
+
+	debug.PrintBoard(g)
+
+	g.VisitedNodes.Push(nil)
+
+	// update list with available moves
+	for i := 0; i < int(g.MaxNeighbourCount); i++ {
+		// neighbouring node
+		thisNode := n.Neighbours[(i)%int(g.MaxNeighbourCount)]
+		if thisNode != nil {
+			canBeRemoved := checkIfCanBeRemoved(thisNode, g)
+			if canBeRemoved && !thisNode.CanBeRemoved {
+				g.AvailableMoves.PushBack(thisNode)
+				thisNode.CanBeRemoved = canBeRemoved
+			} else if !canBeRemoved && thisNode.CanBeRemoved {
+				for e := g.AvailableMoves.Front(); e != nil; e = e.Next() {
+					if e.Value == thisNode {
+						g.AvailableMoves.Remove(e)
+						break
+					}
+				}
+				thisNode.CanBeRemoved = canBeRemoved
+			}
+
+			// diagonal node
+			thisNode := thisNode.Neighbours[(i+1)%int(g.MaxNeighbourCount)]
+			if thisNode != nil {
+				canBeRemoved := checkIfCanBeRemoved(thisNode, g)
+				if canBeRemoved && !thisNode.CanBeRemoved {
+					g.AvailableMoves.PushBack(thisNode)
+					thisNode.CanBeRemoved = canBeRemoved
+				} else if !canBeRemoved && thisNode.CanBeRemoved {
+					for e := g.AvailableMoves.Front(); e != nil; e = e.Next() {
+						if e.Value == thisNode {
+							g.AvailableMoves.Remove(e)
+							break
+						}
+					}
+					thisNode.CanBeRemoved = canBeRemoved
+				}
+			}
+		}
+	}
+}
+
 func LoopSolve(g *utils.Graph, isCheckingAllSolutions bool) {
 
 	_, cost := g.CalculateCost()
 	g.CalculateStartingMoves()
 	debug.PrintBoard(g)
-	fmt.Println(cost)
+	// fmt.Println(cost)
 
-	// g.AvaliableMoves = nil
+	g.VisitedNodes = stack.New()
+	debug.Print(g.VisitedNodes.Len())
 
-	// loopSolveRecursion(g.Root, g, cost)
+	// for {
+	// 	g.AvailableMoves.
+	// }
+
+	loopSolveRecursion(g.Root, g, cost)
 }
