@@ -21,45 +21,17 @@ type Graph struct {
 func (g *Graph) CalculateStartingMoves() {
 	g.AvailableMoves = list.New()
 	thisNode := g.Root
-	for {
-		g.AvailableMoves.PushBack(thisNode)
-		thisNode.CanBeRemoved = true
-		if thisNode.Neighbours[0] != nil {
-			thisNode = thisNode.Neighbours[0]
-		} else {
-			break
+	for i := 0; i < int(g.MaxNeighbourCount); i++ {
+		for {
+			if thisNode.Neighbours[i] != nil {
+				thisNode = thisNode.Neighbours[i]
+				g.AvailableMoves.PushBack(thisNode)
+				thisNode.CanBeRemoved = true
+			} else {
+				break
+			}
 		}
 	}
-	for {
-		g.AvailableMoves.PushBack(thisNode)
-		thisNode.CanBeRemoved = true
-		if thisNode.Neighbours[1] != nil {
-			thisNode = thisNode.Neighbours[1]
-		} else {
-			break
-		}
-	}
-	for {
-		g.AvailableMoves.PushBack(thisNode)
-		thisNode.CanBeRemoved = true
-		if thisNode.Neighbours[2] != nil {
-			thisNode = thisNode.Neighbours[2]
-		} else {
-			break
-		}
-	}
-	for {
-		g.AvailableMoves.PushBack(thisNode)
-		thisNode.CanBeRemoved = true
-		if thisNode.Neighbours[3] != g.Root {
-			thisNode = thisNode.Neighbours[3]
-		} else {
-			break
-		}
-	}
-	// for e := g.AvaliableMoves.Front(); e != nil; e = e.Next() {
-	// 	fmt.Println(e.Value)
-	// }
 }
 
 func (g *Graph) PrintSquaresBoard(isDebugMode bool) {
