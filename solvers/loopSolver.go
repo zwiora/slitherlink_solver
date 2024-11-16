@@ -152,49 +152,12 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int) {
 
 func LoopSolve(g *utils.Graph, isCheckingAllSolutions bool) {
 
-	// isSolutionFound := false
-	// g.PrintSquaresBoard()
 	_, cost := g.CalculateCost()
+	g.CalculateStartingMoves()
+	debug.PrintBoard(g)
 	fmt.Println(cost)
 
-	loopSolveRecursion(g.Root, g, cost)
+	// g.AvaliableMoves = nil
 
-	// lastLineNode := g.Root
-	// thisNode := g.Root
-
-	// for n := 0; n < g.SizeY; n++ {
-	// 	for m := 0; m < g.SizeX; m++ {
-	// 		if thisNode.IsInLoop {
-	// 			fmt.Printf("\033[42m")
-	// 		}
-	// 		if thisNode.Value == -1 {
-	// 			fmt.Printf("   \033[49m|")
-	// 		} else {
-	// 			fmt.Printf(" %d \033[49m|", thisNode.Value)
-	// 		}
-	// 		thisNode = thisNode.Neighbours[0]
-	// 	}
-	// 	fmt.Println()
-	// 	fmt.Printf("-")
-
-	// 	for m := 0; m < g.SizeX; m++ {
-	// 		fmt.Printf("----")
-	// 	}
-	// 	fmt.Println()
-	// 	thisNode = lastLineNode.Neighbours[1]
-	// 	lastLineNode = thisNode
-	// }
-
-	// for true {
-
-	// 	thisNode := g.Root
-
-	// 	if cost == 0 {
-	// 		isSolutionFound = true
-	// 	}
-
-	// 	if !isCheckingAllSolutions && isSolutionFound {
-	// 		break
-	// 	}
-	// }
+	// loopSolveRecursion(g.Root, g, cost)
 }

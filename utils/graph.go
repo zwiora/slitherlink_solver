@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"container/list"
 	"fmt"
 )
 
@@ -11,6 +12,47 @@ type Graph struct {
 	SizeX             int
 	SizeY             int
 	shape             string
+	AvaliableMoves    *list.List
+}
+
+func (g *Graph) CalculateStartingMoves() {
+	g.AvaliableMoves = list.New()
+	thisNode := g.Root
+	for {
+		g.AvaliableMoves.PushBack(thisNode)
+		if thisNode.Neighbours[0] != nil {
+			thisNode = thisNode.Neighbours[0]
+		} else {
+			break
+		}
+	}
+	for {
+		g.AvaliableMoves.PushBack(thisNode)
+		if thisNode.Neighbours[1] != nil {
+			thisNode = thisNode.Neighbours[1]
+		} else {
+			break
+		}
+	}
+	for {
+		g.AvaliableMoves.PushBack(thisNode)
+		if thisNode.Neighbours[2] != nil {
+			thisNode = thisNode.Neighbours[2]
+		} else {
+			break
+		}
+	}
+	for {
+		g.AvaliableMoves.PushBack(thisNode)
+		if thisNode.Neighbours[3] != g.Root {
+			thisNode = thisNode.Neighbours[3]
+		} else {
+			break
+		}
+	}
+	for e := g.AvaliableMoves.Front(); e != nil; e = e.Next() {
+		fmt.Println(e.Value)
+	}
 }
 
 func (g *Graph) PrintSquaresBoard(isDebugMode bool) {
