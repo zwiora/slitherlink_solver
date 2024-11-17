@@ -213,21 +213,14 @@ func checkIfCanBeRemoved(n *utils.Node, g *utils.Graph) bool {
 	return true
 }
 
-func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int) {
-	n.IsInLoop = false
-
-	debug.PrintBoard(g)
-	g.PrintSquaresBoard(false)
-
-	g.VisitedNodes.Push(nil)
-
+func updateAvailableMoves(n *utils.Node, g *utils.Graph) {
 	// update list with available moves
 	for i := 0; i < int(g.MaxNeighbourCount); i++ {
 		// neighbouring node
 		thisNode := n.Neighbours[(i)%int(g.MaxNeighbourCount)]
 		if thisNode != nil {
 
-			if thisNode.IsInLoop && !thisNode.IsDisabled {
+			if thisNode.IsInLoop && !thisNode.IsVisited {
 				canBeRemoved := checkIfCanBeRemoved(thisNode, g)
 				if canBeRemoved && !thisNode.CanBeRemoved {
 					g.AvailableMoves.PushBack(thisNode)
@@ -244,7 +237,7 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int) {
 
 				// diagonal node
 				thisNode := thisNode.Neighbours[(i+1)%int(g.MaxNeighbourCount)]
-				if thisNode != nil && thisNode.IsInLoop && !thisNode.IsDisabled {
+				if thisNode != nil && thisNode.IsInLoop && !thisNode.IsVisited {
 					canBeRemoved := checkIfCanBeRemoved(thisNode, g)
 					if canBeRemoved && !thisNode.CanBeRemoved {
 						g.AvailableMoves.PushBack(thisNode)
@@ -262,6 +255,20 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int) {
 			}
 		}
 	}
+}
+
+func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int) {
+	n.IsInLoop = false
+
+	debug.PrintBoard(g)
+	g.PrintSquaresBoard(true)
+
+	g.VisitedNodes.Push(nil)
+
+	updateAvailableMoves(n, g)
+	n.IsInLoop = true
+	updateAvailableMoves(n, g)
+
 }
 
 func LoopSolve(g *utils.Graph, isCheckingAllSolutions bool) {
@@ -286,7 +293,8 @@ func LoopSolve(g *utils.Graph, isCheckingAllSolutions bool) {
 		loopSolveRecursion(thisNode, g, cost)
 
 		g.AvailableMoves.Remove(thisElement)
-		thisNode.IsDisabled = true
+		thisNode.IsInLoop = true
+		thisNode.IsVisited = true
 		thisNode.CanBeRemoved = false
 	}
 
