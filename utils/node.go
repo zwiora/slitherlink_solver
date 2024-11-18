@@ -14,6 +14,7 @@ type Node struct {
 	QueueIndex   int
 }
 
+/* Calculates number of neighbours that are in the loop */
 func (n *Node) GetDegree() int {
 	count := 0
 	for _, v := range n.Neighbours {
@@ -24,40 +25,43 @@ func (n *Node) GetDegree() int {
 	return count
 }
 
-func (n *Node) GetLinesAround(maxDegree int) int {
+/* Calculates number of edges of the loop around the field */
+func (n *Node) getLinesAround(maxDegree int) int {
 	if n.IsInLoop {
 		return maxDegree - n.GetDegree()
 	}
 	return n.GetDegree()
 }
 
-func (n *Node) GetCostOfField(maxDegree int) int {
-	linesAround := n.GetLinesAround(int(maxDegree))
+/* Calculates cost of the single field (node) */
+func (n *Node) getCostOfField(maxDegree int) int {
+	linesAround := n.getLinesAround(int(maxDegree))
 	return int(math.Abs(float64(linesAround) - float64(n.Value)))
 }
 
+/* Calculates new cost on the node for priority queue */
 func (n *Node) CalculateNodeCost(g *Graph) int {
 	newCost := 0
 
 	if n.Value != -1 {
-		newCost += n.GetCostOfField(int(g.MaxDegree))
+		newCost += n.getCostOfField(int(g.MaxDegree))
 	}
 
 	for _, v := range n.Neighbours {
 		if v != nil && v.Value != -1 {
-			newCost += v.GetCostOfField(int(g.MaxDegree))
+			newCost += v.getCostOfField(int(g.MaxDegree))
 		}
 	}
 
 	n.IsInLoop = false
 
 	if n.Value != -1 {
-		newCost -= n.GetCostOfField(int(g.MaxDegree))
+		newCost -= n.getCostOfField(int(g.MaxDegree))
 	}
 
 	for _, v := range n.Neighbours {
 		if v != nil && v.Value != -1 {
-			newCost -= v.GetCostOfField(int(g.MaxDegree))
+			newCost -= v.getCostOfField(int(g.MaxDegree))
 		}
 	}
 
@@ -66,6 +70,7 @@ func (n *Node) CalculateNodeCost(g *Graph) int {
 	return newCost
 }
 
+/* Calculates and updates cost of the node in the heap */
 func (n *Node) UpdateNodeCost(g *Graph) {
 	newCost := n.CalculateNodeCost(g)
 

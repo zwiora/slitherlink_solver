@@ -53,6 +53,7 @@ func ConstructBoardFromData(fileName string) *Graph {
 	board.SizeY = puzzleSizeY
 	board.shape = "square"
 
+	/* Type: squares" */
 	if puzzleType == "0de" {
 		m := 0
 		n := 0
@@ -64,8 +65,9 @@ func ConstructBoardFromData(fileName string) *Graph {
 		for m := 0; m < puzzleSizeX-1; m++ {
 
 			nextNode := &Node{
-				Value:    -1,
-				IsInLoop: true,
+				Value:      -1,
+				IsInLoop:   true,
+				QueueIndex: -1,
 			}
 			nextNode.Neighbours = make([]*Node, board.MaxDegree)
 
@@ -110,12 +112,6 @@ func ConstructBoardFromData(fileName string) *Graph {
 						thisNode.Neighbours[2].Neighbours[1].Neighbours[0] = bottomNode
 					}
 				}
-
-				// for _, v := range thisNode.neighbours {
-				// 	if v != nil {
-				// 		thisNode.deg++
-				// 	}
-				// }
 
 				/* Calculating next position */
 				m++

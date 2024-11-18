@@ -1,9 +1,11 @@
+/* Based on: https://pkg.go.dev/container/heap#example-package-PriorityQueue */
 package utils
 
 import (
 	"container/heap"
 )
 
+/* Implements build-in heap interface */
 type PriorityQueue []*Node
 
 func (pq PriorityQueue) Len() int { return len(pq) }

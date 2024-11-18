@@ -18,37 +18,7 @@ type Graph struct {
 	VisitedNodes   *stack.Stack
 }
 
-/* Calculates list of available moves at starting position */
-func (g *Graph) CalculateStartMoves() {
-	movesArr := []*Node{}
-	// g.AvailableMoves = pr
-	thisNode := g.Root
-	for i := 0; i < int(g.MaxDegree); i++ {
-		for {
-			if thisNode.Neighbours[i] != nil {
-				thisNode.Cost = thisNode.CalculateNodeCost(g)
-				thisNode = thisNode.Neighbours[i]
-				thisNode.CanBeRemoved = true
-
-				movesArr = append(movesArr, thisNode)
-			} else {
-				break
-			}
-		}
-	}
-
-	pq := make(PriorityQueue, len(movesArr))
-	g.AvailableMoves = &pq
-
-	i := 0
-	for _, v := range movesArr {
-		(*g.AvailableMoves)[i] = v
-		v.QueueIndex = i
-		i++
-	}
-	heap.Init(g.AvailableMoves)
-}
-
+/* Prints full board - type: squares */
 func (g *Graph) PrintSquaresBoard(isDebugMode bool) {
 	lastLineNode := g.Root
 	thisNode := g.Root
@@ -119,7 +89,7 @@ func (g *Graph) ClearIsVisited() {
 }
 
 /*
-Calculates sum of all visible values on the board and starting cost assuming there's a loop around whole board
+Calculates sum of all visible values on the board and starting cost assuming there's a loop around the whole board
 */
 func (g *Graph) CalculateStartCost() (int, int) {
 	fullCost := 0
@@ -133,7 +103,7 @@ func (g *Graph) CalculateStartCost() (int, int) {
 			fullCost += int(thisNode.Value)
 
 			if thisNode.GetDegree() < int(g.MaxDegree) {
-				startCost += thisNode.GetCostOfField(int(g.MaxDegree))
+				startCost += thisNode.getCostOfField(int(g.MaxDegree))
 			} else {
 				startCost += int(thisNode.Value)
 			}
@@ -153,9 +123,39 @@ func (g *Graph) CalculateStartCost() (int, int) {
 		}
 	}
 
-	/* Clear isVisited parameters */
-
 	g.ClearIsVisited()
 
 	return fullCost, startCost
+}
+
+/* Calculate list of available moves at starting position */
+func (g *Graph) CalculateStartMoves() {
+	movesArr := []*Node{}
+	thisNode := g.Root
+
+	for i := 0; i < int(g.MaxDegree); i++ {
+		for {
+			if thisNode.Neighbours[i] == nil {
+				break
+			}
+			thisNode.Cost = thisNode.CalculateNodeCost(g)
+			thisNode = thisNode.Neighbours[i]
+			thisNode.CanBeRemoved = true
+
+			movesArr = append(movesArr, thisNode)
+		}
+	}
+
+	/* Transform array into heap */
+	pq := make(PriorityQueue, len(movesArr))
+	g.AvailableMoves = &pq
+
+	i := 0
+	for _, v := range movesArr {
+		(*g.AvailableMoves)[i] = v
+		v.QueueIndex = i
+		i++
+	}
+
+	heap.Init(g.AvailableMoves)
 }

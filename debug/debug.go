@@ -2,6 +2,7 @@ package debug
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	"slytherlink_solver/utils"
@@ -9,9 +10,13 @@ import (
 
 var IsDebugMode bool
 
-func Print(message any) {
+func Println(message any) {
 	if IsDebugMode {
-		fmt.Println(message)
+		if message != "" {
+			log.Println(message)
+		} else {
+			fmt.Println()
+		}
 	}
 }
 

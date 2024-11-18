@@ -10,33 +10,33 @@ import (
 
 /* Checks if node can be removed from the loop */
 func checkIfCanBeRemoved(n *utils.Node, g *utils.Graph) bool {
-	debug.Print("Checking if can be removed: ")
+	debug.Println("Checking if can be removed: ")
 
 	/* Checking if removal would create loop inside the loop */
 	nodeDegree := n.GetDegree()
 	if nodeDegree == 0 || nodeDegree == int(g.MaxDegree) {
-		debug.Print("\t- SKIP: removal would create loop inside the loop")
+		debug.Println("\t- SKIP: removal would create loop inside the loop")
 		return false
 	}
-	debug.Print("\t- degree ok")
+	debug.Println("\t- degree ok")
 
 	/* It can be removed if it's a leaf */
 	if n.GetDegree() == 1 {
-		debug.Print("\t- it's a leaf")
+		debug.Println("\t- it's a leaf")
 		return true
 	}
-	debug.Print("\t- not a leaf")
+	debug.Println("\t- not a leaf")
 
 	/* Checking if its neighbour is leaf */
 	for _, v := range n.Neighbours {
 		if v != nil && v.IsInLoop {
 			if v.GetDegree() == 1 {
-				debug.Print("\t- SKIP: neighbour is a leaf")
+				debug.Println("\t- SKIP: neighbour is a leaf")
 				return false
 			}
 		}
 	}
-	debug.Print("\t- neighbour isn't a leaf")
+	debug.Println("\t- neighbour isn't a leaf")
 
 	/* Checking if is between two sides of graph*/
 	sidesCounter := 0
@@ -47,11 +47,11 @@ func checkIfCanBeRemoved(n *utils.Node, g *utils.Graph) bool {
 			sidesCounter++
 		}
 		if sidesCounter == 3 {
-			debug.Print("\t- SKIP: deletion would create two separate graphs")
+			debug.Println("\t- SKIP: deletion would create two separate graphs")
 			return false
 		}
 	}
-	debug.Print("\t- deletion wouldn't create two separate graphs")
+	debug.Println("\t- deletion wouldn't create two separate graphs")
 
 	/* Checking if is connected via corner*/
 	for k, v := range n.Neighbours {
@@ -61,7 +61,7 @@ func checkIfCanBeRemoved(n *utils.Node, g *utils.Graph) bool {
 				nextNeighbour := diagonalNode.Neighbours[(k+2)%int(g.MaxDegree)]
 				if nextNeighbour.IsInLoop {
 
-					debug.Print("\t- SKIP: deletion would create two graphs with common corner")
+					debug.Println("\t- SKIP: deletion would create two graphs with common corner")
 					return false
 				}
 			}
@@ -125,11 +125,11 @@ func updateAvailableMoves(n *utils.Node, g *utils.Graph) {
 
 /* Main solver logic */
 func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound *bool) {
-	debug.Print("")
-	debug.Print("Node:")
-	debug.Print(n)
-	debug.Print("Cost:")
-	debug.Print(cost)
+	debug.Println("")
+	debug.Println("Node:")
+	debug.Println(n)
+	debug.Println("Cost:")
+	debug.Println(cost)
 
 	/* Update list with available moves */
 	n.IsInLoop = false
@@ -150,7 +150,7 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 		/* Check if solution is found */
 		if cost == newNode.Cost {
 			newNode.IsInLoop = false
-			debug.Print("SOLUTION FOUND")
+			debug.Println("SOLUTION FOUND")
 			*isSolutionFound = true
 			return
 		}
@@ -187,8 +187,8 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 }
 
 /* Solver preparation */
-func LoopSolve(g *utils.Graph, isCheckingAllSolutions bool) {
-	debug.Print("START Loop Solver")
+func LoopSolve(g *utils.Graph) {
+	debug.Println("START Loop Solver")
 
 	_, cost := g.CalculateStartCost()
 	g.CalculateStartMoves()
@@ -196,8 +196,8 @@ func LoopSolve(g *utils.Graph, isCheckingAllSolutions bool) {
 	isSolutionFound := new(bool)
 
 	debug.PrintBoard(g)
-	debug.Print("Cost:")
-	debug.Print(cost)
+	debug.Println("Cost:")
+	debug.Println(cost)
 
 	for g.AvailableMoves.Len() > 0 {
 
