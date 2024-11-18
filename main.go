@@ -13,5 +13,6 @@ func main() {
 		debug.IsDebugMode = true
 	}
 	g := utils.ConstructBoardFromData("data/test" + args[1] + ".sav")
+
 	solvers.LoopSolve(g, false)
 }

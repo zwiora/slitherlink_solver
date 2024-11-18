@@ -8,6 +8,7 @@ import (
 	"github.com/golang-collections/collections/stack"
 )
 
+/* Checks if node can be removed from the loop */
 func checkIfCanBeRemoved(n *utils.Node, g *utils.Graph) bool {
 	debug.Print("Checking if can be removed: ")
 
@@ -67,11 +68,12 @@ func checkIfCanBeRemoved(n *utils.Node, g *utils.Graph) bool {
 		}
 	}
 
+	/* No troubles found - node can be deleted */
 	return true
 }
 
+/* Updates heap of nodes that can be removed from the loop - checks if can be removed and its cost*/
 func updateAvailableMoves(n *utils.Node, g *utils.Graph) {
-	// update list with available moves
 	for i := 0; i < int(g.MaxDegree); i++ {
 		/* neighbouring node */
 		thisNode := n.Neighbours[(i)%int(g.MaxDegree)]
@@ -93,7 +95,7 @@ func updateAvailableMoves(n *utils.Node, g *utils.Graph) {
 				}
 			}
 
-			/* neighbour of the neighbour */
+			/* neighbour of the neighbour - only updates cost*/
 			nextNode := thisNode.Neighbours[(i)%int(g.MaxDegree)]
 			if nextNode != nil && nextNode.IsInLoop && nextNode.CanBeRemoved && !nextNode.IsVisited {
 				nextNode.UpdateNodeCost(g)
@@ -121,8 +123,14 @@ func updateAvailableMoves(n *utils.Node, g *utils.Graph) {
 	}
 }
 
+/* Main solver logic */
 func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound *bool) {
+	debug.Print("")
+	debug.Print("Node:")
+	debug.Print(n)
+	debug.Print("Cost:")
 	debug.Print(cost)
+
 	/* Update list with available moves */
 	n.IsInLoop = false
 	g.VisitedNodes.Push(nil)
@@ -133,29 +141,27 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 
 	/* Select new move */
 	for g.AvailableMoves.Len() > 0 {
-		for _, v := range *g.AvailableMoves {
-			debug.Print(v)
-		}
-		thisElement := heap.Pop(g.AvailableMoves)
-		thisNode := thisElement.(*utils.Node)
+		// for _, v := range *g.AvailableMoves {
+		// 	debug.Print(v)
+		// }
+		newElement := heap.Pop(g.AvailableMoves)
+		newNode := newElement.(*utils.Node)
 
-		debug.Print("Removing:")
-		debug.Print(thisNode)
 		/* Check if solution is found */
-		if cost == thisNode.Cost {
-			thisNode.IsInLoop = false
+		if cost == newNode.Cost {
+			newNode.IsInLoop = false
 			debug.Print("SOLUTION FOUND")
 			*isSolutionFound = true
 			return
 		}
 
-		/* Delete move from options and save in stack */
-		thisNode.CanBeRemoved = false
-		thisNode.IsVisited = true
-		g.VisitedNodes.Push(thisNode)
+		/* Delete move from available moves and save it in stack */
+		newNode.CanBeRemoved = false
+		newNode.IsVisited = true
+		g.VisitedNodes.Push(newNode)
 
-		/* Run with chosen node */
-		loopSolveRecursion(thisNode, g, cost-thisNode.Cost, isSolutionFound)
+		/* Run recursion with new node */
+		loopSolveRecursion(newNode, g, cost-newNode.Cost, isSolutionFound)
 
 		if *isSolutionFound {
 			return
@@ -180,42 +186,41 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 
 }
 
+/* Solver preparation */
 func LoopSolve(g *utils.Graph, isCheckingAllSolutions bool) {
-	_, cost := g.CalculateCost()
-	g.CalculateStartingMoves()
-	debug.PrintBoard(g)
-	debug.Print(cost)
+	debug.Print("START Loop Solver")
 
+	_, cost := g.CalculateStartCost()
+	g.CalculateStartMoves()
 	g.VisitedNodes = stack.New()
-
 	isSolutionFound := new(bool)
 
+	debug.PrintBoard(g)
+	debug.Print("Cost:")
+	debug.Print(cost)
+
 	for g.AvailableMoves.Len() > 0 {
-		for _, v := range *g.AvailableMoves {
-			debug.Print(v)
-		}
 
-		thisElement := heap.Pop(g.AvailableMoves)
-		thisNode := thisElement.(*utils.Node)
+		/* Choose new Node */
+		newElement := heap.Pop(g.AvailableMoves)
+		newNode := newElement.(*utils.Node)
 
-		debug.Print("Removing:")
-		debug.Print(thisNode)
-
-		if cost == thisNode.Cost {
-			thisNode.IsInLoop = false
+		if cost == newNode.Cost {
+			newNode.IsInLoop = false
 			break
 		}
 
-		thisNode.IsVisited = true
-		thisNode.CanBeRemoved = false
+		newNode.IsVisited = true
+		newNode.CanBeRemoved = false
 
-		loopSolveRecursion(thisNode, g, cost-thisNode.Cost, isSolutionFound)
+		/* Run recursion with new node */
+		loopSolveRecursion(newNode, g, cost-newNode.Cost, isSolutionFound)
 
 		if *isSolutionFound {
 			break
 		}
 
-		thisNode.IsInLoop = true
+		newNode.IsInLoop = true
 	}
 
 	g.PrintSquaresBoard(false)

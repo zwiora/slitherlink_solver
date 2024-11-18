@@ -19,7 +19,7 @@ type Graph struct {
 }
 
 /* Calculates list of available moves at starting position */
-func (g *Graph) CalculateStartingMoves() {
+func (g *Graph) CalculateStartMoves() {
 	movesArr := []*Node{}
 	// g.AvailableMoves = pr
 	thisNode := g.Root
@@ -121,7 +121,7 @@ func (g *Graph) ClearIsVisited() {
 /*
 Calculates sum of all visible values on the board and starting cost assuming there's a loop around whole board
 */
-func (g *Graph) CalculateCost() (int, int) {
+func (g *Graph) CalculateStartCost() (int, int) {
 	fullCost := 0
 	startCost := 0
 	thisNode := g.Root
