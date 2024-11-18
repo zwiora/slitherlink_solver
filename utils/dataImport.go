@@ -56,8 +56,8 @@ func ConstructBoardFromData(fileName string) *Graph {
 		m := 0
 		n := 0
 
-		board.MaxNeighbourCount = 4
-		thisNode.Neighbours = make([]*Node, board.MaxNeighbourCount)
+		board.MaxDegree = 4
+		thisNode.Neighbours = make([]*Node, board.MaxDegree)
 
 		/* Preparing first row */
 		for m := 0; m < puzzleSizeX-1; m++ {
@@ -66,7 +66,7 @@ func ConstructBoardFromData(fileName string) *Graph {
 				Value:    -1,
 				IsInLoop: true,
 			}
-			nextNode.Neighbours = make([]*Node, board.MaxNeighbourCount)
+			nextNode.Neighbours = make([]*Node, board.MaxDegree)
 
 			thisNode.Neighbours[0] = nextNode
 			nextNode.Neighbours[2] = thisNode
@@ -99,7 +99,7 @@ func ConstructBoardFromData(fileName string) *Graph {
 						Value:    -1,
 						IsInLoop: true,
 					}
-					bottomNode.Neighbours = make([]*Node, board.MaxNeighbourCount)
+					bottomNode.Neighbours = make([]*Node, board.MaxDegree)
 					thisNode.Neighbours[1] = bottomNode
 					bottomNode.Neighbours[3] = thisNode
 

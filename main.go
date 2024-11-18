@@ -9,10 +9,10 @@ import (
 
 func main() {
 	args := os.Args
-	if len(args) > 1 && args[1] == "d" {
+	if len(args) > 2 && args[2] == "d" {
 		debug.IsDebugMode = true
 	}
-	g := utils.ConstructBoardFromData("data/test5.sav")
+	g := utils.ConstructBoardFromData("data/test" + args[1] + ".sav")
 	// g.PrintSquaresBoard()
 	// fmt.Println(g.CalculateCost())
 	solvers.LoopSolve(g, false)

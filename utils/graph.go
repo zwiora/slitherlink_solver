@@ -8,20 +8,20 @@ import (
 )
 
 type Graph struct {
-	Root              *Node
-	MaxNeighbourCount int8
-	maxCost           int
-	SizeX             int
-	SizeY             int
-	shape             string
-	AvailableMoves    *list.List
-	VisitedNodes      *stack.Stack
+	Root           *Node
+	MaxDegree      int8
+	maxCost        int
+	SizeX          int
+	SizeY          int
+	shape          string
+	AvailableMoves *list.List
+	VisitedNodes   *stack.Stack
 }
 
 func (g *Graph) CalculateStartingMoves() {
 	g.AvailableMoves = list.New()
 	thisNode := g.Root
-	for i := 0; i < int(g.MaxNeighbourCount); i++ {
+	for i := 0; i < int(g.MaxDegree); i++ {
 		for {
 			if thisNode.Neighbours[i] != nil {
 				thisNode = thisNode.Neighbours[i]
@@ -56,10 +56,16 @@ func (g *Graph) PrintSquaresBoard(isDebugMode bool) {
 				fmt.Printf(" ")
 			}
 			if thisNode.Value == -1 {
-				fmt.Printf("  \033[49m|")
+				fmt.Printf(" ")
 			} else {
-				fmt.Printf("%d \033[49m|", thisNode.Value)
+				fmt.Printf("%d", thisNode.Value)
 			}
+			if isDebugMode && thisNode.CanBeRemoved {
+				fmt.Printf("#")
+			} else {
+				fmt.Printf(" ")
+			}
+			fmt.Printf("\033[49m|")
 			thisNode = thisNode.Neighbours[0]
 		}
 		fmt.Println()
@@ -97,14 +103,6 @@ func (g *Graph) ClearIsVisited() {
 	}
 }
 
-func (g *Graph) calculatePerimeter() int {
-	if g.shape == "square" {
-		return g.SizeX*2 + g.SizeY*2 - 4
-	}
-
-	return 0
-}
-
 /*
 Calculates sum of all visible values on the board and starting cost assuming there's a loop around whole board
 */
@@ -112,18 +110,15 @@ func (g *Graph) CalculateCost() (int, int) {
 	fullCost := 0
 	startCost := 0
 	thisNode := g.Root
-	countVisited := 0
-	perimiter := g.calculatePerimeter()
 
 	for {
 		thisNode.IsVisited = true
-		countVisited++
 
 		if thisNode.Value >= 0 {
 			fullCost += int(thisNode.Value)
 
-			if countVisited <= perimiter {
-				startCost += thisNode.GetCostOfField(int(g.MaxNeighbourCount))
+			if thisNode.GetDegree() < int(g.MaxDegree) {
+				startCost += thisNode.GetCostOfField(int(g.MaxDegree))
 			} else {
 				startCost += int(thisNode.Value)
 			}
