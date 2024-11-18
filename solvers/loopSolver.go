@@ -1,7 +1,6 @@
 package solvers
 
 import (
-	"fmt"
 	"slytherlink_solver/debug"
 	"slytherlink_solver/utils"
 
@@ -148,21 +147,19 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 
 	if newCost == 0 {
 		debug.Print("SOLUTION FOUND")
-		fmt.Println(newCost)
-		// g.PrintSquaresBoard(false)
 		*isSolutionFound = true
 		return
 	}
 
+	/* Update list with available moves */
 	g.VisitedNodes.Push(nil)
-
 	updateAvailableMoves(n, g)
 
 	debug.PrintBoard(g)
 	debug.Print(g.AvailableMoves.Len())
-
 	debug.Sleep(1000)
 
+	/* Select new move */
 	for {
 		thisElement := g.AvailableMoves.Front()
 		if thisElement == nil {
@@ -172,21 +169,20 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 		thisNode := thisElement.Value.(*utils.Node)
 
 		/* Delete move from options and save in stack */
-
 		thisNode.CanBeRemoved = false
 		g.AvailableMoves.Remove(thisElement)
 		thisNode.IsVisited = true
 		g.VisitedNodes.Push(thisNode)
 
+		/* Run with chosen node */
 		loopSolveRecursion(thisNode, g, newCost, isSolutionFound)
 
 		if *isSolutionFound {
 			return
 		}
-
-		thisNode.IsInLoop = true
 	}
 
+	/* Clear changes */
 	for {
 		thisElement := g.VisitedNodes.Pop()
 		if thisElement == nil {
