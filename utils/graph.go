@@ -18,6 +18,7 @@ type Graph struct {
 	VisitedNodes   *stack.Stack
 }
 
+/* Calculates list of available moves at starting position */
 func (g *Graph) CalculateStartingMoves() {
 	g.AvailableMoves = list.New()
 	thisNode := g.Root
@@ -25,7 +26,7 @@ func (g *Graph) CalculateStartingMoves() {
 		for {
 			if thisNode.Neighbours[i] != nil {
 				thisNode = thisNode.Neighbours[i]
-				g.AvailableMoves.PushBack(thisNode)
+				g.AvailableMoves.PushFront(thisNode)
 				thisNode.CanBeRemoved = true
 			} else {
 				break

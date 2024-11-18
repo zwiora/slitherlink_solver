@@ -114,7 +114,7 @@ func updateAvailableMoves(n *utils.Node, g *utils.Graph) {
 	}
 }
 
-func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int) {
+func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound *bool) {
 	/* Calculate new cost */
 	debug.Print("Old cost:")
 	debug.Print(cost)
@@ -149,7 +149,9 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int) {
 	if newCost == 0 {
 		debug.Print("SOLUTION FOUND")
 		fmt.Println(newCost)
-		g.PrintSquaresBoard(false)
+		// g.PrintSquaresBoard(false)
+		*isSolutionFound = true
+		return
 	}
 
 	g.VisitedNodes.Push(nil)
@@ -176,7 +178,11 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int) {
 		thisNode.IsVisited = true
 		g.VisitedNodes.Push(thisNode)
 
-		loopSolveRecursion(thisNode, g, newCost)
+		loopSolveRecursion(thisNode, g, newCost, isSolutionFound)
+
+		if *isSolutionFound {
+			return
+		}
 
 		thisNode.IsInLoop = true
 	}
@@ -199,16 +205,14 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int) {
 }
 
 func LoopSolve(g *utils.Graph, isCheckingAllSolutions bool) {
-
 	_, cost := g.CalculateCost()
-	// fmt.Println(cost)
-
 	g.CalculateStartingMoves()
 	// debug.PrintBoard(g)
-	// fmt.Println(cost)
 
 	g.VisitedNodes = stack.New()
 	debug.Print(g.VisitedNodes.Len())
+
+	isSolutionFound := new(bool)
 
 	for {
 		thisElement := g.AvailableMoves.Front()
@@ -221,8 +225,14 @@ func LoopSolve(g *utils.Graph, isCheckingAllSolutions bool) {
 		thisNode.CanBeRemoved = false
 		g.AvailableMoves.Remove(thisElement)
 
-		loopSolveRecursion(thisNode, g, cost)
+		loopSolveRecursion(thisNode, g, cost, isSolutionFound)
+
+		if *isSolutionFound {
+			break
+		}
 
 		thisNode.IsInLoop = true
 	}
+
+	g.PrintSquaresBoard(false)
 }
