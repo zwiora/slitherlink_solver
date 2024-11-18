@@ -10,6 +10,8 @@ type Node struct {
 	IsInLoop     bool
 	IsVisited    bool
 	CanBeRemoved bool
+	Priority     int
+	QueueIndex   int
 }
 
 func (n *Node) GetDegree() int {

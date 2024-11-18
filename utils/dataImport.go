@@ -42,8 +42,9 @@ func ConstructBoardFromData(fileName string) *Graph {
 	var board Graph
 	var thisNode *Node
 	thisNode = &Node{
-		Value:    -1,
-		IsInLoop: true,
+		Value:      -1,
+		IsInLoop:   true,
+		QueueIndex: -1,
 	}
 	lastLineNode := thisNode
 	board.Root = thisNode

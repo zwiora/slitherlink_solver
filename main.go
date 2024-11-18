@@ -13,7 +13,5 @@ func main() {
 		debug.IsDebugMode = true
 	}
 	g := utils.ConstructBoardFromData("data/test" + args[1] + ".sav")
-	// g.PrintSquaresBoard()
-	// fmt.Println(g.CalculateCost())
 	solvers.LoopSolve(g, false)
 }

@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"container/list"
+	"container/heap"
 	"fmt"
 
 	"github.com/golang-collections/collections/stack"
@@ -14,25 +14,39 @@ type Graph struct {
 	SizeX          int
 	SizeY          int
 	shape          string
-	AvailableMoves *list.List
+	AvailableMoves *PriorityQueue
 	VisitedNodes   *stack.Stack
 }
 
 /* Calculates list of available moves at starting position */
 func (g *Graph) CalculateStartingMoves() {
-	g.AvailableMoves = list.New()
+	movesArr := []*Node{}
+	// g.AvailableMoves = pr
 	thisNode := g.Root
 	for i := 0; i < int(g.MaxDegree); i++ {
 		for {
 			if thisNode.Neighbours[i] != nil {
+				thisNode.Priority = 1
 				thisNode = thisNode.Neighbours[i]
-				g.AvailableMoves.PushFront(thisNode)
 				thisNode.CanBeRemoved = true
+
+				movesArr = append(movesArr, thisNode)
 			} else {
 				break
 			}
 		}
 	}
+
+	pq := make(PriorityQueue, len(movesArr))
+	g.AvailableMoves = &pq
+
+	i := 0
+	for _, v := range movesArr {
+		(*g.AvailableMoves)[i] = v
+		v.QueueIndex = i
+		i++
+	}
+	heap.Init(g.AvailableMoves)
 }
 
 func (g *Graph) PrintSquaresBoard(isDebugMode bool) {

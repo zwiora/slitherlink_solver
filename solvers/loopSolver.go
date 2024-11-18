@@ -1,6 +1,7 @@
 package solvers
 
 import (
+	"container/heap"
 	"slytherlink_solver/debug"
 	"slytherlink_solver/utils"
 
@@ -79,15 +80,10 @@ func updateAvailableMoves(n *utils.Node, g *utils.Graph) {
 			if thisNode.IsInLoop && !thisNode.IsVisited {
 				canBeRemoved := checkIfCanBeRemoved(thisNode, g)
 				if canBeRemoved && !thisNode.CanBeRemoved {
-					g.AvailableMoves.PushBack(thisNode)
+					g.AvailableMoves.Push(thisNode)
 					thisNode.CanBeRemoved = true
 				} else if !canBeRemoved && thisNode.CanBeRemoved {
-					for e := g.AvailableMoves.Front(); e != nil; e = e.Next() {
-						if e.Value == thisNode {
-							g.AvailableMoves.Remove(e)
-							break
-						}
-					}
+					heap.Remove(g.AvailableMoves, thisNode.QueueIndex)
 					thisNode.CanBeRemoved = false
 				}
 			}
@@ -97,15 +93,10 @@ func updateAvailableMoves(n *utils.Node, g *utils.Graph) {
 			if thisNode != nil && thisNode.IsInLoop && !thisNode.IsVisited {
 				canBeRemoved := checkIfCanBeRemoved(thisNode, g)
 				if canBeRemoved && !thisNode.CanBeRemoved {
-					g.AvailableMoves.PushBack(thisNode)
+					g.AvailableMoves.Push(thisNode)
 					thisNode.CanBeRemoved = true
 				} else if !canBeRemoved && thisNode.CanBeRemoved {
-					for e := g.AvailableMoves.Front(); e != nil; e = e.Next() {
-						if e.Value == thisNode {
-							g.AvailableMoves.Remove(e)
-							break
-						}
-					}
+					heap.Remove(g.AvailableMoves, thisNode.QueueIndex)
 					thisNode.CanBeRemoved = false
 				}
 			}
@@ -160,17 +151,13 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 	debug.Sleep(1000)
 
 	/* Select new move */
-	for {
-		thisElement := g.AvailableMoves.Front()
-		if thisElement == nil {
-			break
-		}
+	for g.AvailableMoves.Len() > 0 {
+		thisElement := g.AvailableMoves.Pop()
 
-		thisNode := thisElement.Value.(*utils.Node)
+		thisNode := thisElement.(*utils.Node)
 
 		/* Delete move from options and save in stack */
 		thisNode.CanBeRemoved = false
-		g.AvailableMoves.Remove(thisElement)
 		thisNode.IsVisited = true
 		g.VisitedNodes.Push(thisNode)
 
@@ -192,7 +179,7 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 		thisNode := thisElement.(*utils.Node)
 		thisNode.IsVisited = false
 		thisNode.CanBeRemoved = true
-		g.AvailableMoves.PushFront(thisNode)
+		g.AvailableMoves.Push(thisNode)
 	}
 
 	n.IsInLoop = true
@@ -203,7 +190,7 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 func LoopSolve(g *utils.Graph, isCheckingAllSolutions bool) {
 	_, cost := g.CalculateCost()
 	g.CalculateStartingMoves()
-	// debug.PrintBoard(g)
+	debug.PrintBoard(g)
 
 	g.VisitedNodes = stack.New()
 	debug.Print(g.VisitedNodes.Len())
@@ -211,15 +198,14 @@ func LoopSolve(g *utils.Graph, isCheckingAllSolutions bool) {
 	isSolutionFound := new(bool)
 
 	for {
-		thisElement := g.AvailableMoves.Front()
+		thisElement := g.AvailableMoves.Pop()
 		if thisElement == nil {
 			break
 		}
 
-		thisNode := thisElement.Value.(*utils.Node)
+		thisNode := thisElement.(*utils.Node)
 		thisNode.IsVisited = true
 		thisNode.CanBeRemoved = false
-		g.AvailableMoves.Remove(thisElement)
 
 		loopSolveRecursion(thisNode, g, cost, isSolutionFound)
 
