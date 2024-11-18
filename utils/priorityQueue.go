@@ -8,9 +8,9 @@ type PriorityQueue []*Node
 
 func (pq PriorityQueue) Len() int { return len(pq) }
 
-/* Min heap */
+/* Max heap */
 func (pq PriorityQueue) Less(i, j int) bool {
-	return pq[i].Priority < pq[j].Priority
+	return pq[i].Cost > pq[j].Cost
 }
 
 func (pq PriorityQueue) Swap(i, j int) {
@@ -37,6 +37,6 @@ func (pq *PriorityQueue) Pop() any {
 }
 
 func (pq *PriorityQueue) update(node *Node, priority int) {
-	node.Priority = priority
+	node.Cost = priority
 	heap.Fix(pq, node.QueueIndex)
 }

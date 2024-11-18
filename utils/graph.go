@@ -26,7 +26,7 @@ func (g *Graph) CalculateStartingMoves() {
 	for i := 0; i < int(g.MaxDegree); i++ {
 		for {
 			if thisNode.Neighbours[i] != nil {
-				thisNode.Priority = 1
+				thisNode.Cost = thisNode.CalculateNodeCost(g)
 				thisNode = thisNode.Neighbours[i]
 				thisNode.CanBeRemoved = true
 
