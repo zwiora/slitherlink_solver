@@ -3,7 +3,9 @@ package utils
 import (
 	"container/heap"
 	"fmt"
+	"time"
 
+	"github.com/golang-collections/collections/queue"
 	"github.com/golang-collections/collections/stack"
 )
 
@@ -40,11 +42,21 @@ func (g *Graph) PrintSquaresBoard(isDebugMode bool) {
 			} else {
 				fmt.Printf(" ")
 			}
+
+			if thisNode.IsForRemoval {
+				fmt.Printf("\033[43m")
+			}
+
 			if thisNode.Value == -1 {
 				fmt.Printf(" ")
 			} else {
 				fmt.Printf("%d", thisNode.Value)
 			}
+
+			if thisNode.IsForRemoval {
+				fmt.Printf("\033[42m")
+			}
+
 			if isDebugMode && thisNode.CanBeRemoved {
 				fmt.Printf("#")
 			} else {
@@ -161,4 +173,52 @@ func (g *Graph) CalculateStartMoves() {
 	}
 
 	heap.Init(g.AvailableMoves)
+}
+
+/* Constructs the queue of nodes, that will be searched for templates */
+func (g *Graph) constructListForCheckingTemplates() *queue.Queue {
+	nodes := queue.New()
+	thisNode := g.Root
+
+	for {
+		thisNode.IsVisited = true
+
+		if thisNode.GetDegree() < int(g.MaxDegree) {
+			nodes.Enqueue(thisNode)
+		}
+
+		isNewNode := false
+		for _, v := range thisNode.Neighbours {
+			if v != nil && !v.IsVisited {
+				thisNode = v
+				isNewNode = true
+				break
+			}
+		}
+
+		if !isNewNode {
+			break
+		}
+	}
+
+	g.ClearIsVisited()
+	return nodes
+}
+
+/* Should be run after preparation of the solver but before its start */
+func (g *Graph) FindTemplates() {
+	nodes := g.constructListForCheckingTemplates()
+	for nodes.Len() > 0 {
+		thisNode := (nodes.Dequeue()).(*Node)
+
+		/* If the final state of the node hasn't been found */
+		if !thisNode.IsVisited && !thisNode.IsForRemoval {
+			thisNode.findCornerTemplates(g, nodes)
+		}
+
+		fmt.Println(thisNode)
+		g.PrintSquaresBoard(true)
+		time.Sleep(1000 * time.Millisecond)
+
+	}
 }

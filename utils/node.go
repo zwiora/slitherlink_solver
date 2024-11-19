@@ -9,6 +9,7 @@ type Node struct {
 	Value         int8
 	IsInLoop      bool
 	IsVisited     bool
+	IsForRemoval  bool
 	CanBeRemoved  bool
 	Cost          int
 	QueueIndex    int
