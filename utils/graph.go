@@ -3,7 +3,6 @@ package utils
 import (
 	"container/heap"
 	"fmt"
-	"time"
 
 	"github.com/golang-collections/collections/queue"
 	"github.com/golang-collections/collections/stack"
@@ -43,7 +42,7 @@ func (g *Graph) PrintSquaresBoard(isDebugMode bool) {
 				fmt.Printf(" ")
 			}
 
-			if thisNode.IsForRemoval {
+			if isDebugMode && thisNode.IsForRemoval {
 				fmt.Printf("\033[43m")
 			}
 
@@ -53,8 +52,10 @@ func (g *Graph) PrintSquaresBoard(isDebugMode bool) {
 				fmt.Printf("%d", thisNode.Value)
 			}
 
-			if thisNode.IsForRemoval {
+			if thisNode.IsInLoop {
 				fmt.Printf("\033[42m")
+			} else {
+				fmt.Printf("\033[49m")
 			}
 
 			if isDebugMode && thisNode.CanBeRemoved {
@@ -214,11 +215,12 @@ func (g *Graph) FindTemplates() {
 		/* If the final state of the node hasn't been found */
 		if !thisNode.IsVisited && !thisNode.IsForRemoval {
 			thisNode.findCornerTemplates(g, nodes)
+			// fmt.Println("analysed")
 		}
 
-		fmt.Println(thisNode)
-		g.PrintSquaresBoard(true)
-		time.Sleep(1000 * time.Millisecond)
+		// fmt.Println(thisNode)
+		// g.PrintSquaresBoard(true)
+		// time.Sleep(1000 * time.Millisecond)
 
 	}
 }
