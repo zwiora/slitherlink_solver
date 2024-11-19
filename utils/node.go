@@ -5,13 +5,14 @@ import (
 )
 
 type Node struct {
-	Neighbours   []*Node
-	Value        int8
-	IsInLoop     bool
-	IsVisited    bool
-	CanBeRemoved bool
-	Cost         int
-	QueueIndex   int
+	Neighbours    []*Node
+	Value         int8
+	IsInLoop      bool
+	IsVisited     bool
+	CanBeRemoved  bool
+	Cost          int
+	QueueIndex    int
+	QueuePriority int
 }
 
 /* Calculates number of neighbours that are in the loop */

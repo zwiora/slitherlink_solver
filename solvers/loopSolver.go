@@ -84,6 +84,9 @@ func updateAvailableMoves(n *utils.Node, g *utils.Graph) {
 				if canBeRemoved {
 					if !thisNode.CanBeRemoved {
 						thisNode.Cost = thisNode.CalculateNodeCost(g)
+						if utils.IsHeuristicOn {
+							thisNode.QueuePriority = thisNode.Cost
+						}
 						heap.Push(g.AvailableMoves, thisNode)
 						thisNode.CanBeRemoved = true
 					} else {
@@ -108,6 +111,9 @@ func updateAvailableMoves(n *utils.Node, g *utils.Graph) {
 				if canBeRemoved {
 					if !thisNode.CanBeRemoved {
 						thisNode.Cost = thisNode.CalculateNodeCost(g)
+						if utils.IsHeuristicOn {
+							thisNode.QueuePriority = thisNode.Cost
+						}
 						heap.Push(g.AvailableMoves, thisNode)
 						thisNode.CanBeRemoved = true
 					} else {
@@ -141,9 +147,9 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 
 	/* Select new move */
 	for g.AvailableMoves.Len() > 0 {
-		// for _, v := range *g.AvailableMoves {
-		// 	debug.Print(v)
-		// }
+		for _, v := range *g.AvailableMoves {
+			debug.Println(v)
+		}
 		newElement := heap.Pop(g.AvailableMoves)
 		newNode := newElement.(*utils.Node)
 
@@ -200,6 +206,9 @@ func LoopSolve(g *utils.Graph) {
 	debug.Println(cost)
 
 	for g.AvailableMoves.Len() > 0 {
+		for _, v := range *g.AvailableMoves {
+			debug.Println(v)
+		}
 
 		/* Choose new Node */
 		newElement := heap.Pop(g.AvailableMoves)

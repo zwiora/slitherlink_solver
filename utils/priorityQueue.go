@@ -12,7 +12,7 @@ func (pq PriorityQueue) Len() int { return len(pq) }
 
 /* Max heap */
 func (pq PriorityQueue) Less(i, j int) bool {
-	return pq[i].Cost > pq[j].Cost
+	return pq[i].QueuePriority > pq[j].QueuePriority
 }
 
 func (pq PriorityQueue) Swap(i, j int) {
@@ -38,7 +38,10 @@ func (pq *PriorityQueue) Pop() any {
 	return node
 }
 
-func (pq *PriorityQueue) update(node *Node, priority int) {
-	node.Cost = priority
-	heap.Fix(pq, node.QueueIndex)
+func (pq *PriorityQueue) update(node *Node, cost int) {
+	node.Cost = cost
+	if IsHeuristicOn {
+		node.QueuePriority = node.Cost
+		heap.Fix(pq, node.QueueIndex)
+	}
 }

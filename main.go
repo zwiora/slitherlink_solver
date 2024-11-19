@@ -9,10 +9,13 @@ import (
 
 func main() {
 	args := os.Args
-	if len(args) > 2 && args[2] == "d" {
+	if len(args) > 3 && args[3] == "d" {
 		debug.IsDebugMode = true
 	}
-	g := utils.ConstructBoardFromData("data/test" + args[1] + ".sav")
+	g := utils.ConstructBoardFromData("data/test" + args[2] + ".sav")
 
+	if args[1] == "on" {
+		utils.IsHeuristicOn = true
+	}
 	solvers.LoopSolve(g)
 }
