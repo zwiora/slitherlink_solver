@@ -151,11 +151,14 @@ func (g *Graph) CalculateStartMoves() {
 			if thisNode.Neighbours[i] == nil {
 				break
 			}
-			thisNode.SetNodeCost(g)
 			thisNode = thisNode.Neighbours[i]
-			thisNode.CanBeRemoved = true
 
-			movesArr = append(movesArr, thisNode)
+			thisNode.SetNodeCost(g)
+			if !thisNode.IsVisited {
+				thisNode.CanBeRemoved = true
+				movesArr = append(movesArr, thisNode)
+			}
+
 		}
 	}
 
