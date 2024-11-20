@@ -77,7 +77,11 @@ func (n *Node) SetNodeCost(g *Graph) {
 	n.Cost = newCost
 
 	if IsHeuristicOn {
-		n.QueuePriority = newCost
+		if n.IsForRemoval {
+			n.QueuePriority = 1000
+		} else {
+			n.QueuePriority = newCost
+		}
 	}
 }
 
@@ -88,7 +92,11 @@ func (n *Node) UpdateNodeCost(g *Graph) {
 
 	if IsHeuristicOn {
 		if n.Cost != n.QueuePriority {
-			g.AvailableMoves.update(n, newCost)
+			if n.IsForRemoval {
+				g.AvailableMoves.update(n, 1000)
+			} else {
+				g.AvailableMoves.update(n, newCost)
+			}
 		}
 	}
 }
