@@ -173,3 +173,25 @@ func (n *Node) findCornerTemplates(g *Graph, q *queue.Queue) bool {
 
 	return false
 }
+
+func (n *Node) find31Templates(g *Graph, q *queue.Queue) bool {
+	if n.Value == 3 {
+		for i := 0; i < len(n.Neighbours); i++ {
+			thisNeighbour := n.Neighbours[i]
+			if thisNeighbour == nil || thisNeighbour.IsForRemoval || thisNeighbour.IsVisited {
+				nextNeigh := n.Neighbours[(i+1)%int(g.MaxDegree)]
+				prevNeigh := n.Neighbours[(i-1+int(g.MaxDegree))%int(g.MaxDegree)]
+				if (prevNeigh != nil && prevNeigh.Value == 1) || (nextNeigh != nil && prevNeigh.Value == 1) {
+					if thisNeighbour != nil && thisNeighbour.IsVisited {
+						n.IsForRemoval = true
+						addNeighboursToQueue(n, q, thisNeighbour)
+					} else {
+						n.IsVisited = true
+						addNeighboursToQueue(n, q, thisNeighbour)
+					}
+				}
+			}
+		}
+	}
+	return false
+}

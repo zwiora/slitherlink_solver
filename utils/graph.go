@@ -215,7 +215,9 @@ func (g *Graph) FindTemplates() {
 		/* If the final state of the node isn't set */
 		if !thisNode.IsVisited && !thisNode.IsForRemoval {
 			if !thisNode.findZeroTemplates(g, nodes) {
-				thisNode.findCornerTemplates(g, nodes)
+				if !thisNode.findCornerTemplates(g, nodes) {
+					thisNode.find31Templates(g, nodes)
+				}
 			}
 			// fmt.Println("analysed")
 		}
