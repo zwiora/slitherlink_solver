@@ -42,7 +42,7 @@ func (n *Node) getCostOfField(maxDegree int) int {
 }
 
 /* Calculates new cost on the node for priority queue */
-func (n *Node) CalculateNodeCost(g *Graph) int {
+func (n *Node) calculateNodeCost(g *Graph) int {
 	newCost := 0
 
 	if n.Value != -1 {
@@ -72,11 +72,23 @@ func (n *Node) CalculateNodeCost(g *Graph) int {
 	return newCost
 }
 
+func (n *Node) SetNodeCost(g *Graph) {
+	newCost := n.calculateNodeCost(g)
+	n.Cost = newCost
+
+	if IsHeuristicOn {
+		n.QueuePriority = newCost
+	}
+}
+
 /* Calculates and updates cost of the node in the heap */
 func (n *Node) UpdateNodeCost(g *Graph) {
-	newCost := n.CalculateNodeCost(g)
+	newCost := n.calculateNodeCost(g)
+	n.Cost = newCost
 
-	if n.Cost != newCost {
-		g.AvailableMoves.update(n, newCost)
+	if IsHeuristicOn {
+		if n.Cost != n.QueuePriority {
+			g.AvailableMoves.update(n, newCost)
+		}
 	}
 }

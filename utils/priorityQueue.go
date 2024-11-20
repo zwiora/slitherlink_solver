@@ -38,10 +38,7 @@ func (pq *PriorityQueue) Pop() any {
 	return node
 }
 
-func (pq *PriorityQueue) update(node *Node, cost int) {
-	node.Cost = cost
-	if IsHeuristicOn {
-		node.QueuePriority = node.Cost
-		heap.Fix(pq, node.QueueIndex)
-	}
+func (pq *PriorityQueue) update(node *Node, priority int) {
+	node.QueuePriority = priority
+	heap.Fix(pq, node.QueueIndex)
 }

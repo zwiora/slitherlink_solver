@@ -151,10 +151,7 @@ func (g *Graph) CalculateStartMoves() {
 			if thisNode.Neighbours[i] == nil {
 				break
 			}
-			thisNode.Cost = thisNode.CalculateNodeCost(g)
-			if IsHeuristicOn {
-				thisNode.QueuePriority = thisNode.Cost
-			}
+			thisNode.SetNodeCost(g)
 			thisNode = thisNode.Neighbours[i]
 			thisNode.CanBeRemoved = true
 

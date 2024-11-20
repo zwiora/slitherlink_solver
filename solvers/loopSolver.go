@@ -83,10 +83,7 @@ func updateAvailableMoves(n *utils.Node, g *utils.Graph) {
 				canBeRemoved := checkIfCanBeRemoved(thisNode, g)
 				if canBeRemoved {
 					if !thisNode.CanBeRemoved {
-						thisNode.Cost = thisNode.CalculateNodeCost(g)
-						if utils.IsHeuristicOn {
-							thisNode.QueuePriority = thisNode.Cost
-						}
+						thisNode.SetNodeCost(g)
 						heap.Push(g.AvailableMoves, thisNode)
 						thisNode.CanBeRemoved = true
 					} else {
@@ -110,10 +107,7 @@ func updateAvailableMoves(n *utils.Node, g *utils.Graph) {
 				canBeRemoved := checkIfCanBeRemoved(thisNode, g)
 				if canBeRemoved {
 					if !thisNode.CanBeRemoved {
-						thisNode.Cost = thisNode.CalculateNodeCost(g)
-						if utils.IsHeuristicOn {
-							thisNode.QueuePriority = thisNode.Cost
-						}
+						thisNode.SetNodeCost(g)
 						heap.Push(g.AvailableMoves, thisNode)
 						thisNode.CanBeRemoved = true
 					} else {
