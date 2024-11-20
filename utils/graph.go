@@ -212,9 +212,11 @@ func (g *Graph) FindTemplates() {
 	for nodes.Len() > 0 {
 		thisNode := (nodes.Dequeue()).(*Node)
 
-		/* If the final state of the node hasn't been found */
+		/* If the final state of the node isn't set */
 		if !thisNode.IsVisited && !thisNode.IsForRemoval {
-			thisNode.findCornerTemplates(g, nodes)
+			if !thisNode.findZeroTemplates(g, nodes) {
+				thisNode.findCornerTemplates(g, nodes)
+			}
 			// fmt.Println("analysed")
 		}
 

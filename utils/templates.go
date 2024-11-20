@@ -28,6 +28,35 @@ func addNeighboursToQueue(n *Node, q *queue.Queue, excludedNodes ...*Node) {
 	}
 }
 
+func (n *Node) findZeroTemplates(g *Graph, q *queue.Queue) bool {
+	if n.Value == 0 {
+		for i := 0; i < len(n.Neighbours); i++ {
+			thisNeighbour := n.Neighbours[i]
+			if thisNeighbour == nil || thisNeighbour.IsForRemoval || thisNeighbour.IsVisited {
+				if thisNeighbour != nil && thisNeighbour.IsVisited {
+					n.IsVisited = true
+					for j := 0; j < len(n.Neighbours); j++ {
+						if j != i && n.Neighbours[j] != nil {
+							n.Neighbours[j].IsVisited = true
+							addNeighboursToQueue(n.Neighbours[j], q, n)
+						}
+					}
+				} else {
+					n.IsForRemoval = true
+					for j := 0; j < len(n.Neighbours); j++ {
+						if j != i && n.Neighbours[j] != nil {
+							n.Neighbours[j].IsForRemoval = true
+							addNeighboursToQueue(n.Neighbours[j], q, n)
+						}
+					}
+				}
+				return true
+			}
+		}
+	}
+	return false
+}
+
 /* Returns true, if template found */
 func (n *Node) findCornerTemplates(g *Graph, q *queue.Queue) bool {
 	for i := 0; i < len(n.Neighbours); i++ {
