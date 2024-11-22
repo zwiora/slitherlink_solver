@@ -124,7 +124,12 @@ func updateAvailableMoves(n *utils.Node, g *utils.Graph) {
 }
 
 /* Main solver logic */
-func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound *bool) {
+func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound *bool, depth int) {
+	utils.NoVisitedStates++
+	utils.AvgDepth += float32(depth)
+	if depth > utils.MaxDepth {
+		utils.MaxDepth = depth
+	}
 	debug.Println("")
 	debug.Println("Node:")
 	debug.Println(n)
@@ -161,7 +166,7 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 		g.VisitedNodes.Push(newNode)
 
 		/* Run recursion with new node */
-		loopSolveRecursion(newNode, g, cost-newNode.Cost, isSolutionFound)
+		loopSolveRecursion(newNode, g, cost-newNode.Cost, isSolutionFound, depth+1)
 
 		if *isSolutionFound {
 			return
@@ -211,6 +216,7 @@ func LoopSolve(g *utils.Graph) {
 		newElement := heap.Pop(g.AvailableMoves)
 		newNode := newElement.(*utils.Node)
 
+		/* Solution found */
 		if cost == newNode.Cost {
 			newNode.IsInLoop = false
 			break
@@ -220,7 +226,7 @@ func LoopSolve(g *utils.Graph) {
 		newNode.CanBeRemoved = false
 
 		/* Run recursion with new node */
-		loopSolveRecursion(newNode, g, cost-newNode.Cost, isSolutionFound)
+		loopSolveRecursion(newNode, g, cost-newNode.Cost, isSolutionFound, 1)
 
 		if *isSolutionFound {
 			break

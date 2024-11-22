@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"slytherlink_solver/debug"
 	"slytherlink_solver/solvers"
@@ -18,4 +19,9 @@ func main() {
 		utils.IsHeuristicOn = true
 	}
 	solvers.LoopSolve(g)
+
+	utils.AvgDepth /= float32(utils.NoVisitedStates)
+	fmt.Println("Visited states: ", utils.NoVisitedStates)
+	fmt.Println("Average depth: ", utils.AvgDepth)
+	fmt.Println("Max depth: ", utils.MaxDepth)
 }
