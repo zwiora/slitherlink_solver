@@ -55,26 +55,14 @@ func (n *Node) findZeroTemplates(g *Graph, q *queue.Queue) bool {
 	if n.Value == 0 {
 		for i := 0; i < len(n.Neighbours); i++ {
 			thisNeighbour := n.Neighbours[i]
-			if thisNeighbour == nil || thisNeighbour.IsDecided {
-				if thisNeighbour != nil && !thisNeighbour.IsForRemoval {
-					n.IsForRemoval = false
-					n.IsDecided = true
-					for j := 0; j < len(n.Neighbours); j++ {
-						if j != i && n.Neighbours[j] != nil {
-							n.Neighbours[j].IsForRemoval = false
-							n.Neighbours[j].IsDecided = true
-							addNeighboursToQueue(n.Neighbours[j], q, n)
-						}
-					}
-				} else {
-					n.IsForRemoval = true
-					n.IsDecided = true
-					for j := 0; j < len(n.Neighbours); j++ {
-						if j != i && n.Neighbours[j] != nil {
-							n.Neighbours[j].IsForRemoval = true
-							n.Neighbours[j].IsDecided = true
-							addNeighboursToQueue(n.Neighbours[j], q, n)
-						}
+			if isNodeDecided(thisNeighbour) {
+				n.IsDecided = true
+				n.IsForRemoval = isNodeDecidedOut(thisNeighbour)
+				for j := 0; j < len(n.Neighbours); j++ {
+					if j != i && n.Neighbours[j] != nil {
+						n.Neighbours[j].IsDecided = true
+						n.Neighbours[j].IsForRemoval = n.IsForRemoval
+						addNeighboursToQueue(n.Neighbours[j], q, n)
 					}
 				}
 				return true
