@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"slytherlink_solver/utils"
+	"slitherlink_solver/utils"
 )
 
 var IsDebugMode bool

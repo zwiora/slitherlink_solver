@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 	"os"
-	"slytherlink_solver/debug"
-	"slytherlink_solver/solvers"
-	"slytherlink_solver/utils"
+	"slitherlink_solver/debug"
+	"slitherlink_solver/solvers"
+	"slitherlink_solver/utils"
 )
 
 func main() {

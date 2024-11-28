@@ -2,8 +2,8 @@ package solvers
 
 import (
 	"container/heap"
-	"slytherlink_solver/debug"
-	"slytherlink_solver/utils"
+	"slitherlink_solver/debug"
+	"slitherlink_solver/utils"
 
 	"github.com/golang-collections/collections/stack"
 )
@@ -19,6 +19,17 @@ func checkIfCanBeRemoved(n *utils.Node, g *utils.Graph) bool {
 		return false
 	}
 	debug.Println("\t- degree ok")
+
+	/* Checking if neighbour would have enough edges*/
+	for _, v := range n.Neighbours {
+		if v != nil && !v.IsInLoop {
+			if v.GetDegree() <= int(v.Value) {
+				debug.Println("\t- SKIP: deletion isn't in the solution")
+				n.IsInLoop = true
+				return false
+			}
+		}
+	}
 
 	/* It can be removed if it's a leaf */
 	if n.GetDegree() == 1 {
@@ -60,7 +71,6 @@ func checkIfCanBeRemoved(n *utils.Node, g *utils.Graph) bool {
 			if diagonalNode != nil && !diagonalNode.IsInLoop {
 				nextNeighbour := diagonalNode.Neighbours[(k+2)%int(g.MaxDegree)]
 				if nextNeighbour.IsInLoop {
-
 					debug.Println("\t- SKIP: deletion would create two graphs with common corner")
 					return false
 				}

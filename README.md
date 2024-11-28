@@ -1,2 +1,2 @@
-# slytherlink_solver
+# slitherlink_solver
 Praca inżynierska
