@@ -42,8 +42,13 @@ func (g *Graph) PrintSquaresBoard(isDebugMode bool) {
 				fmt.Printf(" ")
 			}
 
-			if isDebugMode && thisNode.IsForRemoval {
-				fmt.Printf("\033[43m")
+			if isDebugMode && thisNode.IsDecided {
+
+				if thisNode.IsForRemoval {
+					fmt.Printf("\033[43m")
+				} else {
+					fmt.Printf("\033[41m")
+				}
 			}
 
 			if thisNode.Value == -1 {
@@ -154,7 +159,7 @@ func (g *Graph) CalculateStartMoves() {
 			thisNode = thisNode.Neighbours[i]
 
 			thisNode.SetNodeCost(g)
-			if !thisNode.IsVisited {
+			if !(thisNode.IsDecided && !thisNode.IsForRemoval) {
 				thisNode.CanBeRemoved = true
 				movesArr = append(movesArr, thisNode)
 			}
@@ -177,7 +182,7 @@ func (g *Graph) CalculateStartMoves() {
 }
 
 /* Constructs the queue of nodes, that will be searched for templates */
-func (g *Graph) constructListForCheckingTemplates() *queue.Queue {
+func (g *Graph) constructQueueForCheckingTemplates() *queue.Queue {
 	nodes := queue.New()
 	thisNode := g.Root
 
@@ -208,12 +213,12 @@ func (g *Graph) constructListForCheckingTemplates() *queue.Queue {
 
 /* Should be run after preparation of the solver but before its start */
 func (g *Graph) FindTemplates() {
-	nodes := g.constructListForCheckingTemplates()
+	nodes := g.constructQueueForCheckingTemplates()
 	for nodes.Len() > 0 {
 		thisNode := (nodes.Dequeue()).(*Node)
 
 		/* If the final state of the node isn't set */
-		if !thisNode.IsVisited && !thisNode.IsForRemoval {
+		if !thisNode.IsDecided {
 			if !thisNode.findZeroTemplates(g, nodes) {
 				if !thisNode.findCornerTemplates(g, nodes) {
 					thisNode.find31Templates(g, nodes)

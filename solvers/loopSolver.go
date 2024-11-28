@@ -89,7 +89,7 @@ func updateAvailableMoves(n *utils.Node, g *utils.Graph) {
 		thisNode := n.Neighbours[(i)%int(g.MaxDegree)]
 		if thisNode != nil {
 
-			if thisNode.IsInLoop && !thisNode.IsVisited {
+			if thisNode.IsInLoop && !thisNode.IsVisited && !(thisNode.IsDecided && !thisNode.IsForRemoval) {
 				canBeRemoved := checkIfCanBeRemoved(thisNode, g)
 				if canBeRemoved {
 					if !thisNode.CanBeRemoved {
@@ -107,13 +107,13 @@ func updateAvailableMoves(n *utils.Node, g *utils.Graph) {
 
 			/* neighbour of the neighbour - only updates cost*/
 			nextNode := thisNode.Neighbours[(i)%int(g.MaxDegree)]
-			if nextNode != nil && nextNode.IsInLoop && nextNode.CanBeRemoved && !nextNode.IsVisited {
+			if nextNode != nil && nextNode.IsInLoop && nextNode.CanBeRemoved && !nextNode.IsVisited && !(nextNode.IsDecided && !nextNode.IsForRemoval) {
 				nextNode.UpdateNodeCost(g)
 			}
 
 			/* diagonal node */
 			thisNode := thisNode.Neighbours[(i+1)%int(g.MaxDegree)]
-			if thisNode != nil && thisNode.IsInLoop && !thisNode.IsVisited {
+			if thisNode != nil && thisNode.IsInLoop && !thisNode.IsVisited && !(thisNode.IsDecided && !thisNode.IsForRemoval) {
 				canBeRemoved := checkIfCanBeRemoved(thisNode, g)
 				if canBeRemoved {
 					if !thisNode.CanBeRemoved {

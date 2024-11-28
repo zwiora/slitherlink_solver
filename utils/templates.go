@@ -2,11 +2,26 @@ package utils
 
 import "github.com/golang-collections/collections/queue"
 
-func isTheSameState(n1 *Node, n2 *Node) bool {
-	if ((n1 == nil || n1.IsForRemoval) && (n2 == nil || n2.IsForRemoval)) || ((n1 != nil && n1.IsVisited) && (n2 != nil && n2.IsVisited)) {
-		return true
+func isTheSameState(n1 *Node, n2 *Node) (bool, bool) {
+
+	// we can't say if they have the same state
+	if (n1 != nil && !n1.IsDecided) || (n2 != nil && !n2.IsDecided) {
+		return false, false
 	}
-	return false
+
+	isN1Out := n1 == nil || (n1.IsDecided && n1.IsForRemoval)
+	isN2Out := n2 == nil || (n2.IsDecided && n2.IsForRemoval)
+
+	if isN1Out == isN2Out {
+		return true, isN1Out
+	}
+
+	return false, false
+
+	// if ((n1 == nil || n1.IsForRemoval) && (n2 == nil || n2.IsForRemoval)) || ((n1 != nil && n1.IsVisited) && (n2 != nil && n2.IsVisited)) {
+	// 	return true
+	// }
+	// return false
 }
 
 func addNeighboursToQueue(n *Node, q *queue.Queue, excludedNodes ...*Node) {
@@ -32,20 +47,24 @@ func (n *Node) findZeroTemplates(g *Graph, q *queue.Queue) bool {
 	if n.Value == 0 {
 		for i := 0; i < len(n.Neighbours); i++ {
 			thisNeighbour := n.Neighbours[i]
-			if thisNeighbour == nil || thisNeighbour.IsForRemoval || thisNeighbour.IsVisited {
-				if thisNeighbour != nil && thisNeighbour.IsVisited {
-					n.IsVisited = true
+			if thisNeighbour == nil || thisNeighbour.IsDecided {
+				if thisNeighbour != nil && !thisNeighbour.IsForRemoval {
+					n.IsForRemoval = false
+					n.IsDecided = true
 					for j := 0; j < len(n.Neighbours); j++ {
 						if j != i && n.Neighbours[j] != nil {
-							n.Neighbours[j].IsVisited = true
+							n.Neighbours[j].IsForRemoval = false
+							n.Neighbours[j].IsDecided = true
 							addNeighboursToQueue(n.Neighbours[j], q, n)
 						}
 					}
 				} else {
 					n.IsForRemoval = true
+					n.IsDecided = true
 					for j := 0; j < len(n.Neighbours); j++ {
 						if j != i && n.Neighbours[j] != nil {
 							n.Neighbours[j].IsForRemoval = true
+							n.Neighbours[j].IsDecided = true
 							addNeighboursToQueue(n.Neighbours[j], q, n)
 						}
 					}
@@ -62,35 +81,42 @@ func (n *Node) findCornerTemplates(g *Graph, q *queue.Queue) bool {
 	for i := 0; i < len(n.Neighbours); i++ {
 		thisNeighbour := n.Neighbours[i]
 		nextNeighbour := n.Neighbours[(i+1)%int(g.MaxDegree)]
-		if isTheSameState(thisNeighbour, nextNeighbour) {
+		isSame, _ := isTheSameState(thisNeighbour, nextNeighbour)
+		if isSame {
 			switch n.Value {
 			case 0:
 				if thisNeighbour == nil || thisNeighbour.IsForRemoval {
 					n.IsForRemoval = true
+					n.IsDecided = true
 
 					oppositeNeighbour := n.Neighbours[(i+2)%int(g.MaxDegree)]
 					if oppositeNeighbour != nil {
 						oppositeNeighbour.IsForRemoval = true
+						oppositeNeighbour.IsDecided = true
 						addNeighboursToQueue(oppositeNeighbour, q, n)
 					}
 
 					oppositeNeighbour = n.Neighbours[(i+3)%int(g.MaxDegree)]
 					if oppositeNeighbour != nil {
 						oppositeNeighbour.IsForRemoval = true
+						oppositeNeighbour.IsDecided = true
 						addNeighboursToQueue(oppositeNeighbour, q, n)
 					}
 				} else {
-					n.IsVisited = true
+					n.IsForRemoval = false
+					n.IsDecided = true
 
 					oppositeNeighbour := n.Neighbours[(i+2)%int(g.MaxDegree)]
 					if oppositeNeighbour != nil {
-						oppositeNeighbour.IsVisited = true
+						oppositeNeighbour.IsForRemoval = false
+						oppositeNeighbour.IsDecided = true
 						addNeighboursToQueue(oppositeNeighbour, q, n)
 					}
 
 					oppositeNeighbour = n.Neighbours[(i+3)%int(g.MaxDegree)]
 					if oppositeNeighbour != nil {
-						oppositeNeighbour.IsVisited = true
+						oppositeNeighbour.IsForRemoval = false
+						oppositeNeighbour.IsDecided = true
 						addNeighboursToQueue(oppositeNeighbour, q, n)
 					}
 				}
@@ -98,39 +124,45 @@ func (n *Node) findCornerTemplates(g *Graph, q *queue.Queue) bool {
 				if thisNeighbour == nil || thisNeighbour.IsForRemoval {
 					n.IsForRemoval = true
 				} else {
-					n.IsVisited = true
+					n.IsForRemoval = false
 				}
+				n.IsDecided = true
 				addNeighboursToQueue(n, q)
 			case 2:
 				if thisNeighbour == nil || thisNeighbour.IsForRemoval {
 					oppositeNeighbour := n.Neighbours[(i+2)%int(g.MaxDegree)]
 					if oppositeNeighbour != nil {
-						oppositeNeighbour.IsVisited = true
+						oppositeNeighbour.IsForRemoval = false
+						oppositeNeighbour.IsDecided = true
 						addNeighboursToQueue(oppositeNeighbour, q, n)
 					}
 
 					oppositeNeighbour = n.Neighbours[(i+3)%int(g.MaxDegree)]
 					if oppositeNeighbour != nil {
-						oppositeNeighbour.IsVisited = true
+						oppositeNeighbour.IsForRemoval = false
+						oppositeNeighbour.IsDecided = true
 						addNeighboursToQueue(oppositeNeighbour, q, n)
 					}
 
 					if thisNeighbour != nil {
 						diagonal := thisNeighbour.Neighbours[(i+1)%int(g.MaxDegree)]
-						if diagonal != nil && diagonal.IsVisited {
+						if diagonal != nil && diagonal.IsDecided && !diagonal.IsForRemoval {
 							n.IsForRemoval = true
+							n.IsDecided = true
 						}
 					}
 				} else {
 					oppositeNeighbour := n.Neighbours[(i+2)%int(g.MaxDegree)]
 					if oppositeNeighbour != nil {
 						oppositeNeighbour.IsForRemoval = true
+						oppositeNeighbour.IsDecided = true
 						addNeighboursToQueue(oppositeNeighbour, q, n)
 					}
 
 					oppositeNeighbour = n.Neighbours[(i+3)%int(g.MaxDegree)]
 					if oppositeNeighbour != nil {
 						oppositeNeighbour.IsForRemoval = true
+						oppositeNeighbour.IsDecided = true
 						addNeighboursToQueue(oppositeNeighbour, q, n)
 					}
 
@@ -138,28 +170,33 @@ func (n *Node) findCornerTemplates(g *Graph, q *queue.Queue) bool {
 					if thisNeighbour != nil {
 						diagonal := thisNeighbour.Neighbours[(i+1)%int(g.MaxDegree)]
 						if diagonal == nil || diagonal.IsForRemoval {
-							n.IsVisited = true
+							n.IsForRemoval = false
+							n.IsDecided = true
 						}
 					}
 				}
 			case 3:
 				if thisNeighbour == nil || thisNeighbour.IsForRemoval {
-					n.IsVisited = true
+					n.IsForRemoval = false
+					n.IsDecided = true
 					/* We can determine state of diagonal node */
 					if thisNeighbour != nil {
 						diagonal := thisNeighbour.Neighbours[(i+1)%int(g.MaxDegree)]
 						if diagonal != nil {
 							diagonal.IsForRemoval = true
+							diagonal.IsDecided = true
 							addNeighboursToQueue(diagonal, q, thisNeighbour, nextNeighbour)
 						}
 					}
 				} else {
 					n.IsForRemoval = true
+					n.IsDecided = true
 					/* We can determine state of diagonal node */
 					if thisNeighbour != nil {
 						diagonal := thisNeighbour.Neighbours[(i+1)%int(g.MaxDegree)]
 						if diagonal != nil {
-							diagonal.IsVisited = true
+							diagonal.IsForRemoval = false
+							diagonal.IsDecided = true
 							addNeighboursToQueue(diagonal, q, thisNeighbour, nextNeighbour)
 						}
 					}
@@ -178,15 +215,17 @@ func (n *Node) find31Templates(g *Graph, q *queue.Queue) bool {
 	if n.Value == 3 {
 		for i := 0; i < len(n.Neighbours); i++ {
 			thisNeighbour := n.Neighbours[i]
-			if thisNeighbour == nil || thisNeighbour.IsForRemoval || thisNeighbour.IsVisited {
+			if thisNeighbour == nil || thisNeighbour.IsDecided {
 				nextNeigh := n.Neighbours[(i+1)%int(g.MaxDegree)]
 				prevNeigh := n.Neighbours[(i-1+int(g.MaxDegree))%int(g.MaxDegree)]
 				if (prevNeigh != nil && prevNeigh.Value == 1) || (nextNeigh != nil && prevNeigh.Value == 1) {
-					if thisNeighbour != nil && thisNeighbour.IsVisited {
+					if thisNeighbour != nil && thisNeighbour.IsDecided && !thisNeighbour.IsForRemoval {
 						n.IsForRemoval = true
+						n.IsDecided = true
 						addNeighboursToQueue(n, q, thisNeighbour)
 					} else {
-						n.IsVisited = true
+						n.IsForRemoval = false
+						n.IsDecided = true
 						addNeighboursToQueue(n, q, thisNeighbour)
 					}
 				}
