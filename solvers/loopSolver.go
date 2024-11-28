@@ -151,7 +151,9 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 	g.VisitedNodes.Push(nil)
 	updateAvailableMoves(n, g)
 
-	debug.PrintBoard(g)
+	if debug.IsDebugMode {
+		g.PrintSquaresBoard(true)
+	}
 	debug.Sleep(1000)
 
 	/* Select new move */
@@ -213,7 +215,9 @@ func LoopSolve(g *utils.Graph) {
 	g.VisitedNodes = stack.New()
 	isSolutionFound := new(bool)
 
-	debug.PrintBoard(g)
+	if debug.IsDebugMode {
+		g.PrintSquaresBoard(true)
+	}
 	debug.Println("Cost:")
 	debug.Println(cost)
 

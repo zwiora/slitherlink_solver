@@ -1,6 +1,8 @@
 package utils
 
-import "github.com/golang-collections/collections/queue"
+import (
+	"github.com/golang-collections/collections/queue"
+)
 
 func isTheSameState(n1 *Node, n2 *Node) (bool, bool) {
 
@@ -24,10 +26,10 @@ func isTheSameState(n1 *Node, n2 *Node) (bool, bool) {
 	// return false
 }
 
-func addNeighboursToQueue(n *Node, q *queue.Queue, excludedNodes ...*Node) {
+func addNeighboursToQueueWithExclusions(n *Node, q *queue.Queue, excludedNodes ...*Node) {
 	for i := 0; i < len(n.Neighbours); i++ {
 		thisNeighbour := n.Neighbours[i]
-		if thisNeighbour != nil {
+		if thisNeighbour != nil && !thisNeighbour.IsDecided {
 			isExcluded := false
 			for k, v := range excludedNodes {
 				if thisNeighbour == v {
@@ -43,6 +45,15 @@ func addNeighboursToQueue(n *Node, q *queue.Queue, excludedNodes ...*Node) {
 	}
 }
 
+func addNeighboursToQueue(n *Node, q *queue.Queue) {
+	for i := 0; i < len(n.Neighbours); i++ {
+		thisNeighbour := n.Neighbours[i]
+		if thisNeighbour != nil && !thisNeighbour.IsDecided {
+			q.Enqueue(n.Neighbours[i])
+		}
+	}
+}
+
 func isNodeDecided(n *Node) bool {
 	return n == nil || n.IsDecided
 }
@@ -51,28 +62,46 @@ func isNodeDecidedOut(n *Node) bool {
 	return !(n != nil && n.IsDecided && !n.IsForRemoval)
 }
 
-func (n *Node) findZeroTemplates(g *Graph, q *queue.Queue) bool {
+func addNodeToGroup(n *Node, base *Node, q *queue.Queue) {
+
+	if base.IsDecided {
+		if n.TemplateGroup == nil {
+			n.IsDecided = true
+			n.IsForRemoval = base.IsForRemoval
+		} else {
+			n.TemplateGroup.setValue(base.CanBeRemoved, q)
+		}
+	} else {
+		l := base.TemplateGroup
+		if n.TemplateGroup == nil {
+			l.addElement(n)
+		} else {
+			addLists(l, n.TemplateGroup)
+		}
+	}
+}
+
+func (n *Node) findZeroTemplates(q *queue.Queue) {
 	/* is value 0 */
 	if n.Value == 0 {
+
+		if !n.IsDecided && n.TemplateGroup == nil {
+			n.TemplateGroup = new(List)
+			n.TemplateGroup.addElement(n)
+		}
+
 		/* check if any neighbour is decided */
 		for i := 0; i < len(n.Neighbours); i++ {
 			thisNeighbour := n.Neighbours[i]
+
 			if isNodeDecided(thisNeighbour) {
 				/* set this node and all neighbours as decided */
-				n.IsDecided = true
-				n.IsForRemoval = isNodeDecidedOut(thisNeighbour)
-				for j := 0; j < len(n.Neighbours); j++ {
-					if j != i && n.Neighbours[j] != nil {
-						n.Neighbours[j].IsDecided = true
-						n.Neighbours[j].IsForRemoval = n.IsForRemoval
-						addNeighboursToQueue(n.Neighbours[j], q, n)
-					}
-				}
-				return true
+				n.TemplateGroup.setValue(isNodeDecidedOut(thisNeighbour), q)
+			} else {
+				addNodeToGroup(thisNeighbour, n, q)
 			}
 		}
 	}
-	return false
 }
 
 /* Returns true, if template found */
@@ -86,20 +115,20 @@ func (n *Node) findCornerTemplates(g *Graph, q *queue.Queue) bool {
 			case 1:
 				n.IsForRemoval = stateOfBoth
 				n.IsDecided = true
-				addNeighboursToQueue(n, q)
+				addNeighboursToQueueWithExclusions(n, q)
 			case 2:
 				oppositeNeighbour := n.Neighbours[(i+2)%int(g.MaxDegree)]
 				if oppositeNeighbour != nil {
 					oppositeNeighbour.IsForRemoval = !isNodeDecidedOut(thisNeighbour)
 					oppositeNeighbour.IsDecided = true
-					addNeighboursToQueue(oppositeNeighbour, q, n)
+					addNeighboursToQueueWithExclusions(oppositeNeighbour, q, n)
 				}
 
 				oppositeNeighbour = n.Neighbours[(i+3)%int(g.MaxDegree)]
 				if oppositeNeighbour != nil {
 					oppositeNeighbour.IsForRemoval = !isNodeDecidedOut(thisNeighbour)
 					oppositeNeighbour.IsDecided = true
-					addNeighboursToQueue(oppositeNeighbour, q, n)
+					addNeighboursToQueueWithExclusions(oppositeNeighbour, q, n)
 				}
 			case 3:
 				n.IsForRemoval = !isNodeDecidedOut(thisNeighbour)
@@ -114,7 +143,7 @@ func (n *Node) findCornerTemplates(g *Graph, q *queue.Queue) bool {
 				// 	}
 				// }
 
-				addNeighboursToQueue(n, q)
+				addNeighboursToQueueWithExclusions(n, q)
 			}
 
 			return true
@@ -137,7 +166,7 @@ func (n *Node) find31Templates(g *Graph, q *queue.Queue) bool {
 				if (prevNeigh != nil && prevNeigh.Value == 1) || (nextNeigh != nil && prevNeigh.Value == 1) {
 					n.IsDecided = true
 					n.IsForRemoval = !isNodeDecidedOut(thisNeighbour)
-					addNeighboursToQueue(n, q, thisNeighbour)
+					addNeighboursToQueueWithExclusions(n, q, thisNeighbour)
 				}
 			}
 		}

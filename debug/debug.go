@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"log"
 	"time"
-
-	"slitherlink_solver/utils"
+	// "slitherlink_solver/utils"
 )
 
 var IsDebugMode bool
@@ -20,11 +19,11 @@ func Println(message any) {
 	}
 }
 
-func PrintBoard(g *utils.Graph) {
-	if IsDebugMode {
-		g.PrintSquaresBoard(true)
-	}
-}
+// func PrintBoard(g *utils.Graph) {
+// 	if IsDebugMode {
+// 		g.PrintSquaresBoard(true)
+// 	}
+// }
 
 func Sleep(t int) {
 	if IsDebugMode {

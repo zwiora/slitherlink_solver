@@ -189,7 +189,10 @@ func (g *Graph) constructQueueForCheckingTemplates() *queue.Queue {
 	for {
 		thisNode.IsVisited = true
 
-		if thisNode.GetDegree() < int(g.MaxDegree) {
+		// all templates not near edge use 0 or 3
+		if thisNode.Value == 0 || thisNode.Value == 3 {
+			nodes.Enqueue(thisNode)
+		} else if thisNode.GetDegree() < int(g.MaxDegree) {
 			nodes.Enqueue(thisNode)
 		}
 
@@ -219,12 +222,16 @@ func (g *Graph) FindTemplates() {
 
 		/* If the final state of the node isn't set */
 		if !thisNode.IsDecided {
-			if !thisNode.findZeroTemplates(g, nodes) {
-				if !thisNode.findCornerTemplates(g, nodes) {
-					thisNode.find31Templates(g, nodes)
-				}
+			thisNode.findZeroTemplates(nodes)
+			if !thisNode.findCornerTemplates(g, nodes) {
+				thisNode.find31Templates(g, nodes)
 			}
+
 			// fmt.Println("analysed")
+		}
+
+		if !thisNode.IsDecided {
+
 		}
 
 		// fmt.Println(thisNode)
