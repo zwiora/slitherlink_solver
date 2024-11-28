@@ -52,10 +52,13 @@ func isNodeDecidedOut(n *Node) bool {
 }
 
 func (n *Node) findZeroTemplates(g *Graph, q *queue.Queue) bool {
+	/* is value 0 */
 	if n.Value == 0 {
+		/* check if any neighbour is decided */
 		for i := 0; i < len(n.Neighbours); i++ {
 			thisNeighbour := n.Neighbours[i]
 			if isNodeDecided(thisNeighbour) {
+				/* set this node and all neighbours as decided */
 				n.IsDecided = true
 				n.IsForRemoval = isNodeDecidedOut(thisNeighbour)
 				for j := 0; j < len(n.Neighbours); j++ {
@@ -77,126 +80,40 @@ func (n *Node) findCornerTemplates(g *Graph, q *queue.Queue) bool {
 	for i := 0; i < len(n.Neighbours); i++ {
 		thisNeighbour := n.Neighbours[i]
 		nextNeighbour := n.Neighbours[(i+1)%int(g.MaxDegree)]
-		isSame, _ := isTheSameState(thisNeighbour, nextNeighbour)
+		isSame, stateOfBoth := isTheSameState(thisNeighbour, nextNeighbour)
 		if isSame {
 			switch n.Value {
-			case 0:
-				if thisNeighbour == nil || thisNeighbour.IsForRemoval {
-					n.IsForRemoval = true
-					n.IsDecided = true
-
-					oppositeNeighbour := n.Neighbours[(i+2)%int(g.MaxDegree)]
-					if oppositeNeighbour != nil {
-						oppositeNeighbour.IsForRemoval = true
-						oppositeNeighbour.IsDecided = true
-						addNeighboursToQueue(oppositeNeighbour, q, n)
-					}
-
-					oppositeNeighbour = n.Neighbours[(i+3)%int(g.MaxDegree)]
-					if oppositeNeighbour != nil {
-						oppositeNeighbour.IsForRemoval = true
-						oppositeNeighbour.IsDecided = true
-						addNeighboursToQueue(oppositeNeighbour, q, n)
-					}
-				} else {
-					n.IsForRemoval = false
-					n.IsDecided = true
-
-					oppositeNeighbour := n.Neighbours[(i+2)%int(g.MaxDegree)]
-					if oppositeNeighbour != nil {
-						oppositeNeighbour.IsForRemoval = false
-						oppositeNeighbour.IsDecided = true
-						addNeighboursToQueue(oppositeNeighbour, q, n)
-					}
-
-					oppositeNeighbour = n.Neighbours[(i+3)%int(g.MaxDegree)]
-					if oppositeNeighbour != nil {
-						oppositeNeighbour.IsForRemoval = false
-						oppositeNeighbour.IsDecided = true
-						addNeighboursToQueue(oppositeNeighbour, q, n)
-					}
-				}
 			case 1:
-				if thisNeighbour == nil || thisNeighbour.IsForRemoval {
-					n.IsForRemoval = true
-				} else {
-					n.IsForRemoval = false
-				}
+				n.IsForRemoval = stateOfBoth
 				n.IsDecided = true
 				addNeighboursToQueue(n, q)
 			case 2:
-				if thisNeighbour == nil || thisNeighbour.IsForRemoval {
-					oppositeNeighbour := n.Neighbours[(i+2)%int(g.MaxDegree)]
-					if oppositeNeighbour != nil {
-						oppositeNeighbour.IsForRemoval = false
-						oppositeNeighbour.IsDecided = true
-						addNeighboursToQueue(oppositeNeighbour, q, n)
-					}
+				oppositeNeighbour := n.Neighbours[(i+2)%int(g.MaxDegree)]
+				if oppositeNeighbour != nil {
+					oppositeNeighbour.IsForRemoval = !isNodeDecidedOut(thisNeighbour)
+					oppositeNeighbour.IsDecided = true
+					addNeighboursToQueue(oppositeNeighbour, q, n)
+				}
 
-					oppositeNeighbour = n.Neighbours[(i+3)%int(g.MaxDegree)]
-					if oppositeNeighbour != nil {
-						oppositeNeighbour.IsForRemoval = false
-						oppositeNeighbour.IsDecided = true
-						addNeighboursToQueue(oppositeNeighbour, q, n)
-					}
-
-					if thisNeighbour != nil {
-						diagonal := thisNeighbour.Neighbours[(i+1)%int(g.MaxDegree)]
-						if diagonal != nil && diagonal.IsDecided && !diagonal.IsForRemoval {
-							n.IsForRemoval = true
-							n.IsDecided = true
-						}
-					}
-				} else {
-					oppositeNeighbour := n.Neighbours[(i+2)%int(g.MaxDegree)]
-					if oppositeNeighbour != nil {
-						oppositeNeighbour.IsForRemoval = true
-						oppositeNeighbour.IsDecided = true
-						addNeighboursToQueue(oppositeNeighbour, q, n)
-					}
-
-					oppositeNeighbour = n.Neighbours[(i+3)%int(g.MaxDegree)]
-					if oppositeNeighbour != nil {
-						oppositeNeighbour.IsForRemoval = true
-						oppositeNeighbour.IsDecided = true
-						addNeighboursToQueue(oppositeNeighbour, q, n)
-					}
-
-					/* diagonal might determine this node */
-					if thisNeighbour != nil {
-						diagonal := thisNeighbour.Neighbours[(i+1)%int(g.MaxDegree)]
-						if diagonal == nil || diagonal.IsForRemoval {
-							n.IsForRemoval = false
-							n.IsDecided = true
-						}
-					}
+				oppositeNeighbour = n.Neighbours[(i+3)%int(g.MaxDegree)]
+				if oppositeNeighbour != nil {
+					oppositeNeighbour.IsForRemoval = !isNodeDecidedOut(thisNeighbour)
+					oppositeNeighbour.IsDecided = true
+					addNeighboursToQueue(oppositeNeighbour, q, n)
 				}
 			case 3:
-				if thisNeighbour == nil || thisNeighbour.IsForRemoval {
-					n.IsForRemoval = false
-					n.IsDecided = true
-					/* We can determine state of diagonal node */
-					if thisNeighbour != nil {
-						diagonal := thisNeighbour.Neighbours[(i+1)%int(g.MaxDegree)]
-						if diagonal != nil {
-							diagonal.IsForRemoval = true
-							diagonal.IsDecided = true
-							addNeighboursToQueue(diagonal, q, thisNeighbour, nextNeighbour)
-						}
-					}
-				} else {
-					n.IsForRemoval = true
-					n.IsDecided = true
-					/* We can determine state of diagonal node */
-					if thisNeighbour != nil {
-						diagonal := thisNeighbour.Neighbours[(i+1)%int(g.MaxDegree)]
-						if diagonal != nil {
-							diagonal.IsForRemoval = false
-							diagonal.IsDecided = true
-							addNeighboursToQueue(diagonal, q, thisNeighbour, nextNeighbour)
-						}
-					}
-				}
+				n.IsForRemoval = !isNodeDecidedOut(thisNeighbour)
+				n.IsDecided = true
+				/* We can determine state of diagonal node - also possible with other method */
+				// if thisNeighbour != nil {
+				// 	diagonal := thisNeighbour.Neighbours[(i+1)%int(g.MaxDegree)]
+				// 	if diagonal != nil {
+				// 		diagonal.IsForRemoval = true
+				// 		diagonal.IsDecided = true
+				// 		addNeighboursToQueue(diagonal, q, thisNeighbour, nextNeighbour)
+				// 	}
+				// }
+
 				addNeighboursToQueue(n, q)
 			}
 

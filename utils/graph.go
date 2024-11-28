@@ -224,7 +224,7 @@ func (g *Graph) FindTemplates() {
 					thisNode.find31Templates(g, nodes)
 				}
 			}
-			fmt.Println("analysed")
+			// fmt.Println("analysed")
 		}
 
 		// fmt.Println(thisNode)
