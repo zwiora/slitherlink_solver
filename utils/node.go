@@ -14,6 +14,7 @@ type Node struct {
 	Cost          int
 	QueueIndex    int
 	QueuePriority int
+	TemplateGroup *List
 }
 
 /* Calculates number of neighbours that are in the loop */
