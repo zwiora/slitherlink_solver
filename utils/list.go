@@ -2,8 +2,6 @@ package utils
 
 import (
 	"fmt"
-
-	"github.com/golang-collections/collections/queue"
 )
 
 type List struct {
@@ -32,13 +30,12 @@ func (l *List) addElement(node *Node) {
 	}
 }
 
-func (l *List) setValue(isForRemoval bool, q *queue.Queue) {
+func (l *List) setValue(isForRemoval bool) {
 	if l != nil && !l.root.value.IsDecided {
 		thisElement := l.root
 		for {
 			thisElement.value.IsDecided = true
 			thisElement.value.IsForRemoval = isForRemoval
-			addNeighboursToQueue(thisElement.value, q)
 			thisElement = thisElement.next
 
 			if thisElement == l.root {
@@ -46,7 +43,7 @@ func (l *List) setValue(isForRemoval bool, q *queue.Queue) {
 			}
 		}
 
-		l.oppositeList.setValue(!isForRemoval, q)
+		l.oppositeList.setValue(!isForRemoval)
 	}
 }
 

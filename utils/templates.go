@@ -27,31 +27,31 @@ func isTheSameState(n1 *Node, n2 *Node) (bool, bool) {
 }
 
 func addNeighboursToQueueWithExclusions(n *Node, q *queue.Queue, excludedNodes ...*Node) {
-	for i := 0; i < len(n.Neighbours); i++ {
-		thisNeighbour := n.Neighbours[i]
-		if thisNeighbour != nil && !thisNeighbour.IsDecided {
-			isExcluded := false
-			for k, v := range excludedNodes {
-				if thisNeighbour == v {
-					isExcluded = true
-					excludedNodes = append(excludedNodes[:k], excludedNodes[k+1:]...)
-					break
-				}
-			}
-			if !isExcluded {
-				q.Enqueue(n.Neighbours[i])
-			}
-		}
-	}
+	// for i := 0; i < len(n.Neighbours); i++ {
+	// 	thisNeighbour := n.Neighbours[i]
+	// 	if thisNeighbour != nil && !thisNeighbour.IsDecided {
+	// 		isExcluded := false
+	// 		for k, v := range excludedNodes {
+	// 			if thisNeighbour == v {
+	// 				isExcluded = true
+	// 				excludedNodes = append(excludedNodes[:k], excludedNodes[k+1:]...)
+	// 				break
+	// 			}
+	// 		}
+	// 		if !isExcluded {
+	// 			q.Enqueue(n.Neighbours[i])
+	// 		}
+	// 	}
+	// }
 }
 
 func addNeighboursToQueue(n *Node, q *queue.Queue) {
-	for i := 0; i < len(n.Neighbours); i++ {
-		thisNeighbour := n.Neighbours[i]
-		if thisNeighbour != nil && !thisNeighbour.IsDecided {
-			q.Enqueue(n.Neighbours[i])
-		}
-	}
+	// for i := 0; i < len(n.Neighbours); i++ {
+	// 	thisNeighbour := n.Neighbours[i]
+	// 	if thisNeighbour != nil && !thisNeighbour.IsDecided {
+	// 		q.Enqueue(n.Neighbours[i])
+	// 	}
+	// }
 }
 
 func isNodeDecided(n *Node) bool {
@@ -69,7 +69,7 @@ func addNodeToGroup(n *Node, base *Node, q *queue.Queue) {
 			n.IsDecided = true
 			n.IsForRemoval = base.IsForRemoval
 		} else {
-			n.TemplateGroup.setValue(base.CanBeRemoved, q)
+			n.TemplateGroup.setValue(base.CanBeRemoved)
 		}
 	} else {
 		l := base.TemplateGroup
@@ -79,6 +79,8 @@ func addNodeToGroup(n *Node, base *Node, q *queue.Queue) {
 			addLists(l, n.TemplateGroup)
 		}
 	}
+
+	addNeighboursToQueueWithExclusions(n, q, base)
 }
 
 func (n *Node) findZeroTemplates(q *queue.Queue) {
@@ -90,13 +92,15 @@ func (n *Node) findZeroTemplates(q *queue.Queue) {
 			n.TemplateGroup.addElement(n)
 		}
 
+		addNeighboursToQueue(n, q)
+
 		/* check if any neighbour is decided */
 		for i := 0; i < len(n.Neighbours); i++ {
 			thisNeighbour := n.Neighbours[i]
 
 			if isNodeDecided(thisNeighbour) {
 				/* set this node and all neighbours as decided */
-				n.TemplateGroup.setValue(isNodeDecidedOut(thisNeighbour), q)
+				n.TemplateGroup.setValue(isNodeDecidedOut(thisNeighbour))
 			} else {
 				addNodeToGroup(thisNeighbour, n, q)
 			}
@@ -106,6 +110,20 @@ func (n *Node) findZeroTemplates(q *queue.Queue) {
 
 /* Returns true, if template found */
 func (n *Node) findCornerTemplates(g *Graph, q *queue.Queue) bool {
+
+	if n.Value == 2 {
+		noDecided := 0
+		for i := 0; i < len(n.Neighbours); i++ {
+			if n.Neighbours[i] == nil || n.Neighbours[i].IsDecided {
+				noDecided++
+			}
+		}
+
+		if noDecided == 4 {
+			return false
+		}
+	}
+
 	for i := 0; i < len(n.Neighbours); i++ {
 		thisNeighbour := n.Neighbours[i]
 		nextNeighbour := n.Neighbours[(i+1)%int(g.MaxDegree)]

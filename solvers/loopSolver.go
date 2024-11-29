@@ -161,8 +161,20 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 		for _, v := range *g.AvailableMoves {
 			debug.Println(v)
 		}
-		newElement := heap.Pop(g.AvailableMoves)
-		newNode := newElement.(*utils.Node)
+		var newElement any
+		var newNode *utils.Node
+		for {
+			newElement = heap.Pop(g.AvailableMoves)
+			newNode = newElement.(*utils.Node)
+
+			newNode.IsVisited = true
+			g.VisitedNodes.Push(newNode)
+
+			if newNode.CanBeRemoved {
+				newNode.CanBeRemoved = false
+				break
+			}
+		}
 
 		/* Check if solution is found */
 		if cost == newNode.Cost {
@@ -173,9 +185,9 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 		}
 
 		/* Delete move from available moves and save it in stack */
-		newNode.CanBeRemoved = false
-		newNode.IsVisited = true
-		g.VisitedNodes.Push(newNode)
+		// newNode.CanBeRemoved = false
+		// newNode.IsVisited = true
+		// g.VisitedNodes.Push(newNode)
 
 		/* Run recursion with new node */
 		loopSolveRecursion(newNode, g, cost-newNode.Cost, isSolutionFound, depth+1)

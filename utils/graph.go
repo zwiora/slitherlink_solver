@@ -3,6 +3,7 @@ package utils
 import (
 	"container/heap"
 	"fmt"
+	"slitherlink_solver/debug"
 
 	"github.com/golang-collections/collections/queue"
 	"github.com/golang-collections/collections/stack"
@@ -217,6 +218,8 @@ func (g *Graph) constructQueueForCheckingTemplates() *queue.Queue {
 /* Should be run after preparation of the solver but before its start */
 func (g *Graph) FindTemplates() {
 	nodes := g.constructQueueForCheckingTemplates()
+	debug.Println("check templates")
+
 	for nodes.Len() > 0 {
 		thisNode := (nodes.Dequeue()).(*Node)
 
@@ -239,4 +242,46 @@ func (g *Graph) FindTemplates() {
 		// time.Sleep(1000 * time.Millisecond)
 
 	}
+
+	for {
+		// g.PrintSquaresBoard(true)
+
+		newTemplatesFound := 0
+		thisNode := g.Root
+
+		for {
+			thisNode.IsVisited = true
+
+			// all templates not near edge use 0 or 3
+			if !thisNode.IsDecided && thisNode.Value != -1 {
+				if !thisNode.findCornerTemplates(g, nodes) {
+					if thisNode.find31Templates(g, nodes) {
+						newTemplatesFound++
+					}
+				} else {
+					newTemplatesFound++
+				}
+			}
+
+			isNewNode := false
+			for _, v := range thisNode.Neighbours {
+				if v != nil && !v.IsVisited {
+					thisNode = v
+					isNewNode = true
+					break
+				}
+			}
+
+			if !isNewNode {
+				break
+			}
+		}
+
+		g.ClearIsVisited()
+
+		if newTemplatesFound == 0 {
+			break
+		}
+	}
+
 }
