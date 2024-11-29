@@ -225,7 +225,7 @@ func (g *Graph) FindTemplates() {
 
 		/* If the final state of the node isn't set */
 		if !thisNode.IsDecided {
-			thisNode.findZeroTemplates(nodes)
+			thisNode.findZeroTemplates(nodes, g)
 			if !thisNode.findCornerTemplates(g, nodes) {
 				thisNode.find31Templates(g, nodes)
 			}
@@ -245,6 +245,7 @@ func (g *Graph) FindTemplates() {
 
 	for {
 		// g.PrintSquaresBoard(true)
+		// time.Sleep(1000 * time.Millisecond)
 
 		newTemplatesFound := 0
 		thisNode := g.Root
@@ -262,6 +263,8 @@ func (g *Graph) FindTemplates() {
 					newTemplatesFound++
 				}
 			}
+
+			// fmt.Println(newTemplatesFound)
 
 			isNewNode := false
 			for _, v := range thisNode.Neighbours {

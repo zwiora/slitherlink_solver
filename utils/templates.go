@@ -62,14 +62,14 @@ func isNodeDecidedOut(n *Node) bool {
 	return !(n != nil && n.IsDecided && !n.IsForRemoval)
 }
 
-func addNodeToGroup(n *Node, base *Node, q *queue.Queue) {
+func addNodeToGroup(n *Node, base *Node, q *queue.Queue, g *Graph) {
 
 	if base.IsDecided {
 		if n.TemplateGroup == nil {
 			n.IsDecided = true
 			n.IsForRemoval = base.IsForRemoval
 		} else {
-			n.TemplateGroup.setValue(base.CanBeRemoved)
+			n.TemplateGroup.SetValue(base.CanBeRemoved, nil, g)
 		}
 	} else {
 		l := base.TemplateGroup
@@ -83,7 +83,7 @@ func addNodeToGroup(n *Node, base *Node, q *queue.Queue) {
 	addNeighboursToQueueWithExclusions(n, q, base)
 }
 
-func (n *Node) findZeroTemplates(q *queue.Queue) {
+func (n *Node) findZeroTemplates(q *queue.Queue, g *Graph) {
 	/* is value 0 */
 	if n.Value == 0 {
 
@@ -100,9 +100,9 @@ func (n *Node) findZeroTemplates(q *queue.Queue) {
 
 			if isNodeDecided(thisNeighbour) {
 				/* set this node and all neighbours as decided */
-				n.TemplateGroup.setValue(isNodeDecidedOut(thisNeighbour))
+				n.TemplateGroup.SetValue(isNodeDecidedOut(thisNeighbour), nil, g)
 			} else {
-				addNodeToGroup(thisNeighbour, n, q)
+				addNodeToGroup(thisNeighbour, n, q, g)
 			}
 		}
 	}
@@ -110,6 +110,8 @@ func (n *Node) findZeroTemplates(q *queue.Queue) {
 
 /* Returns true, if template found */
 func (n *Node) findCornerTemplates(g *Graph, q *queue.Queue) bool {
+
+	// fmt.Println(n)
 
 	if n.Value == 2 {
 		noDecided := 0
@@ -119,16 +121,21 @@ func (n *Node) findCornerTemplates(g *Graph, q *queue.Queue) bool {
 			}
 		}
 
+		// fmt.Println(noDecided)
+
 		if noDecided == 4 {
+			// fmt.Println("Wracamy")
 			return false
 		}
 	}
+
+	// fmt.Println("Nie wracamy")
 
 	for i := 0; i < len(n.Neighbours); i++ {
 		thisNeighbour := n.Neighbours[i]
 		nextNeighbour := n.Neighbours[(i+1)%int(g.MaxDegree)]
 		isSame, stateOfBoth := isTheSameState(thisNeighbour, nextNeighbour)
-		if isSame {
+		if isSame && n.Value != 0 {
 			switch n.Value {
 			case 1:
 				n.IsForRemoval = stateOfBoth

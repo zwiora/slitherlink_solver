@@ -5,56 +5,102 @@ import (
 )
 
 type List struct {
-	root         *ListElem
-	oppositeList *List
-	length       int
+	Root         *ListElem
+	OppositeList *List
+	Removable    int
+	Removed      int
+	Length       int
+	SettingNode  *Node
 }
 
 type ListElem struct {
-	value *Node
-	next  *ListElem
+	Value *Node
+	Next  *ListElem
 }
 
 func (l *List) addElement(node *Node) {
-	l.length++
+	l.Length++
 	newElement := new(ListElem)
-	newElement.value = node
+	newElement.Value = node
 	node.TemplateGroup = l
-	if l.root == nil {
-		newElement.next = newElement
-		l.root = newElement
+	if l.Root == nil {
+		newElement.Next = newElement
+		l.Root = newElement
 	} else {
-		newElement.next = l.root.next
-		l.root.next = newElement
+		newElement.Next = l.Root.Next
+		l.Root.Next = newElement
 
 	}
 }
 
-func (l *List) setValue(isForRemoval bool) {
-	if l != nil && !l.root.value.IsDecided {
-		thisElement := l.root
-		for {
-			thisElement.value.IsDecided = true
-			thisElement.value.IsForRemoval = isForRemoval
-			thisElement = thisElement.next
+func (l *List) SetValue(isForRemoval bool, settingNode *Node, g *Graph) bool {
+	if l != nil && !l.Root.Value.IsDecided {
 
-			if thisElement == l.root {
+		if isForRemoval {
+			l.Removable = l.Length
+		}
+
+		thisElement := l.Root
+		for {
+			/* Checking if neighbour would have enough edges*/
+			if settingNode != nil {
+				if isForRemoval && thisElement.Value.IsDeletionBreakingSecondRule() {
+					/* Deleting this element is against the rules */
+					return false
+				}
+			}
+
+			thisElement.Value.IsDecided = true
+			thisElement.Value.IsForRemoval = isForRemoval
+			if isForRemoval && thisElement.Value.CanBeRemoved {
+				thisElement.Value.UpdateNodeCost(g)
+			}
+			thisElement = thisElement.Next
+
+			if thisElement == l.Root {
 				break
 			}
 		}
 
-		l.oppositeList.setValue(!isForRemoval)
+		l.OppositeList.SetValue(!isForRemoval, settingNode, g)
+	}
+
+	return true
+}
+
+func (l *List) ClearValue(g *Graph) {
+	if l != nil && l.Root.Value.IsDecided {
+
+		l.Removed = 0
+		l.Removable = 0
+
+		thisElement := l.Root
+		for {
+			if thisElement.Value.IsDecided && thisElement.Value.CanBeRemoved {
+				thisElement.Value.UpdateNodeCost(g)
+			}
+
+			thisElement.Value.IsDecided = false
+
+			thisElement = thisElement.Next
+
+			if thisElement == l.Root {
+				break
+			}
+		}
+
+		l.OppositeList.ClearValue(g)
 	}
 }
 
 func (l *List) print() {
 	fmt.Println("List: ", l)
-	thisElement := l.root
+	thisElement := l.Root
 	for {
-		fmt.Println(thisElement.value)
-		thisElement = thisElement.next
+		fmt.Println(thisElement.Value)
+		thisElement = thisElement.Next
 
-		if thisElement == l.root {
+		if thisElement == l.Root {
 			break
 		}
 	}
@@ -68,27 +114,27 @@ func addLists(l1 *List, l2 *List) {
 
 	basicList := l1
 	additionalList := l2
-	if l1.length < l2.length {
+	if l1.Length < l2.Length {
 		basicList = l2
 		additionalList = l1
 	}
 
-	thisElement := additionalList.root
+	thisElement := additionalList.Root
 	var lastElement *ListElem
 	for {
-		thisElement.next.value.TemplateGroup = basicList
-		thisElement = thisElement.next
+		thisElement.Next.Value.TemplateGroup = basicList
+		thisElement = thisElement.Next
 
-		if thisElement.next == additionalList.root {
+		if thisElement.Next == additionalList.Root {
 			lastElement = thisElement
 			break
 		}
 	}
 
-	lastElement.next = basicList.root.next
-	basicList.root.next = additionalList.root
+	lastElement.Next = basicList.Root.Next
+	basicList.Root.Next = additionalList.Root
 
-	basicList.length += additionalList.length
+	basicList.Length += additionalList.Length
 }
 
 // func (l List) markList(isClearing )

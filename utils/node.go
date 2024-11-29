@@ -43,6 +43,31 @@ func (n *Node) getCostOfField(maxDegree int) int {
 	return int(math.Abs(float64(linesAround) - float64(n.Value)))
 }
 
+func (n *Node) IsDeletionBreakingSecondRule() bool {
+	/* Checking if it would have enough edges */
+	n.IsInLoop = false
+	if n.GetDegree() < int(n.Value) {
+		n.IsInLoop = true
+		return true
+	}
+
+	n.IsInLoop = true
+
+	/* Checking if neighbour would have enough edges*/
+	for _, v := range n.Neighbours {
+		if v != nil && !v.IsInLoop {
+			if v.GetDegree() <= int(v.Value) {
+				// if n.CanBeRemoved && n.TemplateGroup != nil && n.IsDecided && n.IsForRemoval {
+				// 	n.TemplateGroup.Removable--
+				// }
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
 /* Calculates new cost on the node for priority queue */
 func (n *Node) calculateNodeCost(g *Graph) int {
 	newCost := 0
@@ -81,6 +106,8 @@ func (n *Node) SetNodeCost(g *Graph) {
 	if IsHeuristicOn {
 		if n.IsForRemoval {
 			n.QueuePriority = 1000
+		} else if n.TemplateGroup != nil {
+			n.QueuePriority = newCost + 100
 		} else {
 			n.QueuePriority = newCost
 		}
@@ -96,6 +123,8 @@ func (n *Node) UpdateNodeCost(g *Graph) {
 		if n.Cost != n.QueuePriority {
 			if n.IsForRemoval {
 				g.AvailableMoves.update(n, 1000)
+			} else if n.TemplateGroup != nil {
+				g.AvailableMoves.update(n, newCost+100)
 			} else {
 				g.AvailableMoves.update(n, newCost)
 			}
