@@ -36,6 +36,27 @@ func readPuzzleStructure(fileName string) (string, int, int, string) {
 	return puzzleType, puzzleSizeX, puzzleSizeY, puzzleContent
 }
 
+/*
+Extracting multiple data about the puzzle from the file:
+- type of slitherlink board (by its code)
+- size of slitherlink board (width)
+- size of slitherlink board (height)
+- content of slitherlink board (encoded as string)
+*/
+func readMultiplePuzzleStructure(fileName string) (string, int, int, string) {
+	fileContent := readFile(fileName)
+	puzzleCode := strings.Split(strings.Split(fileContent, "\n")[3], ":")[2]
+	puzzleCodeArr := strings.Split(puzzleCode, "t")
+	puzzleType := puzzleCodeArr[1]
+	puzzleSizeArr := strings.Split(puzzleCodeArr[0], "x")
+	puzzleSizeX, err := strconv.Atoi(puzzleSizeArr[0])
+	Check(err)
+	puzzleSizeY, err := strconv.Atoi(puzzleSizeArr[1])
+	Check(err)
+	puzzleContent := strings.Split(strings.Split(fileContent, "\n")[6], ":")[2]
+	return puzzleType, puzzleSizeX, puzzleSizeY, puzzleContent
+}
+
 func ConstructBoardFromData(fileName string) *Graph {
 	puzzleType, puzzleSizeX, puzzleSizeY, puzzleContent := readPuzzleStructure(fileName)
 

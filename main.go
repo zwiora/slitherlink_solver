@@ -24,4 +24,6 @@ func main() {
 	fmt.Println("Visited states: ", utils.NoVisitedStates)
 	fmt.Println("Average depth: ", utils.AvgDepth)
 	fmt.Println("Max depth: ", utils.MaxDepth)
+
+	fmt.Println(g.CheckIfSolutionOk())
 }

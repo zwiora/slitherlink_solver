@@ -288,3 +288,23 @@ func (g *Graph) FindTemplates() {
 	}
 
 }
+
+func (g *Graph) CheckIfSolutionOk() bool {
+
+	lastLineNode := g.Root
+	thisNode := g.Root
+
+	for n := 0; n < g.SizeY; n++ {
+		for m := 0; m < g.SizeX; m++ {
+			if thisNode.Value != -1 && thisNode.Value != int8(thisNode.getLinesAround(int(g.MaxDegree))) {
+				fmt.Println(thisNode)
+				return false
+			}
+			thisNode = thisNode.Neighbours[0]
+		}
+		thisNode = lastLineNode.Neighbours[1]
+		lastLineNode = thisNode
+	}
+
+	return true
+}

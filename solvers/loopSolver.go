@@ -8,21 +8,27 @@ import (
 	"github.com/golang-collections/collections/stack"
 )
 
-/* Checks if node can be removed from the loop */
-func checkIfCanBeRemoved(n *utils.Node, g *utils.Graph) bool {
+/*
+* Checks if node can be removed from the loop
+* Second bool is true if we can't delete part of template because of the second rule
+ */
+func checkIfCanBeRemoved(n *utils.Node, g *utils.Graph) (bool, bool) {
 	debug.Println("Checking if can be removed: ")
 
 	/* Checking if removal would create loop inside the loop */
 	nodeDegree := n.GetDegree()
 	if nodeDegree == 0 || nodeDegree == int(g.MaxDegree) {
 		debug.Println("\t- SKIP: removal would create loop inside the loop")
-		return false
+		return false, false
 	}
 	debug.Println("\t- degree ok")
 
 	if n.IsDeletionBreakingSecondRule() {
 		debug.Println("\t- SKIP: deletion isn't in the solution")
-		return false
+		if n.IsDecided && n.IsForRemoval {
+			return false, true
+		}
+		return false, false
 	}
 
 	// if !n.CanBeRemoved && n.TemplateGroup != nil && n.IsDecided && n.IsForRemoval {
@@ -32,7 +38,7 @@ func checkIfCanBeRemoved(n *utils.Node, g *utils.Graph) bool {
 	/* It can be removed if it's a leaf */
 	if n.GetDegree() == 1 {
 		debug.Println("\t- it's a leaf")
-		return true
+		return true, false
 	}
 	debug.Println("\t- not a leaf")
 
@@ -41,7 +47,7 @@ func checkIfCanBeRemoved(n *utils.Node, g *utils.Graph) bool {
 		if v != nil && v.IsInLoop {
 			if v.GetDegree() == 1 {
 				debug.Println("\t- SKIP: neighbour is a leaf")
-				return false
+				return false, false
 			}
 		}
 	}
@@ -57,7 +63,7 @@ func checkIfCanBeRemoved(n *utils.Node, g *utils.Graph) bool {
 		}
 		if sidesCounter == 3 {
 			debug.Println("\t- SKIP: deletion would create two separate graphs")
-			return false
+			return false, false
 		}
 	}
 	debug.Println("\t- deletion wouldn't create two separate graphs")
@@ -70,25 +76,34 @@ func checkIfCanBeRemoved(n *utils.Node, g *utils.Graph) bool {
 				nextNeighbour := diagonalNode.Neighbours[(k+2)%int(g.MaxDegree)]
 				if nextNeighbour.IsInLoop {
 					debug.Println("\t- SKIP: deletion would create two graphs with common corner")
-					return false
+					return false, false
 				}
 			}
 		}
 	}
 
+	// if n.Neighbours[0].Value == 1 && n.Neighbours[1].Value == 0 {
+	// 	debug.Sleep(5000)
+	// }
+
 	/* No troubles found - node can be deleted */
-	return true
+	return true, false
 }
 
 /* Updates heap of nodes that can be removed from the loop - checks if can be removed and its cost*/
-func updateAvailableMoves(n *utils.Node, g *utils.Graph) {
+func updateAvailableMoves(n *utils.Node, g *utils.Graph) bool {
+	stopTesting := false
+	canBeRemoved := false
 	for i := 0; i < int(g.MaxDegree); i++ {
 		/* neighbouring node */
 		thisNode := n.Neighbours[(i)%int(g.MaxDegree)]
 		if thisNode != nil {
 
 			if thisNode.IsInLoop && !thisNode.IsVisited && !(thisNode.IsDecided && !thisNode.IsForRemoval) {
-				canBeRemoved := checkIfCanBeRemoved(thisNode, g)
+				canBeRemoved, stopTesting = checkIfCanBeRemoved(thisNode, g)
+				if stopTesting {
+					return true
+				}
 				if canBeRemoved {
 					if !thisNode.CanBeRemoved {
 						thisNode.SetNodeCost(g)
@@ -112,7 +127,10 @@ func updateAvailableMoves(n *utils.Node, g *utils.Graph) {
 			/* diagonal node */
 			thisNode := thisNode.Neighbours[(i+1)%int(g.MaxDegree)]
 			if thisNode != nil && thisNode.IsInLoop && !thisNode.IsVisited && !(thisNode.IsDecided && !thisNode.IsForRemoval) {
-				canBeRemoved := checkIfCanBeRemoved(thisNode, g)
+				canBeRemoved, stopTesting = checkIfCanBeRemoved(thisNode, g)
+				if stopTesting {
+					return true
+				}
 				if canBeRemoved {
 					if !thisNode.CanBeRemoved {
 						thisNode.SetNodeCost(g)
@@ -129,6 +147,8 @@ func updateAvailableMoves(n *utils.Node, g *utils.Graph) {
 
 		}
 	}
+
+	return stopTesting
 }
 
 /* Main solver logic */
@@ -147,33 +167,45 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 	/* Update list with available moves */
 	n.IsInLoop = false
 
-	if n.TemplateGroup != nil && !n.IsDecided {
+	// if n.TemplateGroup != nil && !n.IsDecided {
 
-		if !n.TemplateGroup.SetValue(true, n, g) {
-			debug.Println("Template not aplicable")
-			if debug.IsDebugMode {
-				g.PrintSquaresBoard(true)
-			}
-			debug.Sleep(1000)
+	// 	if !n.TemplateGroup.SetValue(true, n, g) {
+	// 		debug.Println("Template not aplicable")
+	// 		if debug.IsDebugMode {
+	// 			g.PrintSquaresBoard(true)
+	// 		}
+	// 		// debug.Sleep(100)
 
-			n.IsInLoop = true
-			n.TemplateGroup.ClearValue(g)
-			n.TemplateGroup.SetValue(false, n, g)
-		}
+	// 		n.IsInLoop = true
+	// 		n.TemplateGroup.ClearValue(g)
+	// 		n.TemplateGroup.SetValue(false, n, g)
+	// 		return
+	// 	}
 
-		// 			n.TemplateGroup.ClearValue(g)
-		// 			n.TemplateGroup.SetValue(false, n, g)
-		// 			g.PrintSquaresBoard(true)
-		// 			// debug.Sleep(9999)
+	// 			n.TemplateGroup.ClearValue(g)
+	// 			n.TemplateGroup.SetValue(false, n, g)
+	// 			g.PrintSquaresBoard(true)
+	// 			// debug.Sleep(9999)
 
-		// 			return
-		// 		}
-		// 	}
-		// 	n.TemplateGroup.Removable--
-		// 	n.TemplateGroup.Removed++
+	// 			return
+	// 		}
+	// 	}
+	// 	n.TemplateGroup.Removable--
+	// 	n.TemplateGroup.Removed++
+	// }
+
+	stopTesting := updateAvailableMoves(n, g)
+	if stopTesting {
+		// fmt.Println("STOP TESTING")
+		// if debug.IsDebugMode {
+		// 	g.PrintSquaresBoard(true)
+		// }
+		// debug.Sleep(1000)
+
+		// n.IsInLoop = true
+		// updateAvailableMoves(n, g)
+		// return
 	}
-
-	updateAvailableMoves(n, g)
 
 	// if n.TemplateGroup != nil {
 	// if n.TemplateGroup.Removable+n.TemplateGroup.Removed < n.TemplateGroup.Length {
@@ -189,7 +221,7 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 	if debug.IsDebugMode {
 		g.PrintSquaresBoard(true)
 	}
-	debug.Sleep(100)
+	debug.Sleep(50)
 
 	/* Select new move */
 	for g.AvailableMoves.Len() > 0 {
@@ -202,39 +234,39 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 		newElement = heap.Pop(g.AvailableMoves)
 		newNode = newElement.(*utils.Node)
 
-		if !(newNode.IsDecided && !newNode.IsForRemoval) {
+		// if !(newNode.IsDecided && !newNode.IsForRemoval) {
 
-			// newNode.IsVisited = true
-			// g.VisitedNodes.Push(newNode)
-			// if newNode.CanBeRemoved {
-			// newNode.CanBeRemoved = false
-			// 	break
-			// }
-			// }
+		// newNode.IsVisited = true
+		// g.VisitedNodes.Push(newNode)
+		// if newNode.CanBeRemoved {
+		// newNode.CanBeRemoved = false
+		// 	break
+		// }
+		// }
 
-			/* Check if solution is found */
-			if cost == newNode.Cost {
-				newNode.IsInLoop = false
-				debug.Println("SOLUTION FOUND")
-				*isSolutionFound = true
-				return
-			}
-
-			/* Delete move from available moves and save it in stack */
-			newNode.CanBeRemoved = false
-			newNode.IsVisited = true
-			g.VisitedNodes.Push(newNode)
-
-			/* Run recursion with new node */
-			loopSolveRecursion(newNode, g, cost-newNode.Cost, isSolutionFound, depth+1)
-
-			if *isSolutionFound {
-				return
-			}
-		} else {
-			newNode.CanBeRemoved = false
-			g.VisitedNodes.Push(newNode)
+		/* Check if solution is found */
+		if cost == newNode.Cost {
+			newNode.IsInLoop = false
+			debug.Println("SOLUTION FOUND")
+			*isSolutionFound = true
+			return
 		}
+
+		/* Delete move from available moves and save it in stack */
+		newNode.CanBeRemoved = false
+		newNode.IsVisited = true
+		g.VisitedNodes.Push(newNode)
+
+		/* Run recursion with new node */
+		loopSolveRecursion(newNode, g, cost-newNode.Cost, isSolutionFound, depth+1)
+
+		if *isSolutionFound {
+			return
+		}
+		// } else {
+		// 	newNode.CanBeRemoved = false
+		// 	g.VisitedNodes.Push(newNode)
+		// }
 	}
 
 	/* Clear changes */
@@ -248,9 +280,13 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 		}
 
 		thisNode := thisElement.(*utils.Node)
-		if thisNode.IsVisited && thisNode.TemplateGroup != nil {
-			thisNode.TemplateGroup.ClearValue(g)
-		}
+		// if thisNode.IsVisited && thisNode.TemplateGroup != nil && thisNode.IsDecided && !thisNode.IsForRemoval {
+		// 	thisNode.TemplateGroup.ClearValue(g)
+		// }
+
+		// if thisNode.IsVisited && thisNode.TemplateGroup != nil && thisNode.TemplateGroup.SettingNode == n {
+		// 	thisNode.TemplateGroup.ClearValue(g)
+		// }
 		thisNode.IsVisited = false
 		thisNode.CanBeRemoved = true
 		heap.Push(g.AvailableMoves, thisNode)

@@ -36,6 +36,8 @@ func (l *List) addElement(node *Node) {
 func (l *List) SetValue(isForRemoval bool, settingNode *Node, g *Graph) bool {
 	if l != nil && !l.Root.Value.IsDecided {
 
+		l.SettingNode = settingNode
+
 		if isForRemoval {
 			l.Removable = l.Length
 		}
