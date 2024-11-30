@@ -247,14 +247,28 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 			return
 		}
 
+		if newNode.IsDecided && !newNode.IsForRemoval {
+			continue
+		}
+
 		/* Delete move from available moves and save it in stack */
 		newNode.CanBeRemoved = false
 		newNode.IsVisited = true
 		g.VisitedNodes.Push(newNode)
 
 		if newNode.TemplateGroup != nil && !newNode.IsDecided {
-			newNode.TemplateGroup.SetValue(true, newNode, g)
+			if !newNode.TemplateGroup.SetValue(true, newNode, g) {
+				debug.Println("Template not aplicable")
+				// if debug.IsDebugMode {
+				// 	g.PrintSquaresBoard(true)
+				// }
+				// debug.Sleep(100)
 
+				newNode.TemplateGroup.ClearValue(g)
+				newNode.TemplateGroup.SetValue(false, newNode, g)
+
+				continue
+			}
 		}
 
 		/* Run recursion with new node */
@@ -264,9 +278,10 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 			return
 		}
 
-		// if newNode.TemplateGroup != nil && newNode.TemplateGroup.SettingNode == newNode {
-		// 	newNode.TemplateGroup.ClearValue(g)
-		// }
+		if newNode.TemplateGroup != nil && newNode.TemplateGroup.SettingNode == newNode {
+			newNode.TemplateGroup.ClearValue(g)
+			newNode.TemplateGroup.SetValue(false, newNode, g)
+		}
 		// } else {
 		// 	newNode.CanBeRemoved = false
 		// 	g.VisitedNodes.Push(newNode)
@@ -335,6 +350,25 @@ func LoopSolve(g *utils.Graph) {
 			break
 		}
 
+		if newNode.IsDecided && !newNode.IsForRemoval {
+			continue
+		}
+
+		if newNode.TemplateGroup != nil && !newNode.IsDecided {
+			if !newNode.TemplateGroup.SetValue(true, newNode, g) {
+				debug.Println("Template not aplicable")
+				// if debug.IsDebugMode {
+				// 	g.PrintSquaresBoard(true)
+				// }
+				// debug.Sleep(100)
+
+				newNode.TemplateGroup.ClearValue(g)
+				newNode.TemplateGroup.SetValue(false, newNode, g)
+
+				continue
+			}
+		}
+
 		newNode.IsVisited = true
 		newNode.CanBeRemoved = false
 
@@ -343,6 +377,14 @@ func LoopSolve(g *utils.Graph) {
 
 		if *isSolutionFound {
 			break
+		}
+
+		if newNode.TemplateGroup != nil && newNode.TemplateGroup.SettingNode == newNode {
+			debug.Println("Reversing set value")
+			newNode.TemplateGroup.ClearValue(g)
+			newNode.TemplateGroup.SetValue(false, newNode, g)
+			// debug.Sleep(10000)
+
 		}
 
 		newNode.IsInLoop = true
