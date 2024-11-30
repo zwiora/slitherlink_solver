@@ -59,7 +59,7 @@ func isNodeDecided(n *Node) bool {
 }
 
 func isNodeDecidedOut(n *Node) bool {
-	return !(n != nil && n.IsDecided && !n.IsForRemoval)
+	return n == nil || (n.IsDecided && n.IsForRemoval)
 }
 
 func addNodeToGroup(n *Node, base *Node, q *queue.Queue, g *Graph) {
@@ -180,21 +180,21 @@ func (n *Node) findCornerTemplates(g *Graph, q *queue.Queue) bool {
 
 func (n *Node) find31Templates(g *Graph, q *queue.Queue) bool {
 	/* value of this node equal to 3 */
-	// if n.Value == 3 {
-	// 	/* is next to the wall */
-	// 	for i := 0; i < len(n.Neighbours); i++ {
-	// 		thisNeighbour := n.Neighbours[i]
-	// 		if isNodeDecided(thisNeighbour) {
-	// 			/* is number 1 also next to the wall */
-	// 			nextNeigh := n.Neighbours[(i+1)%int(g.MaxDegree)]
-	// 			prevNeigh := n.Neighbours[(i-1+int(g.MaxDegree))%int(g.MaxDegree)]
-	// 			if (prevNeigh != nil && prevNeigh.Value == 1 && isTheSameState(prevNeigh.Neighbours[i], thisNeighbour)) || (nextNeigh != nil && nextNeigh.Value == 1 && isTheSameState(nextNeigh.Neighbours[i], thisNeighbour)) {
-	// 				n.IsDecided = true
-	// 				n.IsForRemoval = !isNodeDecidedOut(thisNeighbour)
-	// 				addNeighboursToQueueWithExclusions(n, q, thisNeighbour)
-	// 			}
-	// 		}
-	// 	}
-	// }
+	if n.Value == 3 {
+		/* is next to the wall */
+		for i := 0; i < len(n.Neighbours); i++ {
+			thisNeighbour := n.Neighbours[i]
+			if isNodeDecided(thisNeighbour) {
+				/* is number 1 also next to the wall */
+				nextNeigh := n.Neighbours[(i+1)%int(g.MaxDegree)]
+				prevNeigh := n.Neighbours[(i-1+int(g.MaxDegree))%int(g.MaxDegree)]
+				if (prevNeigh != nil && prevNeigh.Value == 1 && isNodeDecidedOut(prevNeigh.Neighbours[i]) == isNodeDecidedOut(thisNeighbour)) || (nextNeigh != nil && nextNeigh.Value == 1 && isNodeDecidedOut(nextNeigh.Neighbours[i]) == isNodeDecidedOut(thisNeighbour)) {
+					n.IsDecided = true
+					n.IsForRemoval = !isNodeDecidedOut(thisNeighbour)
+					addNeighboursToQueueWithExclusions(n, q, thisNeighbour)
+				}
+			}
+		}
+	}
 	return false
 }
