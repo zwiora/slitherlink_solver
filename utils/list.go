@@ -7,8 +7,6 @@ import (
 type List struct {
 	Root         *ListElem
 	OppositeList *List
-	Removable    int
-	Removed      int
 	Length       int
 	SettingNode  *Node
 }
@@ -35,17 +33,11 @@ func (l *List) addElement(node *Node) {
 
 func (l *List) SetValue(isForRemoval bool, settingNode *Node, g *Graph) bool {
 	if l != nil && !l.Root.Value.IsDecided {
-		// time.Sleep(1000 * time.Millisecond)
 
 		l.SettingNode = settingNode
 
-		// if isForRemoval {
-		// 	l.Removable = l.Length
-		// }
-
 		thisElement := l.Root
 		for {
-			// fmt.Println(thisElement)
 			/* Checking if neighbour would have enough edges*/
 			if settingNode != nil {
 				if isForRemoval && thisElement.Value.IsDeletionBreakingSecondRule() {
@@ -74,12 +66,6 @@ func (l *List) SetValue(isForRemoval bool, settingNode *Node, g *Graph) bool {
 
 func (l *List) ClearValue(g *Graph) {
 	if l != nil && l.Root.Value.IsDecided {
-		// fmt.Println("CLEARING")
-		// time.Sleep(1000 * time.Millisecond)
-		// g.PrintSquaresBoard(true)
-
-		l.Removed = 0
-		l.Removable = 0
 
 		thisElement := l.Root
 		for {

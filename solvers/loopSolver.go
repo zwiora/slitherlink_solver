@@ -31,10 +31,6 @@ func checkIfCanBeRemoved(n *utils.Node, g *utils.Graph) (bool, bool) {
 		return false, false
 	}
 
-	// if !n.CanBeRemoved && n.TemplateGroup != nil && n.IsDecided && n.IsForRemoval {
-	// 	n.TemplateGroup.Removable++
-	// }
-
 	/* It can be removed if it's a leaf */
 	if n.GetDegree() == 1 {
 		debug.Println("\t- it's a leaf")
@@ -81,10 +77,6 @@ func checkIfCanBeRemoved(n *utils.Node, g *utils.Graph) (bool, bool) {
 			}
 		}
 	}
-
-	// if n.Neighbours[0].Value == 1 && n.Neighbours[1].Value == 0 {
-	// 	debug.Sleep(5000)
-	// }
 
 	/* No troubles found - node can be deleted */
 	return true, false
@@ -158,86 +150,29 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 	debug.Println("Cost:")
 	debug.Println(cost)
 
-	/* Update list with available moves */
 	n.IsInLoop = false
-
-	// if n.TemplateGroup != nil && !n.IsDecided {
-
-	// 	if !n.TemplateGroup.SetValue(true, n, g) {
-	// 		debug.Println("Template not aplicable")
-	// 		if debug.IsDebugMode {
-	// 			g.PrintSquaresBoard(true)
-	// 		}
-	// 		// debug.Sleep(100)
-
-	// 		n.TemplateGroup.ClearValue(g)
-	// 		n.TemplateGroup.SetValue(false, n, g)
-
-	// 		n.IsInLoop = true
-	// 		return
-	// 	}
-
-	// 	// 			n.TemplateGroup.ClearValue(g)
-	// 	// 			n.TemplateGroup.SetValue(false, n, g)
-	// 	// 			g.PrintSquaresBoard(true)
-	// 	// 			// debug.Sleep(9999)
-
-	// 	// 			return
-	// 	// 		}
-	// 	// 	}
-	// 	// 	n.TemplateGroup.Removable--
-	// 	// 	n.TemplateGroup.Removed++
-	// }
-
-	stopTesting := updateAvailableMoves(n, g)
-	if stopTesting {
-		// fmt.Println("STOP TESTING")
-		// if debug.IsDebugMode {
-		// 	g.PrintSquaresBoard(true)
-		// }
-		// debug.Sleep(1000)
-
-		// n.IsInLoop = true
-		// updateAvailableMoves(n, g)
-		// return
-	}
-
-	// if n.TemplateGroup != nil {
-	// if n.TemplateGroup.Removable+n.TemplateGroup.Removed < n.TemplateGroup.Length {
-	// debug.Sleep(9999)
-	// n.TemplateGroup.ClearValue()
-	// n.TemplateGroup.SetValue(false, n.TemplateGroup.SettingNode)
-	// n.IsInLoop = true
-	// return
-	// }
-	// }
-	g.VisitedNodes.Push(nil)
-
 	if debug.IsDebugMode {
 		g.PrintSquaresBoard(true)
 	}
 	debug.Sleep(50)
+
+	/* Update list with available moves */
+	stopTesting := updateAvailableMoves(n, g)
+	if stopTesting {
+		n.IsInLoop = true
+		updateAvailableMoves(n, g)
+		return
+	}
+
+	g.VisitedNodes.Push(nil)
 
 	/* Select new move */
 	for g.AvailableMoves.Len() > 0 {
 		for _, v := range *g.AvailableMoves {
 			debug.Println(v)
 		}
-		var newElement any
-		var newNode *utils.Node
-		// for {
-		newElement = heap.Pop(g.AvailableMoves)
-		newNode = newElement.(*utils.Node)
-
-		// if !(newNode.IsDecided && !newNode.IsForRemoval) {
-
-		// newNode.IsVisited = true
-		// g.VisitedNodes.Push(newNode)
-		// if newNode.CanBeRemoved {
-		// newNode.CanBeRemoved = false
-		// 	break
-		// }
-		// }
+		newElement := heap.Pop(g.AvailableMoves)
+		newNode := newElement.(*utils.Node)
 
 		/* Check if solution is found */
 		if cost == newNode.Cost {
@@ -247,6 +182,7 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 			return
 		}
 
+		/* Return if it's not possible to remove the node */
 		if newNode.IsDecided && !newNode.IsForRemoval {
 			continue
 		}
@@ -257,16 +193,13 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 		g.VisitedNodes.Push(newNode)
 
 		if newNode.TemplateGroup != nil && !newNode.IsDecided {
+			/* Set value for the group */
 			if !newNode.TemplateGroup.SetValue(true, newNode, g) {
+				/* Return if it's not possible to set this value */
 				debug.Println("Template not aplicable")
-				// if debug.IsDebugMode {
-				// 	g.PrintSquaresBoard(true)
-				// }
-				// debug.Sleep(100)
 
 				newNode.TemplateGroup.ClearValue(g)
 				newNode.TemplateGroup.SetValue(false, newNode, g)
-
 				continue
 			}
 		}
@@ -278,20 +211,13 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 			return
 		}
 
+		/* If the solution withut node wasn't found, then group must be in the loop */
 		if newNode.TemplateGroup != nil && newNode.TemplateGroup.SettingNode == newNode {
 			newNode.TemplateGroup.ClearValue(g)
 			newNode.TemplateGroup.SetValue(false, newNode, g)
 		}
-		// } else {
-		// 	newNode.CanBeRemoved = false
-		// 	g.VisitedNodes.Push(newNode)
-		// }
 	}
 
-	/* Clear changes */
-	// if n.TemplateGroup != nil {
-	// 	n.TemplateGroup.ClearValue(g)
-	// }
 	for {
 		thisElement := g.VisitedNodes.Pop()
 		if thisElement == nil {
@@ -299,13 +225,11 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 		}
 
 		thisNode := thisElement.(*utils.Node)
-		// if thisNode.IsVisited && thisNode.TemplateGroup != nil && thisNode.IsDecided && !thisNode.IsForRemoval {
-		// 	thisNode.TemplateGroup.ClearValue(g)
-		// }
 
-		// if thisNode.IsVisited && thisNode.TemplateGroup != nil && thisNode.TemplateGroup.SettingNode == n {
-		// 	thisNode.TemplateGroup.ClearValue(g)
-		// }
+		/* Clear value of the group */
+		if thisNode.IsVisited && thisNode.TemplateGroup != nil && thisNode.TemplateGroup.SettingNode == n {
+			thisNode.TemplateGroup.ClearValue(g)
+		}
 		thisNode.IsVisited = false
 		thisNode.CanBeRemoved = true
 		heap.Push(g.AvailableMoves, thisNode)
@@ -343,7 +267,6 @@ func LoopSolve(g *utils.Graph) {
 		newElement := heap.Pop(g.AvailableMoves)
 		newNode := newElement.(*utils.Node)
 
-		// if !(newNode.IsDecided && !newNode.IsForRemoval) {
 		/* Solution found */
 		if cost == newNode.Cost {
 			newNode.IsInLoop = false
@@ -357,14 +280,9 @@ func LoopSolve(g *utils.Graph) {
 		if newNode.TemplateGroup != nil && !newNode.IsDecided {
 			if !newNode.TemplateGroup.SetValue(true, newNode, g) {
 				debug.Println("Template not aplicable")
-				// if debug.IsDebugMode {
-				// 	g.PrintSquaresBoard(true)
-				// }
-				// debug.Sleep(100)
 
 				newNode.TemplateGroup.ClearValue(g)
 				newNode.TemplateGroup.SetValue(false, newNode, g)
-
 				continue
 			}
 		}
@@ -383,14 +301,9 @@ func LoopSolve(g *utils.Graph) {
 			debug.Println("Reversing set value")
 			newNode.TemplateGroup.ClearValue(g)
 			newNode.TemplateGroup.SetValue(false, newNode, g)
-			// debug.Sleep(10000)
-
 		}
 
 		newNode.IsInLoop = true
-		// } else {
-		// 	newNode.CanBeRemoved = false
-		// }
 	}
 
 	g.PrintSquaresBoard(false)
