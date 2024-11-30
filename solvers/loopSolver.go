@@ -101,9 +101,6 @@ func updateAvailableMoves(n *utils.Node, g *utils.Graph) bool {
 
 			if thisNode.IsInLoop && !thisNode.IsVisited && !(thisNode.IsDecided && !thisNode.IsForRemoval) {
 				canBeRemoved, stopTesting = checkIfCanBeRemoved(thisNode, g)
-				if stopTesting {
-					return true
-				}
 				if canBeRemoved {
 					if !thisNode.CanBeRemoved {
 						thisNode.SetNodeCost(g)
@@ -128,9 +125,6 @@ func updateAvailableMoves(n *utils.Node, g *utils.Graph) bool {
 			thisNode := thisNode.Neighbours[(i+1)%int(g.MaxDegree)]
 			if thisNode != nil && thisNode.IsInLoop && !thisNode.IsVisited && !(thisNode.IsDecided && !thisNode.IsForRemoval) {
 				canBeRemoved, stopTesting = checkIfCanBeRemoved(thisNode, g)
-				if stopTesting {
-					return true
-				}
 				if canBeRemoved {
 					if !thisNode.CanBeRemoved {
 						thisNode.SetNodeCost(g)
@@ -235,39 +229,48 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 		newElement = heap.Pop(g.AvailableMoves)
 		newNode = newElement.(*utils.Node)
 
-		if !(newNode.IsDecided && !newNode.IsForRemoval) {
+		// if !(newNode.IsDecided && !newNode.IsForRemoval) {
 
-			// newNode.IsVisited = true
-			// g.VisitedNodes.Push(newNode)
-			// if newNode.CanBeRemoved {
-			// newNode.CanBeRemoved = false
-			// 	break
-			// }
-			// }
+		// newNode.IsVisited = true
+		// g.VisitedNodes.Push(newNode)
+		// if newNode.CanBeRemoved {
+		// newNode.CanBeRemoved = false
+		// 	break
+		// }
+		// }
 
-			/* Check if solution is found */
-			if cost == newNode.Cost {
-				newNode.IsInLoop = false
-				debug.Println("SOLUTION FOUND")
-				*isSolutionFound = true
-				return
-			}
-
-			/* Delete move from available moves and save it in stack */
-			newNode.CanBeRemoved = false
-			newNode.IsVisited = true
-			g.VisitedNodes.Push(newNode)
-
-			/* Run recursion with new node */
-			loopSolveRecursion(newNode, g, cost-newNode.Cost, isSolutionFound, depth+1)
-
-			if *isSolutionFound {
-				return
-			}
-		} else {
-			newNode.CanBeRemoved = false
-			g.VisitedNodes.Push(newNode)
+		/* Check if solution is found */
+		if cost == newNode.Cost {
+			newNode.IsInLoop = false
+			debug.Println("SOLUTION FOUND")
+			*isSolutionFound = true
+			return
 		}
+
+		/* Delete move from available moves and save it in stack */
+		newNode.CanBeRemoved = false
+		newNode.IsVisited = true
+		g.VisitedNodes.Push(newNode)
+
+		if newNode.TemplateGroup != nil && !newNode.IsDecided {
+			newNode.TemplateGroup.SetValue(true, newNode, g)
+
+		}
+
+		/* Run recursion with new node */
+		loopSolveRecursion(newNode, g, cost-newNode.Cost, isSolutionFound, depth+1)
+
+		if *isSolutionFound {
+			return
+		}
+
+		// if newNode.TemplateGroup != nil && newNode.TemplateGroup.SettingNode == newNode {
+		// 	newNode.TemplateGroup.ClearValue(g)
+		// }
+		// } else {
+		// 	newNode.CanBeRemoved = false
+		// 	g.VisitedNodes.Push(newNode)
+		// }
 	}
 
 	/* Clear changes */
@@ -281,13 +284,13 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 		}
 
 		thisNode := thisElement.(*utils.Node)
-		if thisNode.IsVisited && thisNode.TemplateGroup != nil && thisNode.IsDecided && !thisNode.IsForRemoval {
-			thisNode.TemplateGroup.ClearValue(g)
-		}
+		// if thisNode.IsVisited && thisNode.TemplateGroup != nil && thisNode.IsDecided && !thisNode.IsForRemoval {
+		// 	thisNode.TemplateGroup.ClearValue(g)
+		// }
 
-		if thisNode.IsVisited && thisNode.TemplateGroup != nil && thisNode.TemplateGroup.SettingNode == n {
-			thisNode.TemplateGroup.ClearValue(g)
-		}
+		// if thisNode.IsVisited && thisNode.TemplateGroup != nil && thisNode.TemplateGroup.SettingNode == n {
+		// 	thisNode.TemplateGroup.ClearValue(g)
+		// }
 		thisNode.IsVisited = false
 		thisNode.CanBeRemoved = true
 		heap.Push(g.AvailableMoves, thisNode)
@@ -325,27 +328,27 @@ func LoopSolve(g *utils.Graph) {
 		newElement := heap.Pop(g.AvailableMoves)
 		newNode := newElement.(*utils.Node)
 
-		if !(newNode.IsDecided && !newNode.IsForRemoval) {
-			/* Solution found */
-			if cost == newNode.Cost {
-				newNode.IsInLoop = false
-				break
-			}
-
-			newNode.IsVisited = true
-			newNode.CanBeRemoved = false
-
-			/* Run recursion with new node */
-			loopSolveRecursion(newNode, g, cost-newNode.Cost, isSolutionFound, 1)
-
-			if *isSolutionFound {
-				break
-			}
-
-			newNode.IsInLoop = true
-		} else {
-			newNode.CanBeRemoved = false
+		// if !(newNode.IsDecided && !newNode.IsForRemoval) {
+		/* Solution found */
+		if cost == newNode.Cost {
+			newNode.IsInLoop = false
+			break
 		}
+
+		newNode.IsVisited = true
+		newNode.CanBeRemoved = false
+
+		/* Run recursion with new node */
+		loopSolveRecursion(newNode, g, cost-newNode.Cost, isSolutionFound, 1)
+
+		if *isSolutionFound {
+			break
+		}
+
+		newNode.IsInLoop = true
+		// } else {
+		// 	newNode.CanBeRemoved = false
+		// }
 	}
 
 	g.PrintSquaresBoard(false)

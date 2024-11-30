@@ -30,6 +30,8 @@ func main() {
 	if len(args) > 2 {
 		i, err := strconv.Atoi(args[2])
 		utils.Check(err)
+		fmt.Println(i, ": ", data[i])
+
 		boardType = data[i][0]
 		sizeX, err = strconv.Atoi(data[i][1])
 		utils.Check(err)

@@ -45,18 +45,18 @@ func (l *List) SetValue(isForRemoval bool, settingNode *Node, g *Graph) bool {
 		thisElement := l.Root
 		for {
 			/* Checking if neighbour would have enough edges*/
-			if settingNode != nil {
-				if isForRemoval && thisElement.Value.IsDeletionBreakingSecondRule() {
-					/* Deleting this element is against the rules */
-					return false
-				}
-			}
+			// if settingNode != nil {
+			// 	if isForRemoval && thisElement.Value.IsDeletionBreakingSecondRule() {
+			// 		/* Deleting this element is against the rules */
+			// 		return false
+			// 	}
+			// }
 
 			thisElement.Value.IsDecided = true
 			thisElement.Value.IsForRemoval = isForRemoval
-			if isForRemoval && thisElement.Value.CanBeRemoved {
-				thisElement.Value.UpdateNodeCost(g)
-			}
+			// if isForRemoval && thisElement.Value.CanBeRemoved {
+			// 	thisElement.Value.UpdateNodeCost(g)
+			// }
 			thisElement = thisElement.Next
 
 			if thisElement == l.Root {
@@ -72,17 +72,23 @@ func (l *List) SetValue(isForRemoval bool, settingNode *Node, g *Graph) bool {
 
 func (l *List) ClearValue(g *Graph) {
 	if l != nil && l.Root.Value.IsDecided {
+		// fmt.Println("CLEARING")
+		// time.Sleep(1000 * time.Millisecond)
+		// g.PrintSquaresBoard(true)
 
 		l.Removed = 0
 		l.Removable = 0
 
 		thisElement := l.Root
 		for {
+
 			if thisElement.Value.IsDecided && thisElement.Value.CanBeRemoved {
+
+				thisElement.Value.IsDecided = false
+				thisElement.Value.IsForRemoval = false
+
 				thisElement.Value.UpdateNodeCost(g)
 			}
-
-			thisElement.Value.IsDecided = false
 
 			thisElement = thisElement.Next
 
