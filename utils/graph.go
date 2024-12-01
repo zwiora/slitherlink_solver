@@ -92,7 +92,7 @@ func (g *Graph) CheckIfSolutionOk() bool {
 	for n := 0; n < g.SizeY; n++ {
 		for m := 0; m < g.SizeX; m++ {
 			if thisNode.Value != -1 && thisNode.Value != int8(thisNode.getLinesAround(int(g.MaxDegree))) {
-				fmt.Println(thisNode)
+				// fmt.Println(thisNode)
 				return false
 			}
 			thisNode = thisNode.Neighbours[0]
@@ -257,7 +257,7 @@ func (g *Graph) FindTemplates() {
 	for {
 		// fmt.Println("REPEAT")
 		// g.PrintSquaresBoard(true)
-		// time.Sleep(1000 * time.Millisecond)
+		// time.Sleep(5000 * time.Millisecond)
 
 		newTemplatesFound := 0
 		thisNode := g.Root

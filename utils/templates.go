@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"fmt"
+
 	"github.com/golang-collections/collections/queue"
 )
 
@@ -63,6 +65,22 @@ func nodeState(n *Node) any {
 
 	if n.TemplateGroup != nil {
 		return n.TemplateGroup
+	}
+
+	return nil
+}
+
+func nodeOppositeState(n *Node) any {
+	if n == nil {
+		return false
+	}
+
+	if n.IsDecided {
+		return !n.IsForRemoval
+	}
+
+	if n.TemplateGroup != nil && n.TemplateGroup.OppositeList != nil {
+		return n.TemplateGroup.OppositeList
 	}
 
 	return nil
@@ -141,6 +159,10 @@ func addNodeToOppositeGroup(n1 *Node, n2 *Node, g *Graph) bool {
 		} else if n1.TemplateGroup != nil {
 			n1.TemplateGroup.addOppositeElement(n2)
 		} else {
+			if n2.TemplateGroup == nil {
+				n2.TemplateGroup = new(List)
+				n2.TemplateGroup.addElement(n2)
+			}
 			n2.TemplateGroup.addOppositeElement(n1)
 		}
 	}
@@ -175,6 +197,8 @@ func (n *Node) findZeroTemplates(g *Graph) bool {
 
 func (n *Node) findNumberTemplates(g *Graph) bool {
 
+	isChangeMade := false
+
 	/* ! DZIAŁA TYLKO DLA KWADRATÓW */
 	if n.Value != -1 && n.Value != 0 {
 		if n.IsDecided || n.TemplateGroup != nil {
@@ -187,7 +211,6 @@ func (n *Node) findNumberTemplates(g *Graph) bool {
 			}
 
 			if len(stateList[nState]) == len(n.Neighbours)-int(n.Value) {
-				isChangeMade := false
 				for key, slice := range stateList {
 					if key != nState {
 						for v := range slice {
@@ -197,7 +220,56 @@ func (n *Node) findNumberTemplates(g *Graph) bool {
 						}
 					}
 				}
-				return isChangeMade
+			} else if n.Value == 1 && len(stateList[nState]) == 2 {
+				var firstNode *Node
+				var secondNode *Node
+				for key, slice := range stateList {
+					if key != nState {
+						for v := range slice {
+							if firstNode == nil {
+								firstNode = n.Neighbours[slice[v]]
+							} else {
+								secondNode = n.Neighbours[slice[v]]
+							}
+						}
+					}
+				}
+
+				if addNodeToOppositeGroup(firstNode, secondNode, g) {
+					isChangeMade = true
+				}
+			}
+
+			oppositeState := nodeOppositeState(n)
+
+			if oppositeState != nil && len(stateList[oppositeState]) == int(n.Value) {
+				for key, slice := range stateList {
+					if key != oppositeState {
+						for v := range slice {
+							if addNodeToGroup(n, n.Neighbours[slice[v]], g) {
+								isChangeMade = true
+							}
+						}
+					}
+				}
+			} else if n.Value == 3 && len(stateList[oppositeState]) == 2 {
+				var firstNode *Node
+				var secondNode *Node
+				for key, slice := range stateList {
+					if key != oppositeState {
+						for v := range slice {
+							if firstNode == nil {
+								firstNode = n.Neighbours[slice[v]]
+							} else {
+								secondNode = n.Neighbours[slice[v]]
+							}
+						}
+					}
+				}
+
+				if addNodeToOppositeGroup(firstNode, secondNode, g) {
+					isChangeMade = true
+				}
 			}
 
 			return false
@@ -214,21 +286,105 @@ func (n *Node) findNumberTemplates(g *Graph) bool {
 
 			for key, slice := range stateList {
 				if key != nil && len(slice) >= 2 {
-					isChangeMade := false
 					if n.Value == 1 {
-						isChangeMade = addNodeToGroup(n, n.Neighbours[slice[0]], g)
-						// time.Sleep(1000 * time.Millisecond)
+						if addNodeToGroup(n, n.Neighbours[slice[0]], g) {
+							isChangeMade = true
+						}
 					} else if n.Value == 3 {
-						isChangeMade = addNodeToOppositeGroup(n, n.Neighbours[slice[0]], g)
+						if addNodeToOppositeGroup(n, n.Neighbours[slice[0]], g) {
+							isChangeMade = true
+						}
 					}
-					return isChangeMade
-
 				}
+			}
+
+		}
+		if n.Value == 2 {
+			stateList := make(map[any][]int)
+			for k, v := range n.Neighbours {
+				vState := nodeState(v)
+				stateList[vState] = append(stateList[vState], k)
+			}
+
+			for key, slice := range stateList {
+				if key != nil && len(slice) >= 2 {
+					for k, s := range stateList {
+						if k != key {
+							for v := range s {
+								if addNodeToOppositeGroup(n.Neighbours[slice[0]], n.Neighbours[s[v]], g) {
+									isChangeMade = true
+								}
+							}
+						}
+					}
+					break
+				}
+			}
+
+			if !isChangeMade {
+
+				if len(stateList[true]) == 1 && len(stateList[false]) == 1 {
+
+					var firstNode *Node
+					var secondNode *Node
+					for key, slice := range stateList {
+						if key != true && key != false {
+							for v := range slice {
+								if firstNode == nil {
+									firstNode = n.Neighbours[slice[v]]
+								} else {
+									secondNode = n.Neighbours[slice[v]]
+								}
+							}
+						}
+					}
+
+					g.PrintSquaresBoard(true)
+					fmt.Println(n)
+					fmt.Println(firstNode, secondNode)
+
+					if addNodeToOppositeGroup(firstNode, secondNode, g) {
+						isChangeMade = true
+					}
+				}
+
+				for key := range stateList {
+					if key != nil && key != true && key != false {
+						list := key.(*List)
+						if list != nil && list.OppositeList != nil && len(stateList[list.OppositeList]) == 1 {
+							var firstNode *Node
+							var secondNode *Node
+							for k, s := range stateList {
+								if k != key && k != list.OppositeList {
+									for v := range s {
+										if firstNode == nil {
+											firstNode = n.Neighbours[s[v]]
+										} else {
+											secondNode = n.Neighbours[s[v]]
+										}
+									}
+								}
+							}
+
+							if addNodeToOppositeGroup(firstNode, secondNode, g) {
+								g.PrintSquaresBoard(true)
+								fmt.Println("Neighbours")
+								for _, v := range n.Neighbours {
+									fmt.Println(v)
+								}
+								fmt.Println(firstNode, secondNode)
+
+								isChangeMade = true
+							}
+						}
+					}
+				}
+
 			}
 		}
 	}
 
-	return false
+	return isChangeMade
 }
 
 // /* Returns true, if template found */

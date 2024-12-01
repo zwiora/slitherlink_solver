@@ -102,6 +102,8 @@ func updateAvailableMoves(n *utils.Node, g *utils.Graph) bool {
 						thisNode.UpdateNodeCost(g)
 					}
 				} else if !canBeRemoved && thisNode.CanBeRemoved {
+					// g.PrintSquaresBoard(true)
+					// fmt.Println(thisNode)
 					heap.Remove(g.AvailableMoves, thisNode.QueueIndex)
 					thisNode.CanBeRemoved = false
 				}
@@ -151,6 +153,7 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 	debug.Println(cost)
 
 	n.IsInLoop = false
+
 	if debug.IsDebugMode {
 		g.PrintSquaresBoard(true)
 	}
@@ -184,6 +187,7 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 
 		/* Return if it's not possible to remove the node */
 		if newNode.IsDecided && !newNode.IsForRemoval {
+			newNode.CanBeRemoved = false
 			continue
 		}
 
@@ -230,6 +234,10 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 		if thisNode.IsVisited && thisNode.TemplateGroup != nil && thisNode.TemplateGroup.SettingNode == n {
 			thisNode.TemplateGroup.ClearValue(g)
 		}
+
+		if thisNode.IsVisited && thisNode.TemplateGroup != nil && thisNode.IsDecided && !thisNode.IsForRemoval {
+			thisNode.TemplateGroup.ClearValue(g)
+		}
 		thisNode.IsVisited = false
 		thisNode.CanBeRemoved = true
 		heap.Push(g.AvailableMoves, thisNode)
@@ -274,6 +282,7 @@ func LoopSolve(g *utils.Graph) {
 		}
 
 		if newNode.IsDecided && !newNode.IsForRemoval {
+			newNode.CanBeRemoved = false
 			continue
 		}
 
