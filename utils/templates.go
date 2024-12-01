@@ -1,8 +1,6 @@
 package utils
 
 import (
-	"fmt"
-
 	"github.com/golang-collections/collections/queue"
 )
 
@@ -339,9 +337,9 @@ func (n *Node) findNumberTemplates(g *Graph) bool {
 						}
 					}
 
-					g.PrintSquaresBoard(true)
-					fmt.Println(n)
-					fmt.Println(firstNode, secondNode)
+					// g.PrintSquaresBoard(true)
+					// fmt.Println(n)
+					// fmt.Println(firstNode, secondNode)
 
 					if addNodeToOppositeGroup(firstNode, secondNode, g) {
 						isChangeMade = true
@@ -367,12 +365,12 @@ func (n *Node) findNumberTemplates(g *Graph) bool {
 							}
 
 							if addNodeToOppositeGroup(firstNode, secondNode, g) {
-								g.PrintSquaresBoard(true)
-								fmt.Println("Neighbours")
-								for _, v := range n.Neighbours {
-									fmt.Println(v)
-								}
-								fmt.Println(firstNode, secondNode)
+								// g.PrintSquaresBoard(true)
+								// fmt.Println("Neighbours")
+								// for _, v := range n.Neighbours {
+								// 	fmt.Println(v)
+								// }
+								// fmt.Println(firstNode, secondNode)
 
 								isChangeMade = true
 							}
