@@ -1,9 +1,6 @@
 package utils
 
 import (
-	"fmt"
-	"time"
-
 	"github.com/golang-collections/collections/queue"
 )
 
@@ -73,7 +70,7 @@ func nodeState(n *Node) any {
 
 /* Returns true if any changes have been applied */
 func addNodeToGroup(n1 *Node, n2 *Node, g *Graph) bool {
-	if isNodeDecided(n1) && isNodeDecided(n2) || isTheSameState(n1, n2) {
+	if (isNodeDecided(n1) && isNodeDecided(n2)) || isTheSameState(n1, n2) {
 		return false
 	}
 
@@ -91,7 +88,7 @@ func addNodeToGroup(n1 *Node, n2 *Node, g *Graph) bool {
 	if notDecided != nil {
 		if notDecided.TemplateGroup == nil {
 			notDecided.IsDecided = true
-			notDecided.IsForRemoval = decided.IsForRemoval
+			notDecided.IsForRemoval = decided == nil || decided.IsForRemoval
 		} else {
 			notDecided.TemplateGroup.SetValue(isNodeDecidedOut(decided), nil, g)
 		}
@@ -102,6 +99,47 @@ func addNodeToGroup(n1 *Node, n2 *Node, g *Graph) bool {
 			n1.TemplateGroup.addElement(n2)
 		} else {
 			n2.TemplateGroup.addElement(n1)
+		}
+	}
+
+	return true
+}
+
+/* Returns true if any changes have been applied */
+func addNodeToOppositeGroup(n1 *Node, n2 *Node, g *Graph) bool {
+	if isNodeDecided(n1) && isNodeDecided(n2) || isDifferentState(n1, n2) {
+		return false
+	}
+
+	var decided *Node
+	var notDecided *Node
+
+	if isNodeDecided(n1) {
+		decided = n1
+		notDecided = n2
+	} else if isNodeDecided(n2) {
+		decided = n2
+		notDecided = n1
+	}
+
+	if notDecided != nil {
+		if notDecided.TemplateGroup == nil {
+			notDecided.IsDecided = true
+			if decided == nil {
+				notDecided.IsForRemoval = false
+			} else {
+				notDecided.IsForRemoval = !decided.IsForRemoval
+			}
+		} else {
+			notDecided.TemplateGroup.SetValue(!isNodeDecidedOut(decided), nil, g)
+		}
+	} else /*Neither one is decided */ {
+		if n1.TemplateGroup != nil && n2.TemplateGroup != nil {
+			addOppositeLists(n1.TemplateGroup, n2.TemplateGroup)
+		} else if n1.TemplateGroup != nil {
+			n1.TemplateGroup.addOppositeElement(n2)
+		} else {
+			n2.TemplateGroup.addOppositeElement(n1)
 		}
 	}
 
@@ -137,6 +175,18 @@ func (n *Node) findNumberTemplates(g *Graph) bool {
 
 	/* ! DZIAŁA TYLKO DLA KWADRATÓW */
 	if n.Value != -1 {
+		// if n.IsDecided || n.TemplateGroup != nil {
+		// 	nState := nodeState(n)
+
+		// 	stateList := make(map[any][]int)
+		// 	for k, v := range n.Neighbours {
+		// 		vState := nodeState(v)
+		// 		if vState != nil {
+		// 			stateList[vState] = append(stateList[vState], k)
+		// 		}
+		// 	}
+
+		// }
 		if !n.IsDecided && n.Value != 2 {
 			stateList := make(map[any][]int)
 			for k, v := range n.Neighbours {
@@ -145,21 +195,16 @@ func (n *Node) findNumberTemplates(g *Graph) bool {
 					stateList[vState] = append(stateList[vState], k)
 				}
 			}
-			fmt.Println(n, stateList)
 
 			for key, slice := range stateList {
 				if key != nil && len(slice) >= 2 {
 					isChangeMade := false
 					if n.Value == 1 {
-
-						n.IsDecided = true
-
 						isChangeMade = addNodeToGroup(n, n.Neighbours[slice[0]], g)
-						time.Sleep(1000 * time.Millisecond)
+						// time.Sleep(1000 * time.Millisecond)
+					} else if n.Value == 3 {
+						isChangeMade = addNodeToOppositeGroup(n, n.Neighbours[slice[0]], g)
 					}
-					// else if n.Value == 3 {
-					// 	n.IsForRemoval = !key.(bool)
-					// }
 					return isChangeMade
 
 				}

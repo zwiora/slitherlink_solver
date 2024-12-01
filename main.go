@@ -77,6 +77,7 @@ func main() {
 			g := utils.ConstructBoardFromData(boardType, sizeX, sizeY, code)
 
 			solvers.LoopSolve(g)
+			g.PrintSquaresBoard(true)
 
 			utils.AvgDepth /= float32(utils.NoVisitedStates)
 			fmt.Println("Visited states: ", utils.NoVisitedStates)

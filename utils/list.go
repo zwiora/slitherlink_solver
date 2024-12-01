@@ -31,6 +31,25 @@ func (l *List) addElement(node *Node) {
 	}
 }
 
+func (l *List) addOppositeElement(node *Node) {
+	if l.OppositeList == nil {
+		l.OppositeList = new(List)
+		l.OppositeList.OppositeList = l
+	}
+	l = l.OppositeList
+	l.Length++
+	newElement := new(ListElem)
+	newElement.Value = node
+	node.TemplateGroup = l
+	if l.Root == nil {
+		newElement.Next = newElement
+		l.Root = newElement
+	} else {
+		newElement.Next = l.Root.Next
+		l.Root.Next = newElement
+	}
+}
+
 func (l *List) SetValue(isForRemoval bool, settingNode *Node, g *Graph) bool {
 	if l != nil && !l.Root.Value.IsDecided {
 
@@ -103,12 +122,7 @@ func (l *List) print() {
 	}
 }
 
-func addLists(l1 *List, l2 *List) {
-
-	if l1 == l2 {
-		return
-	}
-
+func concatLists(l1 *List, l2 *List) {
 	basicList := l1
 	additionalList := l2
 	if l1.Length < l2.Length {
@@ -134,4 +148,36 @@ func addLists(l1 *List, l2 *List) {
 	basicList.Length += additionalList.Length
 }
 
-// func (l List) markList(isClearing )
+func addLists(l1 *List, l2 *List) {
+
+	if l1 == l2 {
+		return
+	}
+	concatLists(l1, l2)
+	if l1.OppositeList == nil && l2.OppositeList != nil {
+		l1.OppositeList = l2.OppositeList
+	} else if l2.OppositeList == nil && l1.OppositeList != nil {
+		l2.OppositeList = l1.OppositeList
+	} else if l1.OppositeList != nil && l2.OppositeList != nil {
+		concatLists(l1.OppositeList, l2.OppositeList)
+	}
+}
+
+func addOppositeLists(l1 *List, l2 *List) {
+
+	if l1 == l2.OppositeList {
+		return
+	}
+
+	if l1.OppositeList == nil {
+		l1.OppositeList = l2
+	} else {
+		concatLists(l1.OppositeList, l2)
+	}
+
+	if l2.OppositeList == nil {
+		l2.OppositeList = l1
+	} else {
+		concatLists(l2.OppositeList, l1)
+	}
+}
