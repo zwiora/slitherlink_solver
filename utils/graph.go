@@ -84,6 +84,26 @@ func (g *Graph) PrintSquaresBoard(isDebugMode bool) {
 	}
 }
 
+func (g *Graph) CheckIfSolutionOk() bool {
+
+	lastLineNode := g.Root
+	thisNode := g.Root
+
+	for n := 0; n < g.SizeY; n++ {
+		for m := 0; m < g.SizeX; m++ {
+			if thisNode.Value != -1 && thisNode.Value != int8(thisNode.getLinesAround(int(g.MaxDegree))) {
+				fmt.Println(thisNode)
+				return false
+			}
+			thisNode = thisNode.Neighbours[0]
+		}
+		thisNode = lastLineNode.Neighbours[1]
+		lastLineNode = thisNode
+	}
+
+	return true
+}
+
 /*
 Change isVisited value from true to false in all nodes in the graph. Should be used after traversing the whole graph.
 */
@@ -225,86 +245,57 @@ func (g *Graph) FindTemplates() {
 
 		/* If the final state of the node isn't set */
 		if !thisNode.IsDecided {
-			thisNode.findZeroTemplates(nodes, g)
-			if !thisNode.findCornerTemplates(g, nodes) {
-				thisNode.find31Templates(g, nodes)
+			if !thisNode.findZeroTemplates(g) {
+				thisNode.findNumberTemplates(g)
 			}
-
-			// fmt.Println("analysed")
-		}
-
-		if !thisNode.IsDecided {
-
-		}
-
-		// fmt.Println(thisNode)
-		// g.PrintSquaresBoard(true)
-		// time.Sleep(1000 * time.Millisecond)
-
-	}
-
-	for {
-		// g.PrintSquaresBoard(true)
-		// time.Sleep(1000 * time.Millisecond)
-
-		newTemplatesFound := 0
-		thisNode := g.Root
-
-		for {
-			thisNode.IsVisited = true
-
-			// all templates not near edge use 0 or 3
-			if !thisNode.IsDecided && thisNode.Value != -1 {
-				if !thisNode.findCornerTemplates(g, nodes) {
-					if thisNode.find31Templates(g, nodes) {
-						newTemplatesFound++
-					}
-				} else {
-					newTemplatesFound++
-				}
-			}
-
-			// fmt.Println(newTemplatesFound)
-
-			isNewNode := false
-			for _, v := range thisNode.Neighbours {
-				if v != nil && !v.IsVisited {
-					thisNode = v
-					isNewNode = true
-					break
-				}
-			}
-
-			if !isNewNode {
-				break
-			}
-		}
-
-		g.ClearIsVisited()
-
-		if newTemplatesFound == 0 {
-			break
+			// if !thisNode.findCornerTemplates(g, nodes) {
+			// 	thisNode.find31Templates(g, nodes)
+			// }
 		}
 	}
 
-}
+	// for {
+	// 	// g.PrintSquaresBoard(true)
+	// 	// time.Sleep(1000 * time.Millisecond)
 
-func (g *Graph) CheckIfSolutionOk() bool {
+	// 	newTemplatesFound := 0
+	// 	thisNode := g.Root
 
-	lastLineNode := g.Root
-	thisNode := g.Root
+	// 	for {
+	// 		thisNode.IsVisited = true
 
-	for n := 0; n < g.SizeY; n++ {
-		for m := 0; m < g.SizeX; m++ {
-			if thisNode.Value != -1 && thisNode.Value != int8(thisNode.getLinesAround(int(g.MaxDegree))) {
-				fmt.Println(thisNode)
-				return false
-			}
-			thisNode = thisNode.Neighbours[0]
-		}
-		thisNode = lastLineNode.Neighbours[1]
-		lastLineNode = thisNode
-	}
+	// 		// checking only templates that use state of other nodes
+	// 		if !thisNode.IsDecided && thisNode.Value != -1 {
+	// 			if !thisNode.findCornerTemplates(g, nodes) {
+	// 				if thisNode.find31Templates(g, nodes) {
+	// 					newTemplatesFound++
+	// 				}
+	// 			} else {
+	// 				newTemplatesFound++
+	// 			}
+	// 		}
 
-	return true
+	// 		// fmt.Println(newTemplatesFound)
+
+	// 		isNewNode := false
+	// 		for _, v := range thisNode.Neighbours {
+	// 			if v != nil && !v.IsVisited {
+	// 				thisNode = v
+	// 				isNewNode = true
+	// 				break
+	// 			}
+	// 		}
+
+	// 		if !isNewNode {
+	// 			break
+	// 		}
+	// 	}
+
+	// 	g.ClearIsVisited()
+
+	// 	if newTemplatesFound == 0 {
+	// 		break
+	// 	}
+	// }
+
 }

@@ -11,24 +11,33 @@ import (
 
 func main() {
 	args := os.Args
+	dataFile := ""
 
-	if args[1] == "on" {
+	if args[1] == "s" {
+		dataFile = "multiple"
+	} else if args[1] == "h" {
+		dataFile = "hexagon"
+	} else {
+		return
+	}
+
+	if args[2] == "on" {
 		utils.IsHeuristicOn = true
 	}
 
-	if len(args) > 3 && args[3] == "d" {
+	if len(args) > 4 && args[4] == "d" {
 		debug.IsDebugMode = true
 	}
 
-	data := utils.ReadMultiplePuzzleStructure("data/multiple.txt")
+	data := utils.ReadMultiplePuzzleStructure("data/" + dataFile + ".txt")
 	boardType := ""
 	sizeX := 0
 	sizeY := 0
 	code := ""
 	var err error
 
-	if len(args) > 2 {
-		i, err := strconv.Atoi(args[2])
+	if len(args) > 3 {
+		i, err := strconv.Atoi(args[3])
 		utils.Check(err)
 		fmt.Println(i, ": ", data[i])
 
@@ -40,6 +49,9 @@ func main() {
 		code = data[i][3]
 
 		g := utils.ConstructBoardFromData(boardType, sizeX, sizeY, code)
+		// fmt.Println(g)
+		// return
+
 		solvers.LoopSolve(g)
 
 		utils.AvgDepth /= float32(utils.NoVisitedStates)
@@ -51,6 +63,9 @@ func main() {
 		fmt.Println()
 	} else {
 		for i := range data {
+			utils.AvgDepth = 0
+			utils.MaxDepth = 0
+			utils.NoVisitedStates = 0
 			fmt.Println(i, ": ", data[i])
 			boardType = data[i][0]
 			sizeX, err = strconv.Atoi(data[i][1])

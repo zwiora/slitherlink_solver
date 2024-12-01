@@ -45,6 +45,7 @@ func (n *Node) getCostOfField(maxDegree int) int {
 
 func (n *Node) IsDeletionBreakingSecondRule() bool {
 	oldIsInLoop := n.IsInLoop
+
 	/* Checking if it would have enough edges */
 	n.IsInLoop = false
 	if n.GetDegree() < int(n.Value) {
@@ -56,9 +57,6 @@ func (n *Node) IsDeletionBreakingSecondRule() bool {
 	for _, v := range n.Neighbours {
 		if v != nil && !v.IsInLoop {
 			if v.GetDegree() < int(v.Value) {
-				// if n.CanBeRemoved && n.TemplateGroup != nil && n.IsDecided && n.IsForRemoval {
-				// 	n.TemplateGroup.Removable--
-				// }
 				n.IsInLoop = oldIsInLoop
 				return true
 			}
