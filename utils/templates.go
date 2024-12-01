@@ -25,7 +25,7 @@ func isTheSameState(n1 *Node, n2 *Node) bool {
 }
 
 func isDifferentState(n1 *Node, n2 *Node) bool {
-	if n1 != nil && n2 != nil && n1.TemplateGroup != nil && n1.TemplateGroup == n2.TemplateGroup.OppositeList {
+	if n1 != nil && n2 != nil && n1.TemplateGroup != nil && n2.TemplateGroup != nil && n1.TemplateGroup == n2.TemplateGroup.OppositeList {
 		return true
 	}
 
@@ -123,6 +123,7 @@ func addNodeToOppositeGroup(n1 *Node, n2 *Node, g *Graph) bool {
 	}
 
 	if notDecided != nil {
+
 		if notDecided.TemplateGroup == nil {
 			notDecided.IsDecided = true
 			if decided == nil {
@@ -134,6 +135,7 @@ func addNodeToOppositeGroup(n1 *Node, n2 *Node, g *Graph) bool {
 			notDecided.TemplateGroup.SetValue(!isNodeDecidedOut(decided), nil, g)
 		}
 	} else /*Neither one is decided */ {
+
 		if n1.TemplateGroup != nil && n2.TemplateGroup != nil {
 			addOppositeLists(n1.TemplateGroup, n2.TemplateGroup)
 		} else if n1.TemplateGroup != nil {
@@ -174,19 +176,33 @@ func (n *Node) findZeroTemplates(g *Graph) bool {
 func (n *Node) findNumberTemplates(g *Graph) bool {
 
 	/* ! DZIAŁA TYLKO DLA KWADRATÓW */
-	if n.Value != -1 {
-		// if n.IsDecided || n.TemplateGroup != nil {
-		// 	nState := nodeState(n)
+	if n.Value != -1 && n.Value != 0 {
+		if n.IsDecided || n.TemplateGroup != nil {
+			nState := nodeState(n)
 
-		// 	stateList := make(map[any][]int)
-		// 	for k, v := range n.Neighbours {
-		// 		vState := nodeState(v)
-		// 		if vState != nil {
-		// 			stateList[vState] = append(stateList[vState], k)
-		// 		}
-		// 	}
+			stateList := make(map[any][]int)
+			for k, v := range n.Neighbours {
+				vState := nodeState(v)
+				stateList[vState] = append(stateList[vState], k)
+			}
 
-		// }
+			if len(stateList[nState]) == len(n.Neighbours)-int(n.Value) {
+				isChangeMade := false
+				for key, slice := range stateList {
+					if key != nState {
+						for v := range slice {
+							if addNodeToOppositeGroup(n, n.Neighbours[slice[v]], g) {
+								isChangeMade = true
+							}
+						}
+					}
+				}
+				return isChangeMade
+			}
+
+			return false
+
+		}
 		if !n.IsDecided && n.Value != 2 {
 			stateList := make(map[any][]int)
 			for k, v := range n.Neighbours {

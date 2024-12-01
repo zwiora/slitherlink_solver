@@ -255,6 +255,7 @@ func (g *Graph) FindTemplates() {
 	}
 
 	for {
+		// fmt.Println("REPEAT")
 		// g.PrintSquaresBoard(true)
 		// time.Sleep(1000 * time.Millisecond)
 
