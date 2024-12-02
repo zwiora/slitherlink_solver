@@ -1,11 +1,5 @@
 package utils
 
-import (
-	"fmt"
-
-	"github.com/golang-collections/collections/queue"
-)
-
 func isTheSameState(n1 *Node, n2 *Node) bool {
 	if n1 != nil && n2 != nil && n1.TemplateGroup != nil && n1.TemplateGroup == n2.TemplateGroup {
 		return true
@@ -158,10 +152,7 @@ func addNodeToOppositeGroup(n1 *Node, n2 *Node, g *Graph) bool {
 			notDecided.TemplateGroup.SetValue(!isNodeDecidedOut(decided), nil, g)
 		}
 	} else /*Neither one is decided */ {
-
 		if n1.TemplateGroup != nil && n2.TemplateGroup != nil {
-			fmt.Println(n1.TemplateGroup)
-			fmt.Println(n2.TemplateGroup)
 			addOppositeLists(n1.TemplateGroup, n2.TemplateGroup)
 		} else if n1.TemplateGroup != nil {
 			n1.TemplateGroup.addOppositeElement(n2)
@@ -218,7 +209,6 @@ func (n *Node) findNumberTemplates(g *Graph) bool {
 				stateList[vState] = append(stateList[vState], k)
 			}
 
-			/* !!!!!!!!!!!!!!!!!!!!!!!!! */
 			if len(stateList[nState]) == len(n.Neighbours)-int(n.Value) {
 				for key, slice := range stateList {
 					if key != nState {
@@ -348,10 +338,6 @@ func (n *Node) findNumberTemplates(g *Graph) bool {
 						}
 					}
 
-					// g.PrintSquaresBoard(true)
-					// fmt.Println(n)
-					// fmt.Println(firstNode, secondNode)
-
 					if addNodeToOppositeGroup(firstNode, secondNode, g) {
 						isChangeMade = true
 					}
@@ -376,13 +362,6 @@ func (n *Node) findNumberTemplates(g *Graph) bool {
 							}
 
 							if addNodeToOppositeGroup(firstNode, secondNode, g) {
-								// g.PrintSquaresBoard(true)
-								// fmt.Println("Neighbours")
-								// for _, v := range n.Neighbours {
-								// 	fmt.Println(v)
-								// }
-								// fmt.Println(firstNode, secondNode)
-
 								isChangeMade = true
 							}
 						}
@@ -494,88 +473,81 @@ func (n *Node) find3and3Templates(g *Graph) bool {
 				if addNodeToOppositeGroup(m, m.Neighbours[1], g) {
 					isChangeMade = true
 				}
-				// if m.TemplateGroup != nil {
-				// 	fmt.Println(m)
-				// 	fmt.Println(m.Neighbours[1])
-				// 	fmt.Println(m.Neighbours[2])
-				// 	fmt.Println(isDifferentState(m, m.Neighbours[1]))
-				// 	m.TemplateGroup.print()
-				// 	fmt.Println("-----------")
-				// }
-
 			}
 		}
 	}
 	return isChangeMade
 }
 
-// /* Returns true, if template found */
-// func (n *Node) findCornerTemplates(g *Graph, q *queue.Queue) bool {
+func (n *Node) findloopReachingNumberTemplates(g *Graph) bool {
+	isChangeMade := false
 
-// 	// fmt.Println(n)
+	if n.Value == 3 {
+		for i, v := range n.Neighbours {
+			if v != nil {
+				w := v.Neighbours[(i+1)%len(n.Neighbours)]
+				if isDifferentState(v, w) {
+					if n.Neighbours[(i+1)%len(n.Neighbours)] != nil {
+						if addNodeToGroup(n.Neighbours[(i+1)%len(n.Neighbours)], w, g) {
+							isChangeMade = true
+						}
+					}
+					if addNodeToOppositeGroup(n, n.Neighbours[(i+2)%len(n.Neighbours)], g) {
+						isChangeMade = true
+					}
+					if addNodeToOppositeGroup(n, n.Neighbours[(i+3)%len(n.Neighbours)], g) {
+						isChangeMade = true
+					}
+				}
 
-// 	if n.Value == 2 {
-// 		noDecided := 0
-// 		for i := 0; i < len(n.Neighbours); i++ {
-// 			if n.Neighbours[i] == nil || n.Neighbours[i].IsDecided {
-// 				noDecided++
-// 			}
-// 		}
+				w = v.Neighbours[(i-1+len(n.Neighbours))%len(n.Neighbours)]
+				if isDifferentState(v, w) {
+					if n.Neighbours[(i-1+len(n.Neighbours))%len(n.Neighbours)] != nil {
+						if addNodeToGroup(n.Neighbours[(i-1+len(n.Neighbours))%len(n.Neighbours)], w, g) {
+							isChangeMade = true
+						}
+					}
+					if addNodeToOppositeGroup(n, n.Neighbours[(i+1)%len(n.Neighbours)], g) {
+						isChangeMade = true
+					}
+					if addNodeToOppositeGroup(n, n.Neighbours[(i+2)%len(n.Neighbours)], g) {
+						isChangeMade = true
+					}
+				}
+			}
+		}
+	} else if n.Value == 1 {
+		for i, v := range n.Neighbours {
+			if v != nil {
+				w := v.Neighbours[(i+1)%len(n.Neighbours)]
+				x := n.Neighbours[(i+1)%len(n.Neighbours)]
+				if isDifferentState(v, w) && isTheSameState(w, x) {
+					if addNodeToGroup(n, n.Neighbours[(i+2)%len(n.Neighbours)], g) {
+						isChangeMade = true
+					}
+					if addNodeToGroup(n, n.Neighbours[(i+3)%len(n.Neighbours)], g) {
+						isChangeMade = true
+					}
+				}
 
-// 		// fmt.Println(noDecided)
+				w = v.Neighbours[(i-1+len(n.Neighbours))%len(n.Neighbours)]
+				x = n.Neighbours[(i-1+len(n.Neighbours))%len(n.Neighbours)]
+				if isDifferentState(v, w) && isTheSameState(w, x) {
+					if addNodeToGroup(n, n.Neighbours[(i+1)%len(n.Neighbours)], g) {
+						isChangeMade = true
+					}
+					if addNodeToGroup(n, n.Neighbours[(i+2)%len(n.Neighbours)], g) {
+						isChangeMade = true
+					}
+				}
+			}
+		}
+	}
 
-// 		if noDecided == 4 {
-// 			// fmt.Println("Wracamy")
-// 			return false
-// 		}
-// 	}
+	return isChangeMade
+}
 
-// 	// fmt.Println("Nie wracamy")
-
-// 	for i := 0; i < len(n.Neighbours); i++ {
-// 		thisNeighbour := n.Neighbours[i]
-// 		nextNeighbour := n.Neighbours[(i+1)%int(g.MaxDegree)]
-// 		isSame, stateOfBoth := isTheSameState(thisNeighbour, nextNeighbour)
-// 		if isSame && n.Value != 0 {
-// 			switch n.Value {
-// 			case 1:
-// 				n.IsForRemoval = stateOfBoth
-// 				n.IsDecided = true
-// 			case 2:
-// 				oppositeNeighbour := n.Neighbours[(i+2)%int(g.MaxDegree)]
-// 				if oppositeNeighbour != nil {
-// 					oppositeNeighbour.IsForRemoval = !isNodeDecidedOut(thisNeighbour)
-// 					oppositeNeighbour.IsDecided = true
-// 				}
-
-// 				oppositeNeighbour = n.Neighbours[(i+3)%int(g.MaxDegree)]
-// 				if oppositeNeighbour != nil {
-// 					oppositeNeighbour.IsForRemoval = !isNodeDecidedOut(thisNeighbour)
-// 					oppositeNeighbour.IsDecided = true
-// 				}
-// 			case 3:
-// 				n.IsForRemoval = !isNodeDecidedOut(thisNeighbour)
-// 				n.IsDecided = true
-// 				/* We can determine state of diagonal node - also possible with other method */
-// 				// if thisNeighbour != nil {
-// 				// 	diagonal := thisNeighbour.Neighbours[(i+1)%int(g.MaxDegree)]
-// 				// 	if diagonal != nil {
-// 				// 		diagonal.IsForRemoval = true
-// 				// 		diagonal.IsDecided = true
-// 				// 		addNeighboursToQueue(diagonal, q, thisNeighbour, nextNeighbour)
-// 				// 	}
-// 				// }
-
-// 			}
-
-// 			return true
-// 		}
-// 	}
-
-// 	return false
-// }
-
-func (n *Node) find31Templates(g *Graph, q *queue.Queue) bool {
+func (n *Node) find31Templates(g *Graph) bool {
 	/* value of this node equal to 3 */
 	if n.Value == 3 {
 		/* is next to the wall */

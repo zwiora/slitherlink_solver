@@ -4,6 +4,7 @@ import (
 	"container/heap"
 	"fmt"
 	"slitherlink_solver/debug"
+	"time"
 
 	"github.com/golang-collections/collections/queue"
 	"github.com/golang-collections/collections/stack"
@@ -280,9 +281,18 @@ func (g *Graph) FindTemplates() {
 			}
 
 			if thisNode.find3and3Templates(g) {
-				// fmt.Println("SUPER")
-				// g.PrintSquaresBoard(true)
-				// time.Sleep(time.Millisecond * 1000)
+
+				newTemplatesFound++
+			}
+
+			g.PrintSquaresBoard(true)
+
+			if thisNode.findloopReachingNumberTemplates(g) {
+				if thisNode.Value == 1 {
+					fmt.Println("SUPER")
+					g.PrintSquaresBoard(true)
+					time.Sleep(time.Millisecond * 1000)
+				}
 
 				newTemplatesFound++
 			}
