@@ -244,20 +244,16 @@ func (g *Graph) FindTemplates() {
 		thisNode := (nodes.Dequeue()).(*Node)
 
 		/* If the final state of the node isn't set */
-		if !thisNode.IsDecided {
-			if !thisNode.findZeroTemplates(g) {
-				thisNode.findNumberTemplates(g)
-			}
-			// if !thisNode.findCornerTemplates(g, nodes) {
-			// 	thisNode.find31Templates(g, nodes)
-			// }
+		if !thisNode.findZeroTemplates(g) {
+			thisNode.findNumberTemplates(g)
 		}
+		// if !thisNode.findCornerTemplates(g, nodes) {
+		// 	thisNode.find31Templates(g, nodes)
+		// }
+
 	}
 
 	for {
-		// fmt.Println("REPEAT")
-		// g.PrintSquaresBoard(true)
-		// time.Sleep(5000 * time.Millisecond)
 
 		newTemplatesFound := 0
 		thisNode := g.Root
@@ -266,7 +262,7 @@ func (g *Graph) FindTemplates() {
 			thisNode.IsVisited = true
 
 			// checking only templates that use state of other nodes
-			if !thisNode.IsDecided && thisNode.Value != -1 {
+			if thisNode.Value != -1 {
 				if thisNode.findNumberTemplates(g) {
 					newTemplatesFound++
 				}
@@ -309,6 +305,9 @@ func (g *Graph) FindTemplates() {
 			}
 		}
 
+		// fmt.Println("REPEAT")
+		// g.PrintSquaresBoard(true)
+		// time.Sleep(1000 * time.Millisecond)
 		g.ClearIsVisited()
 
 		if newTemplatesFound == 0 {

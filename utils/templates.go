@@ -218,6 +218,7 @@ func (n *Node) findNumberTemplates(g *Graph) bool {
 				stateList[vState] = append(stateList[vState], k)
 			}
 
+			/* !!!!!!!!!!!!!!!!!!!!!!!!! */
 			if len(stateList[nState]) == len(n.Neighbours)-int(n.Value) {
 				for key, slice := range stateList {
 					if key != nState {
@@ -488,8 +489,6 @@ func (n *Node) find3and3Templates(g *Graph) bool {
 					isChangeMade = true
 				}
 				if addNodeToOppositeGroup(m, m.Neighbours[2], g) {
-					fmt.Println(&m.TemplateGroup, m.TemplateGroup)
-					fmt.Println(&m.Neighbours[2].TemplateGroup, m.Neighbours[2].TemplateGroup)
 					isChangeMade = true
 				}
 				if addNodeToOppositeGroup(m, m.Neighbours[1], g) {

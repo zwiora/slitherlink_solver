@@ -14,6 +14,7 @@ import (
  */
 func checkIfCanBeRemoved(n *utils.Node, g *utils.Graph) (bool, bool) {
 	debug.Println("Checking if can be removed: ")
+	debug.Println(n)
 
 	/* Checking if removal would create loop inside the loop */
 	nodeDegree := n.GetDegree()
@@ -91,7 +92,7 @@ func updateAvailableMoves(n *utils.Node, g *utils.Graph) bool {
 		thisNode := n.Neighbours[(i)%int(g.MaxDegree)]
 		if thisNode != nil {
 
-			if thisNode.IsInLoop && !thisNode.IsVisited && !(thisNode.IsDecided && !thisNode.IsForRemoval) {
+			if thisNode.IsInLoop && !thisNode.IsVisited {
 				canBeRemoved, stopTesting = checkIfCanBeRemoved(thisNode, g)
 				if canBeRemoved {
 					if !thisNode.CanBeRemoved {
@@ -111,13 +112,13 @@ func updateAvailableMoves(n *utils.Node, g *utils.Graph) bool {
 
 			/* neighbour of the neighbour - only updates cost*/
 			nextNode := thisNode.Neighbours[(i)%int(g.MaxDegree)]
-			if nextNode != nil && nextNode.IsInLoop && nextNode.CanBeRemoved && !nextNode.IsVisited && !(nextNode.IsDecided && !nextNode.IsForRemoval) {
+			if nextNode != nil && nextNode.IsInLoop && nextNode.CanBeRemoved && !nextNode.IsVisited {
 				nextNode.UpdateNodeCost(g)
 			}
 
 			/* diagonal node */
 			thisNode := thisNode.Neighbours[(i+1)%int(g.MaxDegree)]
-			if thisNode != nil && thisNode.IsInLoop && !thisNode.IsVisited && !(thisNode.IsDecided && !thisNode.IsForRemoval) {
+			if thisNode != nil && thisNode.IsInLoop && !thisNode.IsVisited {
 				canBeRemoved, stopTesting = checkIfCanBeRemoved(thisNode, g)
 				if canBeRemoved {
 					if !thisNode.CanBeRemoved {
@@ -151,13 +152,15 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 	debug.Println(n)
 	debug.Println("Cost:")
 	debug.Println(cost)
+	debug.Println("Depth:")
+	debug.Println(depth)
 
 	n.IsInLoop = false
 
 	if debug.IsDebugMode {
 		g.PrintSquaresBoard(true)
 	}
-	debug.Sleep(50)
+	debug.Sleep(1000)
 
 	/* Update list with available moves */
 	stopTesting := updateAvailableMoves(n, g)
@@ -171,11 +174,20 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 
 	/* Select new move */
 	for g.AvailableMoves.Len() > 0 {
+		debug.Println("Priority queue:")
 		for _, v := range *g.AvailableMoves {
 			debug.Println(v)
 		}
 		newElement := heap.Pop(g.AvailableMoves)
 		newNode := newElement.(*utils.Node)
+
+		/* Return if it's not possible to remove the node */
+		if newNode.IsDecided && !newNode.IsForRemoval {
+			newNode.CanBeRemoved = false
+			newNode.IsVisited = true
+			g.VisitedNodes.Push(newNode)
+			continue
+		}
 
 		/* Check if solution is found */
 		if cost == newNode.Cost {
@@ -183,12 +195,6 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 			debug.Println("SOLUTION FOUND")
 			*isSolutionFound = true
 			return
-		}
-
-		/* Return if it's not possible to remove the node */
-		if newNode.IsDecided && !newNode.IsForRemoval {
-			newNode.CanBeRemoved = false
-			continue
 		}
 
 		/* Delete move from available moves and save it in stack */
@@ -223,6 +229,7 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 	}
 
 	for {
+		debug.Println("Clearing changes")
 		thisElement := g.VisitedNodes.Pop()
 		if thisElement == nil {
 			break
@@ -277,15 +284,15 @@ func LoopSolve(g *utils.Graph) {
 		newElement := heap.Pop(g.AvailableMoves)
 		newNode := newElement.(*utils.Node)
 
+		if newNode.IsDecided && !newNode.IsForRemoval {
+			newNode.CanBeRemoved = false
+			continue
+		}
+
 		/* Solution found */
 		if cost == newNode.Cost {
 			newNode.IsInLoop = false
 			break
-		}
-
-		if newNode.IsDecided && !newNode.IsForRemoval {
-			newNode.CanBeRemoved = false
-			continue
 		}
 
 		if newNode.TemplateGroup != nil && !newNode.IsDecided {
