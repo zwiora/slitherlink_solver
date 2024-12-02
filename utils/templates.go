@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"fmt"
+
 	"github.com/golang-collections/collections/queue"
 )
 
@@ -114,6 +116,10 @@ func addNodeToGroup(n1 *Node, n2 *Node, g *Graph) bool {
 		} else if n1.TemplateGroup != nil {
 			n1.TemplateGroup.addElement(n2)
 		} else {
+			if n2.TemplateGroup == nil {
+				n2.TemplateGroup = new(List)
+				n2.TemplateGroup.addElement(n2)
+			}
 			n2.TemplateGroup.addElement(n1)
 		}
 	}
@@ -123,6 +129,7 @@ func addNodeToGroup(n1 *Node, n2 *Node, g *Graph) bool {
 
 /* Returns true if any changes have been applied */
 func addNodeToOppositeGroup(n1 *Node, n2 *Node, g *Graph) bool {
+
 	if isNodeDecided(n1) && isNodeDecided(n2) || isDifferentState(n1, n2) {
 		return false
 	}
@@ -153,9 +160,12 @@ func addNodeToOppositeGroup(n1 *Node, n2 *Node, g *Graph) bool {
 	} else /*Neither one is decided */ {
 
 		if n1.TemplateGroup != nil && n2.TemplateGroup != nil {
+			fmt.Println(n1.TemplateGroup)
+			fmt.Println(n2.TemplateGroup)
 			addOppositeLists(n1.TemplateGroup, n2.TemplateGroup)
 		} else if n1.TemplateGroup != nil {
 			n1.TemplateGroup.addOppositeElement(n2)
+
 		} else {
 			if n2.TemplateGroup == nil {
 				n2.TemplateGroup = new(List)
@@ -382,6 +392,121 @@ func (n *Node) findNumberTemplates(g *Graph) bool {
 		}
 	}
 
+	return isChangeMade
+}
+
+func (n *Node) findContinousSquareTemplates(g *Graph) bool {
+	if !n.IsDecided {
+		for i := range n.Neighbours {
+			j := (i + 1) % len(n.Neighbours)
+			if n.Neighbours[i] != nil && n.Neighbours[j] != nil && n.Neighbours[i].Neighbours[j] != nil {
+				if isTheSameState(n.Neighbours[i], n.Neighbours[j]) && isDifferentState(n.Neighbours[i], n.Neighbours[i].Neighbours[j]) {
+					return addNodeToGroup(n, n.Neighbours[i], g)
+				}
+			}
+		}
+	}
+
+	return false
+}
+
+func (n *Node) find33Templates(g *Graph) bool {
+	isChangeMade := false
+	if n.Value == 3 {
+		m := n.Neighbours[0]
+		if m != nil && m.Value == 3 && !(n.IsDecided && m.IsDecided) {
+			if addNodeToGroup(n, m.Neighbours[0], g) {
+				isChangeMade = true
+			}
+			if addNodeToGroup(m, n.Neighbours[2], g) {
+				isChangeMade = true
+			}
+			if addNodeToOppositeGroup(n, m, g) {
+				isChangeMade = true
+			}
+			if addNodeToGroup(n.Neighbours[3], m.Neighbours[3], g) {
+				isChangeMade = true
+			}
+			if addNodeToGroup(n.Neighbours[1], m.Neighbours[1], g) {
+				isChangeMade = true
+			}
+		}
+
+		m = n.Neighbours[1]
+		if m != nil && m.Value == 3 && !(n.IsDecided && m.IsDecided) {
+			if addNodeToGroup(n, m.Neighbours[1], g) {
+				isChangeMade = true
+			}
+			if addNodeToGroup(m, n.Neighbours[3], g) {
+				isChangeMade = true
+			}
+			if addNodeToOppositeGroup(n, m, g) {
+				isChangeMade = true
+			}
+			if addNodeToGroup(n.Neighbours[0], m.Neighbours[0], g) {
+				isChangeMade = true
+			}
+			if addNodeToGroup(n.Neighbours[2], m.Neighbours[2], g) {
+				isChangeMade = true
+			}
+		}
+
+	}
+	return isChangeMade
+}
+
+func (n *Node) find3and3Templates(g *Graph) bool {
+	isChangeMade := false
+	if n.Value == 3 {
+		tmp := n.Neighbours[0]
+		if tmp != nil {
+			m := tmp.Neighbours[1]
+			if m != nil && m.Value == 3 && !(n.IsDecided && m.IsDecided) {
+				if addNodeToOppositeGroup(n, n.Neighbours[2], g) {
+					isChangeMade = true
+				}
+				if addNodeToOppositeGroup(n, n.Neighbours[3], g) {
+					isChangeMade = true
+				}
+				if addNodeToOppositeGroup(m, m.Neighbours[0], g) {
+					isChangeMade = true
+				}
+				if addNodeToOppositeGroup(m, m.Neighbours[1], g) {
+					isChangeMade = true
+				}
+			}
+		}
+
+		tmp = n.Neighbours[1]
+		if tmp != nil {
+			m := tmp.Neighbours[2]
+			if m != nil && m.Value == 3 && !(n.IsDecided && m.IsDecided) {
+				if addNodeToOppositeGroup(n, n.Neighbours[0], g) {
+					isChangeMade = true
+				}
+				if addNodeToOppositeGroup(n, n.Neighbours[3], g) {
+					isChangeMade = true
+				}
+				if addNodeToOppositeGroup(m, m.Neighbours[2], g) {
+					fmt.Println(&m.TemplateGroup, m.TemplateGroup)
+					fmt.Println(&m.Neighbours[2].TemplateGroup, m.Neighbours[2].TemplateGroup)
+					isChangeMade = true
+				}
+				if addNodeToOppositeGroup(m, m.Neighbours[1], g) {
+					isChangeMade = true
+				}
+				// if m.TemplateGroup != nil {
+				// 	fmt.Println(m)
+				// 	fmt.Println(m.Neighbours[1])
+				// 	fmt.Println(m.Neighbours[2])
+				// 	fmt.Println(isDifferentState(m, m.Neighbours[1]))
+				// 	m.TemplateGroup.print()
+				// 	fmt.Println("-----------")
+				// }
+
+			}
+		}
+	}
 	return isChangeMade
 }
 

@@ -75,7 +75,6 @@ func main() {
 			code = data[i][3]
 
 			g := utils.ConstructBoardFromData(boardType, sizeX, sizeY, code)
-
 			solvers.LoopSolve(g)
 			g.PrintSquaresBoard(true)
 

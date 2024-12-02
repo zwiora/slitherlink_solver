@@ -257,6 +257,8 @@ func LoopSolve(g *utils.Graph) {
 
 	g.CalculateStartMoves()
 
+	g.PrintSquaresBoard(true)
+
 	g.VisitedNodes = stack.New()
 	isSolutionFound := new(bool)
 

@@ -122,7 +122,12 @@ func (l *List) print() {
 	}
 }
 
-func concatLists(l1 *List, l2 *List) {
+func concatLists(l1 *List, l2 *List) *List {
+	if l1 == nil {
+		return l2
+	} else if l2 == nil {
+		return l1
+	}
 	basicList := l1
 	additionalList := l2
 	if l1.Length < l2.Length {
@@ -131,6 +136,7 @@ func concatLists(l1 *List, l2 *List) {
 	}
 
 	thisElement := additionalList.Root
+	thisElement.Value.TemplateGroup = basicList
 	var lastElement *ListElem
 	for {
 		thisElement.Next.Value.TemplateGroup = basicList
@@ -146,6 +152,8 @@ func concatLists(l1 *List, l2 *List) {
 	basicList.Root.Next = additionalList.Root
 
 	basicList.Length += additionalList.Length
+
+	return basicList
 }
 
 func addLists(l1 *List, l2 *List) {
@@ -153,31 +161,44 @@ func addLists(l1 *List, l2 *List) {
 	if l1 == l2 {
 		return
 	}
-	concatLists(l1, l2)
-	if l1.OppositeList == nil && l2.OppositeList != nil {
-		l1.OppositeList = l2.OppositeList
-	} else if l2.OppositeList == nil && l1.OppositeList != nil {
-		l2.OppositeList = l1.OppositeList
-	} else if l1.OppositeList != nil && l2.OppositeList != nil {
-		concatLists(l1.OppositeList, l2.OppositeList)
+	opposite := concatLists(l1.OppositeList, l2.OppositeList)
+	list := concatLists(l1, l2)
+	if opposite != nil {
+		list.OppositeList = opposite
+		opposite.OppositeList = list
 	}
+
+	// if l1.OppositeList == nil && l2.OppositeList != nil {
+	// 	l1.OppositeList = l2.OppositeList
+	// } else if l2.OppositeList == nil && l1.OppositeList != nil {
+	// 	l2.OppositeList = l1.OppositeList
+	// } else if l1.OppositeList != nil && l2.OppositeList != nil {
+	// 	concatLists(l1.OppositeList, l2.OppositeList)
+	// }
 }
 
 func addOppositeLists(l1 *List, l2 *List) {
-
-	if l1 == l2.OppositeList {
+	if l1 == l2.OppositeList || l1 == l2 {
 		return
 	}
 
-	if l1.OppositeList == nil {
-		l1.OppositeList = l2
-	} else {
-		concatLists(l1.OppositeList, l2)
-	}
+	op1 := l1.OppositeList
+	op2 := l2.OppositeList
 
-	if l2.OppositeList == nil {
-		l2.OppositeList = l1
-	} else {
-		concatLists(l2.OppositeList, l1)
-	}
+	opposite := concatLists(l1, op2)
+	list := concatLists(op1, l2)
+	list.OppositeList = opposite
+	opposite.OppositeList = list
+
+	// if l1.OppositeList == nil {
+	// 	l1.OppositeList = l2
+	// } else {
+	// 	concatLists(l1.OppositeList, l2)
+	// }
+
+	// if l2.OppositeList == nil {
+	// 	l2.OppositeList = l1
+	// } else {
+	// 	concatLists(l2.OppositeList, l1)
+	// }
 }

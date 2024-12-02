@@ -279,7 +279,21 @@ func (g *Graph) FindTemplates() {
 				// }
 			}
 
-			// fmt.Println(newTemplatesFound)
+			if thisNode.find33Templates(g) {
+				newTemplatesFound++
+			}
+
+			if thisNode.find3and3Templates(g) {
+				// fmt.Println("SUPER")
+				// g.PrintSquaresBoard(true)
+				// time.Sleep(time.Millisecond * 1000)
+
+				newTemplatesFound++
+			}
+
+			if thisNode.findContinousSquareTemplates(g) {
+				newTemplatesFound++
+			}
 
 			isNewNode := false
 			for _, v := range thisNode.Neighbours {
