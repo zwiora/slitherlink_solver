@@ -51,7 +51,6 @@ func main() {
 		g := utils.ConstructBoardFromData(boardType, sizeX, sizeY, code)
 		fmt.Println(g)
 		g.PrintBoard(debug.IsDebugMode)
-		// return
 
 		solvers.LoopSolve(g)
 

@@ -214,6 +214,7 @@ func constructHexBoard(board *Graph, puzzleContent string) {
 					thisNode.Neighbours[2].Neighbours[0] = bottomNode
 				}
 			}
+			// fmt.Println(thisNode)
 
 			/* Calculating next position */
 			m++

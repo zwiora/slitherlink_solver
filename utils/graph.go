@@ -4,6 +4,7 @@ import (
 	"container/heap"
 	"fmt"
 	"slitherlink_solver/debug"
+	"time"
 
 	"github.com/golang-collections/collections/queue"
 	"github.com/golang-collections/collections/stack"
@@ -147,31 +148,28 @@ func (g *Graph) printHoneycombBoard(isDebugMode bool) {
 				fmt.Print("___")
 			}
 
-			if g.SizeX%2 == 0 {
+			if m < (g.SizeX+1)/2 {
 				if thisNode.Neighbours[0] != nil && thisNode.Neighbours[0].Neighbours[5] != nil {
 					thisNode = thisNode.Neighbours[0].Neighbours[5]
-				} else if thisNode.Neighbours[0] != nil {
+				} else {
 					thisNode = lastLineNode.Neighbours[0]
-					if n != 0 {
+					if n != 0 && m == g.SizeX/2-1 {
 						fmt.Print("/")
 					}
 					fmt.Println()
 					fmt.Print("\\___")
 				}
 			} else {
-				if thisNode.Neighbours[0] != nil && thisNode.Neighbours[0].Neighbours[5] != nil {
-					thisNode = thisNode.Neighbours[0].Neighbours[5]
-				} else if thisNode.Neighbours[0] == nil && n != g.SizeY-1 {
-					thisNode = lastLineNode.Neighbours[0]
-					fmt.Println()
-					fmt.Print("\\___")
-				} else if n != g.SizeY-1 {
-					fmt.Print("/")
-				} else if m == g.SizeX/2 {
-					fmt.Println()
-					fmt.Print("\\___")
-				} else if n == g.SizeY-1 && m == g.SizeX-1 {
-					fmt.Print("___/")
+				if thisNode.Neighbours[5] != nil {
+					if thisNode.Neighbours[5].Neighbours[0] != nil {
+						thisNode = thisNode.Neighbours[5].Neighbours[0]
+
+					} else if n != g.SizeY-1 {
+						fmt.Print("/")
+					} else {
+						fmt.Print("___/")
+					}
+
 				}
 			}
 		}
@@ -243,8 +241,7 @@ func (g *Graph) ClearIsVisited() {
 /*
 Calculates sum of all visible values on the board and starting cost assuming there's a loop around the whole board
 */
-func (g *Graph) CalculateStartCost() (int, int) {
-	fullCost := 0
+func (g *Graph) CalculateStartCost() int {
 	startCost := 0
 	thisNode := g.Root
 
@@ -252,7 +249,6 @@ func (g *Graph) CalculateStartCost() (int, int) {
 		thisNode.IsVisited = true
 
 		if thisNode.Value >= 0 {
-			fullCost += int(thisNode.Value)
 
 			if thisNode.GetDegree() < int(g.MaxDegree) {
 				startCost += thisNode.getCostOfField(int(g.MaxDegree))
@@ -277,7 +273,7 @@ func (g *Graph) CalculateStartCost() (int, int) {
 
 	g.ClearIsVisited()
 
-	return fullCost, startCost
+	return startCost
 }
 
 /* Calculate list of available moves at starting position */
@@ -302,25 +298,38 @@ func (g *Graph) CalculateStartMoves() {
 			}
 		}
 	} else if g.shape == "honeycomb" {
-		for i := 0; i < int(g.MaxDegree); i++ {
-			for {
-				if thisNode.Neighbours[i] == nil {
-					break
-				}
-				thisNode = thisNode.Neighbours[i]
+		i := 5
+		for {
+			thisNode.SetNodeCost(g)
+			if !(thisNode.IsDecided && !thisNode.IsForRemoval) {
+				thisNode.CanBeRemoved = true
+				movesArr = append(movesArr, thisNode)
+			}
 
-				thisNode.SetNodeCost(g)
-				if !(thisNode.IsDecided && !thisNode.IsForRemoval) {
-					thisNode.CanBeRemoved = true
-					movesArr = append(movesArr, thisNode)
-				}
-				if i == 0 || i == 3 {
-					i = (i - 1 + 6) % 6
-				} else if i == 5 || i == 2 {
-					i = (i + 1) % 6
-				}
+			fmt.Println(thisNode)
+			g.PrintBoard(true)
+			time.Sleep(time.Millisecond * 1000)
+
+			if i == 0 || i == 3 {
+				i = (i - 1 + 6) % 6
+			} else if i == 5 || i == 2 {
+				i = (i + 1) % 6
+			}
+
+			fmt.Println(i)
+
+			for thisNode.Neighbours[i] == nil {
+				i = (i + 1) % 6
+				fmt.Println(i)
+			}
+
+			thisNode = thisNode.Neighbours[i]
+
+			if thisNode == g.Root {
+				break
 			}
 		}
+
 	}
 
 	/* Transform array into heap */
