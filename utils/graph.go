@@ -105,23 +105,23 @@ func (g *Graph) printHoneycombBoard(isDebugMode bool) {
 				fmt.Print("___")
 			}
 			fmt.Print("/")
-			// if thisNode.IsInLoop {
-			// 	fmt.Printf("\033[42m")
-			// }
-			// if isDebugMode && thisNode.IsVisited {
-			// 	fmt.Printf("x")
-			// } else {
-			fmt.Printf(" ")
-			// }
+			if thisNode.IsInLoop {
+				fmt.Printf("\033[42m")
+			}
+			if isDebugMode && thisNode.IsVisited {
+				fmt.Printf("x")
+			} else {
+				fmt.Printf(" ")
+			}
 
-			// if isDebugMode && thisNode.IsDecided {
+			if isDebugMode && thisNode.IsDecided {
 
-			// 	if thisNode.IsForRemoval {
-			// 		fmt.Printf("\033[43m")
-			// 	} else {
-			// 		fmt.Printf("\033[41m")
-			// 	}
-			// }
+				if thisNode.IsForRemoval {
+					fmt.Printf("\033[43m")
+				} else {
+					fmt.Printf("\033[41m")
+				}
+			}
 
 			if thisNode.Value == -1 {
 				fmt.Printf(" ")
@@ -129,18 +129,18 @@ func (g *Graph) printHoneycombBoard(isDebugMode bool) {
 				fmt.Printf("%d", thisNode.Value)
 			}
 
-			// if thisNode.IsInLoop {
-			// 	fmt.Printf("\033[42m")
-			// } else {
-			// 	fmt.Printf("\033[49m")
-			// }
+			if thisNode.IsInLoop {
+				fmt.Printf("\033[42m")
+			} else {
+				fmt.Printf("\033[49m")
+			}
 
-			// if isDebugMode && thisNode.CanBeRemoved {
-			// 	fmt.Printf("#")
-			// } else {
-			fmt.Printf(" ")
-			// }
-			// fmt.Printf("\033[49m|")
+			if isDebugMode && thisNode.CanBeRemoved {
+				fmt.Printf("#")
+			} else {
+				fmt.Printf(" ")
+			}
+			fmt.Printf("\033[49m")
 			fmt.Print("\\")
 
 			if thisNode.Neighbours[0] != nil {
