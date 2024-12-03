@@ -285,19 +285,41 @@ func (g *Graph) CalculateStartMoves() {
 	movesArr := []*Node{}
 	thisNode := g.Root
 
-	for i := 0; i < int(g.MaxDegree); i++ {
-		for {
-			if thisNode.Neighbours[i] == nil {
-				break
-			}
-			thisNode = thisNode.Neighbours[i]
+	if g.shape == "square" {
+		for i := 0; i < int(g.MaxDegree); i++ {
+			for {
+				if thisNode.Neighbours[i] == nil {
+					break
+				}
+				thisNode = thisNode.Neighbours[i]
 
-			thisNode.SetNodeCost(g)
-			if !(thisNode.IsDecided && !thisNode.IsForRemoval) {
-				thisNode.CanBeRemoved = true
-				movesArr = append(movesArr, thisNode)
-			}
+				thisNode.SetNodeCost(g)
+				if !(thisNode.IsDecided && !thisNode.IsForRemoval) {
+					thisNode.CanBeRemoved = true
+					movesArr = append(movesArr, thisNode)
+				}
 
+			}
+		}
+	} else if g.shape == "honeycomb" {
+		for i := 0; i < int(g.MaxDegree); i++ {
+			for {
+				if thisNode.Neighbours[i] == nil {
+					break
+				}
+				thisNode = thisNode.Neighbours[i]
+
+				thisNode.SetNodeCost(g)
+				if !(thisNode.IsDecided && !thisNode.IsForRemoval) {
+					thisNode.CanBeRemoved = true
+					movesArr = append(movesArr, thisNode)
+				}
+				if i == 0 || i == 3 {
+					i = (i - 1 + 6) % 6
+				} else if i == 5 || i == 2 {
+					i = (i + 1) % 6
+				}
+			}
 		}
 	}
 

@@ -4,8 +4,6 @@ import (
 	"container/heap"
 	"slitherlink_solver/debug"
 	"slitherlink_solver/utils"
-
-	"github.com/golang-collections/collections/stack"
 )
 
 /*
@@ -259,70 +257,72 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 func LoopSolve(g *utils.Graph) {
 	debug.Println("START Loop Solver")
 
-	_, cost := g.CalculateStartCost()
-	g.FindTemplates()
+	// _, cost := g.CalculateStartCost()
+	// g.FindTemplates()
 
 	g.CalculateStartMoves()
 
-	g.PrintBoard(true)
+	return
 
-	g.VisitedNodes = stack.New()
-	isSolutionFound := new(bool)
+	// g.PrintBoard(true)
 
-	if debug.IsDebugMode {
-		g.PrintBoard(true)
-	}
-	debug.Println("Cost:")
-	debug.Println(cost)
+	// g.VisitedNodes = stack.New()
+	// isSolutionFound := new(bool)
 
-	for g.AvailableMoves.Len() > 0 {
-		for _, v := range *g.AvailableMoves {
-			debug.Println(v)
-		}
+	// if debug.IsDebugMode {
+	// 	g.PrintBoard(true)
+	// }
+	// debug.Println("Cost:")
+	// debug.Println(cost)
 
-		/* Choose new Node */
-		newElement := heap.Pop(g.AvailableMoves)
-		newNode := newElement.(*utils.Node)
+	// for g.AvailableMoves.Len() > 0 {
+	// 	for _, v := range *g.AvailableMoves {
+	// 		debug.Println(v)
+	// 	}
 
-		if newNode.IsDecided && !newNode.IsForRemoval {
-			newNode.CanBeRemoved = false
-			continue
-		}
+	// 	/* Choose new Node */
+	// 	newElement := heap.Pop(g.AvailableMoves)
+	// 	newNode := newElement.(*utils.Node)
 
-		/* Solution found */
-		if cost == newNode.Cost {
-			newNode.IsInLoop = false
-			break
-		}
+	// 	if newNode.IsDecided && !newNode.IsForRemoval {
+	// 		newNode.CanBeRemoved = false
+	// 		continue
+	// 	}
 
-		if newNode.TemplateGroup != nil && !newNode.IsDecided {
-			if !newNode.TemplateGroup.SetValue(true, newNode, g) {
-				debug.Println("Template not aplicable")
+	// 	/* Solution found */
+	// 	if cost == newNode.Cost {
+	// 		newNode.IsInLoop = false
+	// 		break
+	// 	}
 
-				newNode.TemplateGroup.ClearValue(g)
-				newNode.TemplateGroup.SetValue(false, newNode, g)
-				continue
-			}
-		}
+	// 	if newNode.TemplateGroup != nil && !newNode.IsDecided {
+	// 		if !newNode.TemplateGroup.SetValue(true, newNode, g) {
+	// 			debug.Println("Template not aplicable")
 
-		newNode.IsVisited = true
-		newNode.CanBeRemoved = false
+	// 			newNode.TemplateGroup.ClearValue(g)
+	// 			newNode.TemplateGroup.SetValue(false, newNode, g)
+	// 			continue
+	// 		}
+	// 	}
 
-		/* Run recursion with new node */
-		loopSolveRecursion(newNode, g, cost-newNode.Cost, isSolutionFound, 1)
+	// 	newNode.IsVisited = true
+	// 	newNode.CanBeRemoved = false
 
-		if *isSolutionFound {
-			break
-		}
+	// 	/* Run recursion with new node */
+	// 	loopSolveRecursion(newNode, g, cost-newNode.Cost, isSolutionFound, 1)
 
-		if newNode.TemplateGroup != nil && newNode.TemplateGroup.SettingNode == newNode {
-			debug.Println("Reversing set value")
-			newNode.TemplateGroup.ClearValue(g)
-			newNode.TemplateGroup.SetValue(false, newNode, g)
-		}
+	// 	if *isSolutionFound {
+	// 		break
+	// 	}
 
-		newNode.IsInLoop = true
-	}
+	// 	if newNode.TemplateGroup != nil && newNode.TemplateGroup.SettingNode == newNode {
+	// 		debug.Println("Reversing set value")
+	// 		newNode.TemplateGroup.ClearValue(g)
+	// 		newNode.TemplateGroup.SetValue(false, newNode, g)
+	// 	}
 
-	g.PrintBoard(false)
+	// 	newNode.IsInLoop = true
+	// }
+
+	// g.PrintBoard(false)
 }
