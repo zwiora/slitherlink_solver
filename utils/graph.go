@@ -4,7 +4,6 @@ import (
 	"container/heap"
 	"fmt"
 	"slitherlink_solver/debug"
-	"time"
 
 	"github.com/golang-collections/collections/queue"
 	"github.com/golang-collections/collections/stack"
@@ -197,22 +196,26 @@ func (g *Graph) PrintBoard(isDebugMode bool) {
 
 func (g *Graph) CheckIfSolutionOk() bool {
 
-	lastLineNode := g.Root
-	thisNode := g.Root
+	if g.shape == "square" {
+		lastLineNode := g.Root
+		thisNode := g.Root
 
-	for n := 0; n < g.SizeY; n++ {
-		for m := 0; m < g.SizeX; m++ {
-			if thisNode.Value != -1 && thisNode.Value != int8(thisNode.getLinesAround(int(g.MaxDegree))) {
-				// fmt.Println(thisNode)
-				return false
+		for n := 0; n < g.SizeY; n++ {
+			for m := 0; m < g.SizeX; m++ {
+				if thisNode.Value != -1 && thisNode.Value != int8(thisNode.getLinesAround(int(g.MaxDegree))) {
+					// fmt.Println(thisNode)
+					return false
+				}
+				thisNode = thisNode.Neighbours[0]
 			}
-			thisNode = thisNode.Neighbours[0]
+			thisNode = lastLineNode.Neighbours[1]
+			lastLineNode = thisNode
 		}
-		thisNode = lastLineNode.Neighbours[1]
-		lastLineNode = thisNode
-	}
 
-	return true
+		return true
+	}
+	return false
+
 }
 
 /*
@@ -220,21 +223,36 @@ Change isVisited value from true to false in all nodes in the graph. Should be u
 */
 func (g *Graph) ClearIsVisited() {
 	thisNode := g.Root
+
+	i := 0
 	for {
 		thisNode.IsVisited = false
 
-		isNewNode := false
-		for _, v := range thisNode.Neighbours {
-			if v != nil && v.IsVisited {
-				thisNode = v
-				isNewNode = true
+		g.PrintBoard(true)
+
+		if g.shape == "honeycomb" {
+			if i == 0 || i == 3 {
+				i = (i - 1 + 6) % 6
+			} else if i == 5 || i == 2 {
+				i = (i + 1) % 6
+			}
+		}
+
+		finished := false
+		j := i
+		for thisNode.Neighbours[i] == nil || !thisNode.Neighbours[i].IsVisited {
+			i = (i + 1) % int(g.MaxDegree)
+			if j == i {
+				finished = true
 				break
 			}
 		}
 
-		if !isNewNode {
+		if finished {
 			break
 		}
+
+		thisNode = thisNode.Neighbours[i]
 	}
 }
 
@@ -245,11 +263,13 @@ func (g *Graph) CalculateStartCost() int {
 	startCost := 0
 	thisNode := g.Root
 
+	i := 0
 	for {
 		thisNode.IsVisited = true
 
-		if thisNode.Value >= 0 {
+		g.PrintBoard(true)
 
+		if thisNode.Value >= 0 {
 			if thisNode.GetDegree() < int(g.MaxDegree) {
 				startCost += thisNode.getCostOfField(int(g.MaxDegree))
 			} else {
@@ -257,18 +277,29 @@ func (g *Graph) CalculateStartCost() int {
 			}
 		}
 
-		isNewNode := false
-		for _, v := range thisNode.Neighbours {
-			if v != nil && !v.IsVisited {
-				thisNode = v
-				isNewNode = true
+		if g.shape == "honeycomb" {
+			if i == 0 || i == 3 {
+				i = (i - 1 + 6) % 6
+			} else if i == 5 || i == 2 {
+				i = (i + 1) % 6
+			}
+		}
+
+		finished := false
+		j := i
+		for thisNode.Neighbours[i] == nil || thisNode.Neighbours[i].IsVisited {
+			i = (i + 1) % int(g.MaxDegree)
+			if j == i {
+				finished = true
 				break
 			}
 		}
 
-		if !isNewNode {
+		if finished {
 			break
 		}
+
+		thisNode = thisNode.Neighbours[i]
 	}
 
 	g.ClearIsVisited()
@@ -300,15 +331,11 @@ func (g *Graph) CalculateStartMoves() {
 	} else if g.shape == "honeycomb" {
 		i := 5
 		for {
-			thisNode.SetNodeCost(g)
 			if !(thisNode.IsDecided && !thisNode.IsForRemoval) {
+				thisNode.SetNodeCost(g)
 				thisNode.CanBeRemoved = true
 				movesArr = append(movesArr, thisNode)
 			}
-
-			fmt.Println(thisNode)
-			g.PrintBoard(true)
-			time.Sleep(time.Millisecond * 1000)
 
 			if i == 0 || i == 3 {
 				i = (i - 1 + 6) % 6
@@ -316,11 +343,8 @@ func (g *Graph) CalculateStartMoves() {
 				i = (i + 1) % 6
 			}
 
-			fmt.Println(i)
-
 			for thisNode.Neighbours[i] == nil {
 				i = (i + 1) % 6
-				fmt.Println(i)
 			}
 
 			thisNode = thisNode.Neighbours[i]
@@ -392,9 +416,6 @@ func (g *Graph) FindTemplates() {
 			thisNode.findNumberTemplates(g)
 
 		}
-		// if !thisNode.findCornerTemplates(g, nodes) {
-		// 	thisNode.find31Templates(g, nodes)
-		// }
 
 	}
 
@@ -411,10 +432,6 @@ func (g *Graph) FindTemplates() {
 				if thisNode.findNumberTemplates(g) {
 					newTemplatesFound++
 				}
-				// if !thisNode.findCornerTemplates(g, nodes) {
-				// } else {
-				// 	newTemplatesFound++
-				// }
 			}
 
 			if thisNode.find31Templates(g) {
@@ -429,17 +446,10 @@ func (g *Graph) FindTemplates() {
 			}
 
 			if thisNode.find3and3Templates(g) {
-
 				newTemplatesFound++
 			}
 
-			// g.PrintSquaresBoard(true)
-
 			if thisNode.findloopReachingNumberTemplates(g) {
-				if thisNode.Value == 1 {
-
-				}
-
 				newTemplatesFound++
 			}
 
@@ -461,9 +471,6 @@ func (g *Graph) FindTemplates() {
 			}
 		}
 
-		// fmt.Println("REPEAT")
-		// g.PrintSquaresBoard(true)
-		// time.Sleep(1000 * time.Millisecond)
 		g.ClearIsVisited()
 
 		if newTemplatesFound == 0 {
