@@ -49,8 +49,8 @@ func main() {
 		code = data[i][3]
 
 		g := utils.ConstructBoardFromData(boardType, sizeX, sizeY, code)
-		// fmt.Println(g)
-		// return
+		fmt.Println(g)
+		return
 
 		solvers.LoopSolve(g)
 

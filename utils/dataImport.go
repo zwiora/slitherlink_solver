@@ -154,17 +154,21 @@ func constructHexBoard(board *Graph, puzzleContent string) {
 		}
 		nextNode.Neighbours = make([]*Node, board.MaxDegree)
 
-		thisNode.Neighbours[0] = nextNode
-		nextNode.Neighbours[2] = thisNode
+		i := (6 - m%2) % 6
+		j := (i + 3) % 6
+		thisNode.Neighbours[i] = nextNode
+		nextNode.Neighbours[j] = thisNode
 
 		thisNode = nextNode
-
 	}
 
 	thisNode = board.Root
 
+	direction := 0
+
 	/* Setting content and preparing rest of the nodes */
 	for _, character := range strings.Split(puzzleContent, "") {
+
 		characterVal, err := strconv.Atoi(character)
 
 		/* Setting value of the node */
@@ -187,12 +191,27 @@ func constructHexBoard(board *Graph, puzzleContent string) {
 				}
 				bottomNode.Neighbours = make([]*Node, board.MaxDegree)
 				thisNode.Neighbours[1] = bottomNode
-				bottomNode.Neighbours[3] = thisNode
+				bottomNode.Neighbours[4] = thisNode
 
-				/* Connect bottom node with its left neighbour and vice versa */
-				if m > 0 {
-					bottomNode.Neighbours[2] = thisNode.Neighbours[2].Neighbours[1]
-					thisNode.Neighbours[2].Neighbours[1].Neighbours[0] = bottomNode
+				/* Connect bottom node with its top right neighbour (we do this with only half of the nodes) */
+				if thisNode.Neighbours[0] != nil {
+					bottomNode.Neighbours[5] = thisNode.Neighbours[0]
+					thisNode.Neighbours[0].Neighbours[2] = bottomNode
+				}
+
+				/* Connect bottom node with its bottom left neighbours (we do this with only half of the nodes) */
+				if thisNode.Neighbours[2] != nil {
+					newNode := thisNode.Neighbours[2].Neighbours[1]
+					if newNode != nil {
+						newNode.Neighbours[5] = bottomNode
+						bottomNode.Neighbours[2] = newNode
+					}
+				}
+
+				/* Connect bottom node with its left top neighbour and vice versa */
+				if thisNode.Neighbours[2] != nil {
+					bottomNode.Neighbours[3] = thisNode.Neighbours[2]
+					thisNode.Neighbours[2].Neighbours[0] = bottomNode
 				}
 			}
 
@@ -203,8 +222,14 @@ func constructHexBoard(board *Graph, puzzleContent string) {
 				n++
 				thisNode = lastLineNode.Neighbours[1]
 				lastLineNode = lastLineNode.Neighbours[1]
+				direction = 0
 			} else {
-				thisNode = thisNode.Neighbours[0]
+				thisNode = thisNode.Neighbours[direction]
+				if direction == 0 {
+					direction = 5
+				} else {
+					direction = 0
+				}
 			}
 		}
 	}
