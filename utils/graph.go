@@ -15,7 +15,7 @@ type Graph struct {
 	maxCost        int
 	SizeX          int
 	SizeY          int
-	shape          string
+	Shape          string
 	AvailableMoves *PriorityQueue
 	VisitedNodes   *stack.Stack
 }
@@ -187,16 +187,16 @@ func (g *Graph) printHoneycombBoard(isDebugMode bool) {
 }
 
 func (g *Graph) PrintBoard(isDebugMode bool) {
-	if g.shape == "square" {
+	if g.Shape == "square" {
 		g.printSquaresBoard(isDebugMode)
-	} else if g.shape == "honeycomb" {
+	} else if g.Shape == "honeycomb" {
 		g.printHoneycombBoard(isDebugMode)
 	}
 }
 
 func (g *Graph) CheckIfSolutionOk() bool {
 
-	if g.shape == "square" {
+	if g.Shape == "square" {
 		lastLineNode := g.Root
 		thisNode := g.Root
 
@@ -228,9 +228,7 @@ func (g *Graph) ClearIsVisited() {
 	for {
 		thisNode.IsVisited = false
 
-		g.PrintBoard(true)
-
-		if g.shape == "honeycomb" {
+		if g.Shape == "honeycomb" {
 			if i == 0 || i == 3 {
 				i = (i - 1 + 6) % 6
 			} else if i == 5 || i == 2 {
@@ -267,8 +265,6 @@ func (g *Graph) CalculateStartCost() int {
 	for {
 		thisNode.IsVisited = true
 
-		g.PrintBoard(true)
-
 		if thisNode.Value >= 0 {
 			if thisNode.GetDegree() < int(g.MaxDegree) {
 				startCost += thisNode.getCostOfField(int(g.MaxDegree))
@@ -277,7 +273,7 @@ func (g *Graph) CalculateStartCost() int {
 			}
 		}
 
-		if g.shape == "honeycomb" {
+		if g.Shape == "honeycomb" {
 			if i == 0 || i == 3 {
 				i = (i - 1 + 6) % 6
 			} else if i == 5 || i == 2 {
@@ -312,7 +308,7 @@ func (g *Graph) CalculateStartMoves() {
 	movesArr := []*Node{}
 	thisNode := g.Root
 
-	if g.shape == "square" {
+	if g.Shape == "square" {
 		for i := 0; i < int(g.MaxDegree); i++ {
 			for {
 				if thisNode.Neighbours[i] == nil {
@@ -328,7 +324,7 @@ func (g *Graph) CalculateStartMoves() {
 
 			}
 		}
-	} else if g.shape == "honeycomb" {
+	} else if g.Shape == "honeycomb" {
 		i := 5
 		for {
 			if !(thisNode.IsDecided && !thisNode.IsForRemoval) {

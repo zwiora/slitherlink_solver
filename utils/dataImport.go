@@ -252,10 +252,10 @@ func ConstructBoardFromData(puzzleType string, puzzleSizeX int, puzzleSizeY int,
 
 	/* Type: squares" */
 	if puzzleType == "0de" {
-		board.shape = "square"
+		board.Shape = "square"
 		constructSquaresBoard(board, puzzleContent)
 	} else if puzzleType == "2" {
-		board.shape = "honeycomb"
+		board.Shape = "honeycomb"
 		constructHexBoard(board, puzzleContent)
 	}
 
