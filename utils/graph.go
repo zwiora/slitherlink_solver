@@ -203,7 +203,6 @@ func (g *Graph) CheckIfSolutionOk() bool {
 		for n := 0; n < g.SizeY; n++ {
 			for m := 0; m < g.SizeX; m++ {
 				if thisNode.Value != -1 && thisNode.Value != int8(thisNode.getLinesAround(int(g.MaxDegree))) {
-					// fmt.Println(thisNode)
 					return false
 				}
 				thisNode = thisNode.Neighbours[0]
@@ -211,10 +210,29 @@ func (g *Graph) CheckIfSolutionOk() bool {
 			thisNode = lastLineNode.Neighbours[1]
 			lastLineNode = thisNode
 		}
+	} else if g.Shape == "honeycomb" {
+		lastLineNode := g.Root
+		thisNode := g.Root
 
-		return true
+		for n := 0; n < g.SizeY; n++ {
+			direction := 5
+			for m := 0; m < g.SizeX; m++ {
+				if thisNode.Value != -1 && thisNode.Value != int8(thisNode.getLinesAround(int(g.MaxDegree))) {
+					fmt.Println(thisNode)
+					return false
+				}
+				if direction == 0 {
+					direction = 5
+				} else {
+					direction = 0
+				}
+				thisNode = thisNode.Neighbours[direction]
+			}
+			thisNode = lastLineNode.Neighbours[1]
+			lastLineNode = thisNode
+		}
 	}
-	return false
+	return true
 
 }
 

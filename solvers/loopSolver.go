@@ -123,6 +123,14 @@ func updateAvailableMoves(n *utils.Node, g *utils.Graph) bool {
 				nextNode.UpdateNodeCost(g)
 			}
 
+			previousNode := n.Neighbours[(i-1+int(g.MaxDegree))%int(g.MaxDegree)]
+			if previousNode == nil {
+				nextNode = thisNode.Neighbours[(i-1+int(g.MaxDegree))%int(g.MaxDegree)]
+				if nextNode != nil && nextNode.IsInLoop && nextNode.CanBeRemoved && !nextNode.IsVisited {
+					nextNode.UpdateNodeCost(g)
+				}
+			}
+
 			/* diagonal node */
 			if g.Shape != "honeycomb" {
 				thisNode := thisNode.Neighbours[(i+1)%int(g.MaxDegree)]
