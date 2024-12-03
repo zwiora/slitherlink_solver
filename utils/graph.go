@@ -4,7 +4,6 @@ import (
 	"container/heap"
 	"fmt"
 	"slitherlink_solver/debug"
-	"time"
 
 	"github.com/golang-collections/collections/queue"
 	"github.com/golang-collections/collections/stack"
@@ -247,6 +246,7 @@ func (g *Graph) FindTemplates() {
 		/* If the final state of the node isn't set */
 		if !thisNode.findZeroTemplates(g) {
 			thisNode.findNumberTemplates(g)
+
 		}
 		// if !thisNode.findCornerTemplates(g, nodes) {
 		// 	thisNode.find31Templates(g, nodes)
@@ -268,12 +268,16 @@ func (g *Graph) FindTemplates() {
 					newTemplatesFound++
 				}
 				// if !thisNode.findCornerTemplates(g, nodes) {
-				// 	if thisNode.find31Templates(g, nodes) {
-				// 		newTemplatesFound++
-				// 	}
 				// } else {
 				// 	newTemplatesFound++
 				// }
+			}
+
+			if thisNode.find31Templates(g) {
+				newTemplatesFound++
+				// fmt.Println("SUPER")
+				// g.PrintSquaresBoard(true)
+				// time.Sleep(time.Millisecond * 1000)
 			}
 
 			if thisNode.find33Templates(g) {
@@ -285,13 +289,11 @@ func (g *Graph) FindTemplates() {
 				newTemplatesFound++
 			}
 
-			g.PrintSquaresBoard(true)
+			// g.PrintSquaresBoard(true)
 
 			if thisNode.findloopReachingNumberTemplates(g) {
 				if thisNode.Value == 1 {
-					fmt.Println("SUPER")
-					g.PrintSquaresBoard(true)
-					time.Sleep(time.Millisecond * 1000)
+
 				}
 
 				newTemplatesFound++

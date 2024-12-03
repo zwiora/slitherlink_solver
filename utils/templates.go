@@ -548,21 +548,27 @@ func (n *Node) findloopReachingNumberTemplates(g *Graph) bool {
 }
 
 func (n *Node) find31Templates(g *Graph) bool {
+	isChangeMade := false
 	/* value of this node equal to 3 */
 	if n.Value == 3 {
 		/* is next to the wall */
 		for i := 0; i < len(n.Neighbours); i++ {
 			thisNeighbour := n.Neighbours[i]
-			if isNodeDecided(thisNeighbour) {
-				/* is number 1 also next to the wall */
-				nextNeigh := n.Neighbours[(i+1)%int(g.MaxDegree)]
-				prevNeigh := n.Neighbours[(i-1+int(g.MaxDegree))%int(g.MaxDegree)]
-				if (prevNeigh != nil && prevNeigh.Value == 1 && isNodeDecidedOut(prevNeigh.Neighbours[i]) == isNodeDecidedOut(thisNeighbour)) || (nextNeigh != nil && nextNeigh.Value == 1 && isNodeDecidedOut(nextNeigh.Neighbours[i]) == isNodeDecidedOut(thisNeighbour)) {
-					n.IsDecided = true
-					n.IsForRemoval = !isNodeDecidedOut(thisNeighbour)
+			i1 := (i + 1) % int(g.MaxDegree)
+			i2 := (i - 1 + int(g.MaxDegree)) % int(g.MaxDegree)
+			if n.Neighbours[i1] != nil && n.Neighbours[i1].Value == 1 && (thisNeighbour == nil || isTheSameState(thisNeighbour, thisNeighbour.Neighbours[i1])) {
+				if addNodeToOppositeGroup(n, thisNeighbour, g) {
+					isChangeMade = true
 				}
+				break
+			}
+			if n.Neighbours[i2] != nil && n.Neighbours[i2].Value == 1 && (thisNeighbour == nil || isTheSameState(thisNeighbour, thisNeighbour.Neighbours[i2])) {
+				if addNodeToOppositeGroup(n, thisNeighbour, g) {
+					isChangeMade = true
+				}
+				break
 			}
 		}
 	}
-	return false
+	return isChangeMade
 }
