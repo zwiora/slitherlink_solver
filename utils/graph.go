@@ -101,9 +101,9 @@ func (g *Graph) printHoneycombBoard(isDebugMode bool) {
 	fmt.Println()
 	for n := 0; n < g.SizeY; n++ {
 		for m := 0; m < g.SizeX; m++ {
-			if n == g.SizeY-1 && m == g.SizeX-1 {
-				fmt.Print("___")
-			}
+			// if n == g.SizeY-1 && m == g.SizeX-1 {
+			// 	fmt.Print("___")
+			// }
 			fmt.Print("/")
 			if thisNode.IsInLoop {
 				fmt.Printf("\033[42m")
@@ -143,7 +143,7 @@ func (g *Graph) printHoneycombBoard(isDebugMode bool) {
 			fmt.Printf("\033[49m")
 			fmt.Print("\\")
 
-			if thisNode.Neighbours[0] != nil {
+			if (thisNode.Neighbours[0] != nil || n == g.SizeY-1) && m != g.SizeX-1 {
 				fmt.Print("___")
 			}
 
@@ -164,9 +164,9 @@ func (g *Graph) printHoneycombBoard(isDebugMode bool) {
 						thisNode = thisNode.Neighbours[5].Neighbours[0]
 
 					} else if n != g.SizeY-1 {
-						fmt.Print("/")
-					} else {
 						fmt.Print("___/")
+					} else {
+						fmt.Print("/")
 					}
 
 				}

@@ -47,23 +47,15 @@ func main() {
 		sizeY, err = strconv.Atoi(data[i][2])
 		utils.Check(err)
 		code = data[i][3]
-
 		g := utils.ConstructBoardFromData(boardType, sizeX, sizeY, code)
-		fmt.Println(g)
-		g.PrintBoard(debug.IsDebugMode)
-
 		solvers.LoopSolve(g)
-
 		g.PrintBoard(true)
-
-		return
 
 		utils.AvgDepth /= float32(utils.NoVisitedStates)
 		fmt.Println("Visited states: ", utils.NoVisitedStates)
 		fmt.Println("Average depth: ", utils.AvgDepth)
 		fmt.Println("Max depth: ", utils.MaxDepth)
 		fmt.Println(g.CheckIfSolutionOk())
-		g.PrintBoard(true)
 		fmt.Println()
 	} else {
 		for i := range data {
