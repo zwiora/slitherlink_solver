@@ -21,7 +21,7 @@ type Graph struct {
 }
 
 /* Prints full board - type: squares */
-func (g *Graph) PrintSquaresBoard(isDebugMode bool) {
+func (g *Graph) printSquaresBoard(isDebugMode bool) {
 	lastLineNode := g.Root
 	thisNode := g.Root
 
@@ -81,6 +81,119 @@ func (g *Graph) PrintSquaresBoard(isDebugMode bool) {
 		fmt.Println()
 		thisNode = lastLineNode.Neighbours[1]
 		lastLineNode = thisNode
+	}
+}
+
+/* Prints full board - type: honeycomb */
+func (g *Graph) printHoneycombBoard(isDebugMode bool) {
+	lastLineNode := g.Root
+	thisNode := g.Root
+
+	fmt.Printf(" ")
+
+	for m := 0; m < g.SizeX; m++ {
+		if m%2 == 0 {
+			fmt.Printf("___ ")
+		} else {
+			fmt.Printf("    ")
+		}
+	}
+	fmt.Println()
+	for n := 0; n < g.SizeY; n++ {
+		for m := 0; m < g.SizeX; m++ {
+			if n == g.SizeY-1 && m == g.SizeX-1 {
+				fmt.Print("___")
+			}
+			fmt.Print("/")
+			// if thisNode.IsInLoop {
+			// 	fmt.Printf("\033[42m")
+			// }
+			// if isDebugMode && thisNode.IsVisited {
+			// 	fmt.Printf("x")
+			// } else {
+			fmt.Printf(" ")
+			// }
+
+			// if isDebugMode && thisNode.IsDecided {
+
+			// 	if thisNode.IsForRemoval {
+			// 		fmt.Printf("\033[43m")
+			// 	} else {
+			// 		fmt.Printf("\033[41m")
+			// 	}
+			// }
+
+			if thisNode.Value == -1 {
+				fmt.Printf(" ")
+			} else {
+				fmt.Printf("%d", thisNode.Value)
+			}
+
+			// if thisNode.IsInLoop {
+			// 	fmt.Printf("\033[42m")
+			// } else {
+			// 	fmt.Printf("\033[49m")
+			// }
+
+			// if isDebugMode && thisNode.CanBeRemoved {
+			// 	fmt.Printf("#")
+			// } else {
+			fmt.Printf(" ")
+			// }
+			// fmt.Printf("\033[49m|")
+			fmt.Print("\\")
+
+			if thisNode.Neighbours[0] != nil {
+				fmt.Print("___")
+			}
+
+			if g.SizeX%2 == 0 {
+				if thisNode.Neighbours[0] != nil && thisNode.Neighbours[0].Neighbours[5] != nil {
+					thisNode = thisNode.Neighbours[0].Neighbours[5]
+				} else if thisNode.Neighbours[0] != nil {
+					thisNode = lastLineNode.Neighbours[0]
+					if n != 0 {
+						fmt.Print("/")
+					}
+					fmt.Println()
+					fmt.Print("\\___")
+				}
+			} else {
+				if thisNode.Neighbours[0] != nil && thisNode.Neighbours[0].Neighbours[5] != nil {
+					thisNode = thisNode.Neighbours[0].Neighbours[5]
+				} else if thisNode.Neighbours[0] == nil && n != g.SizeY-1 {
+					thisNode = lastLineNode.Neighbours[0]
+					fmt.Println()
+					fmt.Print("\\___")
+				} else if n != g.SizeY-1 {
+					fmt.Print("/")
+				} else if m == g.SizeX/2 {
+					fmt.Println()
+					fmt.Print("\\___")
+				} else if n == g.SizeY-1 && m == g.SizeX-1 {
+					fmt.Print("___/")
+				}
+			}
+		}
+
+		fmt.Println()
+
+		thisNode = lastLineNode.Neighbours[1]
+		lastLineNode = thisNode
+	}
+	fmt.Print("    ")
+	for m := 0; m < g.SizeX/2; m++ {
+		fmt.Print("\\___/   ")
+	}
+
+	fmt.Println()
+}
+
+func (g *Graph) PrintBoard(isDebugMode bool) {
+	if g.shape == "square" {
+		g.printSquaresBoard(isDebugMode)
+	} else if g.shape == "honeycomb" {
+		g.printHoneycombBoard(isDebugMode)
 	}
 }
 

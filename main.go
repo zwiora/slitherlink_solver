@@ -50,6 +50,7 @@ func main() {
 
 		g := utils.ConstructBoardFromData(boardType, sizeX, sizeY, code)
 		fmt.Println(g)
+		g.PrintBoard(debug.IsDebugMode)
 		return
 
 		solvers.LoopSolve(g)
@@ -59,7 +60,7 @@ func main() {
 		fmt.Println("Average depth: ", utils.AvgDepth)
 		fmt.Println("Max depth: ", utils.MaxDepth)
 		fmt.Println(g.CheckIfSolutionOk())
-		g.PrintSquaresBoard(true)
+		g.PrintBoard(true)
 		fmt.Println()
 	} else {
 		for i := range data {
@@ -76,7 +77,7 @@ func main() {
 
 			g := utils.ConstructBoardFromData(boardType, sizeX, sizeY, code)
 			solvers.LoopSolve(g)
-			g.PrintSquaresBoard(true)
+			g.PrintBoard(true)
 
 			utils.AvgDepth /= float32(utils.NoVisitedStates)
 			fmt.Println("Visited states: ", utils.NoVisitedStates)
