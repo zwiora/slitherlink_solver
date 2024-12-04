@@ -63,6 +63,8 @@ func (l *List) SetValue(isForRemoval bool, settingNode *Node, g *Graph) bool {
 					/* Deleting this element is against the rules */
 					return false
 				}
+			} else {
+				thisElement.Value.TemplateGroup = nil
 			}
 
 			thisElement.Value.IsDecided = true

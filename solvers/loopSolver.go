@@ -94,7 +94,7 @@ func updateAvailableMoves(n *utils.Node, g *utils.Graph) bool {
 		thisNode := n.Neighbours[(i)%int(g.MaxDegree)]
 		if thisNode != nil {
 
-			if thisNode.IsInLoop && !thisNode.IsVisited {
+			if thisNode.IsInLoop && !thisNode.IsVisited && !(thisNode.IsDecided && !thisNode.IsForRemoval && thisNode.TemplateGroup == nil) {
 				canBeRemoved, stopTesting = checkIfCanBeRemoved(thisNode, g)
 				if canBeRemoved {
 					if !thisNode.CanBeRemoved {
@@ -114,19 +114,19 @@ func updateAvailableMoves(n *utils.Node, g *utils.Graph) bool {
 
 			/* neighbour of the neighbour - only updates cost*/
 			nextNode := thisNode.Neighbours[(i)%int(g.MaxDegree)]
-			if nextNode != nil && nextNode.IsInLoop && nextNode.CanBeRemoved && !nextNode.IsVisited {
+			if nextNode != nil && nextNode.IsInLoop && nextNode.CanBeRemoved && !nextNode.IsVisited && !(nextNode.IsDecided && !nextNode.IsForRemoval && nextNode.TemplateGroup == nil) {
 				nextNode.UpdateNodeCost(g)
 			}
 			/* another neighbour of the neighbour - in case of honeycomb */
 			nextNode = thisNode.Neighbours[(i+1)%int(g.MaxDegree)]
-			if nextNode != nil && nextNode.IsInLoop && nextNode.CanBeRemoved && !nextNode.IsVisited {
+			if nextNode != nil && nextNode.IsInLoop && nextNode.CanBeRemoved && !nextNode.IsVisited && !(nextNode.IsDecided && !nextNode.IsForRemoval && nextNode.TemplateGroup == nil) {
 				nextNode.UpdateNodeCost(g)
 			}
 
 			previousNode := n.Neighbours[(i-1+int(g.MaxDegree))%int(g.MaxDegree)]
 			if previousNode == nil {
 				nextNode = thisNode.Neighbours[(i-1+int(g.MaxDegree))%int(g.MaxDegree)]
-				if nextNode != nil && nextNode.IsInLoop && nextNode.CanBeRemoved && !nextNode.IsVisited {
+				if nextNode != nil && nextNode.IsInLoop && nextNode.CanBeRemoved && !nextNode.IsVisited && !(nextNode.IsDecided && !nextNode.IsForRemoval && nextNode.TemplateGroup == nil) {
 					nextNode.UpdateNodeCost(g)
 				}
 			}
@@ -134,7 +134,7 @@ func updateAvailableMoves(n *utils.Node, g *utils.Graph) bool {
 			/* diagonal node */
 			if g.Shape != "honeycomb" {
 				thisNode := thisNode.Neighbours[(i+1)%int(g.MaxDegree)]
-				if thisNode != nil && thisNode.IsInLoop && !thisNode.IsVisited {
+				if thisNode != nil && thisNode.IsInLoop && !thisNode.IsVisited && !(thisNode.IsDecided && !thisNode.IsForRemoval && thisNode.TemplateGroup == nil) {
 					canBeRemoved, stopTesting = checkIfCanBeRemoved(thisNode, g)
 					if canBeRemoved {
 						if !thisNode.CanBeRemoved {
@@ -277,7 +277,7 @@ func LoopSolve(g *utils.Graph) {
 	debug.Println("START Loop Solver")
 
 	cost := g.CalculateStartCost()
-	// g.FindTemplates()
+	g.FindTemplates()
 
 	g.CalculateStartMoves()
 

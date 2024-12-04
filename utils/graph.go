@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"slitherlink_solver/debug"
 
-	"github.com/golang-collections/collections/queue"
 	"github.com/golang-collections/collections/stack"
 )
 
@@ -381,111 +380,96 @@ func (g *Graph) CalculateStartMoves() {
 	heap.Init(g.AvailableMoves)
 }
 
-/* Constructs the queue of nodes, that will be searched for templates */
-func (g *Graph) constructQueueForCheckingTemplates() *queue.Queue {
-	nodes := queue.New()
+/* Should be run after preparation of the solver but before its start */
+func (g *Graph) FindTemplates() {
+	debug.Println("check templates")
+
 	thisNode := g.Root
 
+	i := 0
 	for {
 		thisNode.IsVisited = true
 
-		// all templates not near edge use 0 or 3
-		if thisNode.Value == 0 || thisNode.Value == 3 {
-			nodes.Enqueue(thisNode)
-		} else if thisNode.GetDegree() < int(g.MaxDegree) {
-			nodes.Enqueue(thisNode)
+		thisNode.findZeroTemplates(g)
+
+		if g.Shape == "honeycomb" {
+			if i == 0 || i == 3 {
+				i = (i - 1 + 6) % 6
+			} else if i == 5 || i == 2 {
+				i = (i + 1) % 6
+			}
 		}
 
-		isNewNode := false
-		for _, v := range thisNode.Neighbours {
-			if v != nil && !v.IsVisited {
-				thisNode = v
-				isNewNode = true
+		finished := false
+		j := i
+		for thisNode.Neighbours[i] == nil || thisNode.Neighbours[i].IsVisited {
+			i = (i + 1) % int(g.MaxDegree)
+			if j == i {
+				finished = true
 				break
 			}
 		}
 
-		if !isNewNode {
+		if finished {
 			break
 		}
+
+		thisNode = thisNode.Neighbours[i]
 	}
 
 	g.ClearIsVisited()
-	return nodes
-}
 
-/* Should be run after preparation of the solver but before its start */
-func (g *Graph) FindTemplates() {
-	nodes := g.constructQueueForCheckingTemplates()
-	debug.Println("check templates")
-
-	for nodes.Len() > 0 {
-		thisNode := (nodes.Dequeue()).(*Node)
-
-		/* If the final state of the node isn't set */
-		if !thisNode.findZeroTemplates(g) {
-			thisNode.findNumberTemplates(g)
-
-		}
-
-	}
-
-	for {
-
-		newTemplatesFound := 0
-		thisNode := g.Root
-
+	if g.Shape == "square" {
 		for {
-			thisNode.IsVisited = true
+			newTemplatesFound := 0
+			thisNode := g.Root
 
-			// checking only templates that use state of other nodes
-			if thisNode.Value != -1 {
+			for {
+				thisNode.IsVisited = true
+
 				if thisNode.findNumberTemplates(g) {
 					newTemplatesFound++
 				}
-			}
 
-			if thisNode.find31Templates(g) {
-				newTemplatesFound++
-				// fmt.Println("SUPER")
-				// g.PrintSquaresBoard(true)
-				// time.Sleep(time.Millisecond * 1000)
-			}
+				if thisNode.find33Templates(g) {
+					newTemplatesFound++
+				}
 
-			if thisNode.find33Templates(g) {
-				newTemplatesFound++
-			}
+				if thisNode.find3and3Templates(g) {
+					newTemplatesFound++
+				}
 
-			if thisNode.find3and3Templates(g) {
-				newTemplatesFound++
-			}
+				if thisNode.find31Templates(g) {
+					newTemplatesFound++
+				}
 
-			if thisNode.findloopReachingNumberTemplates(g) {
-				newTemplatesFound++
-			}
+				if thisNode.findloopReachingNumberTemplates(g) {
+					newTemplatesFound++
+				}
 
-			if thisNode.findContinousSquareTemplates(g) {
-				newTemplatesFound++
-			}
+				if thisNode.findContinousSquareTemplates(g) {
+					newTemplatesFound++
+				}
 
-			isNewNode := false
-			for _, v := range thisNode.Neighbours {
-				if v != nil && !v.IsVisited {
-					thisNode = v
-					isNewNode = true
+				isNewNode := false
+				for _, v := range thisNode.Neighbours {
+					if v != nil && !v.IsVisited {
+						thisNode = v
+						isNewNode = true
+						break
+					}
+				}
+
+				if !isNewNode {
 					break
 				}
 			}
 
-			if !isNewNode {
+			g.ClearIsVisited()
+
+			if newTemplatesFound == 0 {
 				break
 			}
-		}
-
-		g.ClearIsVisited()
-
-		if newTemplatesFound == 0 {
-			break
 		}
 	}
 
