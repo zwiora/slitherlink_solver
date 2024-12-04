@@ -87,7 +87,4 @@ func main() {
 			}
 		}
 	}
-
-	// g := utils.ConstructBoardFromData("data/test" + args[2] + ".sav")
-
 }
