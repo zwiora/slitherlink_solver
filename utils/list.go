@@ -51,6 +51,7 @@ func (l *List) addOppositeElement(node *Node) {
 }
 
 func (l *List) SetValue(isForRemoval bool, settingNode *Node, g *Graph) bool {
+	result := true
 	if l != nil && !l.Root.Value.IsDecided {
 
 		l.SettingNode = settingNode
@@ -79,10 +80,10 @@ func (l *List) SetValue(isForRemoval bool, settingNode *Node, g *Graph) bool {
 			}
 		}
 
-		l.OppositeList.SetValue(!isForRemoval, settingNode, g)
+		result = l.OppositeList.SetValue(!isForRemoval, settingNode, g)
 	}
 
-	return true
+	return result
 }
 
 func (l *List) ClearValue(g *Graph) {

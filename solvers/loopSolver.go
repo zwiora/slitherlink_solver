@@ -226,8 +226,11 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 				debug.Println("Template not aplicable")
 
 				newNode.TemplateGroup.ClearValue(g)
-				newNode.TemplateGroup.SetValue(false, newNode, g)
-				continue
+				if !newNode.TemplateGroup.SetValue(false, newNode, g) {
+					break
+				} else {
+					continue
+				}
 			}
 		}
 
@@ -241,7 +244,9 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 		/* If the solution withut node wasn't found, then group must be in the loop */
 		if newNode.TemplateGroup != nil && newNode.TemplateGroup.SettingNode == newNode {
 			newNode.TemplateGroup.ClearValue(g)
-			newNode.TemplateGroup.SetValue(false, newNode, g)
+			if !newNode.TemplateGroup.SetValue(false, newNode, g) {
+				break
+			}
 		}
 	}
 
