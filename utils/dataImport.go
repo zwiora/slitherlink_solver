@@ -257,6 +257,11 @@ func ConstructBoardFromData(puzzleType string, puzzleSizeX int, puzzleSizeY int,
 	} else if puzzleType == "2" {
 		board.Shape = "honeycomb"
 		constructHexBoard(board, puzzleContent)
+	} else if puzzleType == "1" {
+		board.Shape = "triangle"
+		board.SizeX *= 2
+		board.SizeX += 1
+		constructHexBoard(board, puzzleContent)
 	}
 
 	return board

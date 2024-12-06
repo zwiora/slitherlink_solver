@@ -14,18 +14,24 @@ func main() {
 	dataFile := ""
 
 	if args[1] == "s" {
-		dataFile = "multiple"
+		dataFile = "square"
 	} else if args[1] == "h" {
 		dataFile = "hexagon"
+	} else if args[1] == "t" {
+		dataFile = "triangle"
 	} else {
 		return
 	}
 
 	if args[2] == "on" {
 		utils.IsHeuristicOn = true
+
+		var err error
+		utils.HeuristicType, err = strconv.Atoi(args[3])
+		utils.Check(err)
 	}
 
-	if len(args) > 4 && args[4] == "d" {
+	if len(args) > 5 && args[5] == "d" {
 		debug.IsDebugMode = true
 	}
 
@@ -36,8 +42,8 @@ func main() {
 	code := ""
 	var err error
 
-	if len(args) > 3 {
-		i, err := strconv.Atoi(args[3])
+	if len(args) > 4 {
+		i, err := strconv.Atoi(args[4])
 		utils.Check(err)
 		fmt.Println(i, ": ", data[i])
 

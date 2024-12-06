@@ -5,6 +5,7 @@ import (
 )
 
 var IsHeuristicOn bool
+var HeuristicType int
 var NoVisitedStates int
 var AvgDepth float32
 var MaxDepth int

@@ -122,9 +122,33 @@ func (n *Node) UpdateNodeCost(g *Graph) {
 	if IsHeuristicOn {
 		if n.Cost != n.QueuePriority {
 			if n.IsForRemoval {
-				g.AvailableMoves.update(n, 1000)
+				g.AvailableMoves.update(n, 10000)
 			} else if n.TemplateGroup != nil {
-				g.AvailableMoves.update(n, newCost+100)
+				if HeuristicType == 1 {
+					g.AvailableMoves.update(n, newCost+1000)
+				} else if HeuristicType == 2 {
+					groupSize := 0
+					if n.TemplateGroup != nil {
+						groupSize += n.TemplateGroup.Length
+
+						if n.TemplateGroup.OppositeList != nil {
+							groupSize += n.TemplateGroup.OppositeList.Length
+						}
+					}
+					g.AvailableMoves.update(n, 1000+groupSize)
+				} else if HeuristicType == 3 {
+					groupSize := 0
+					if n.TemplateGroup != nil {
+						groupSize += n.TemplateGroup.Length
+
+						if n.TemplateGroup.OppositeList != nil {
+							groupSize += n.TemplateGroup.OppositeList.Length
+						}
+					}
+					g.AvailableMoves.update(n, 1000+groupSize*10+newCost)
+				} else {
+					g.AvailableMoves.update(n, newCost)
+				}
 			} else {
 				g.AvailableMoves.update(n, newCost)
 			}

@@ -158,7 +158,7 @@ func updateAvailableMoves(n *utils.Node, g *utils.Graph) bool {
 }
 
 /* Main solver logic */
-func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound *bool, depth int) {
+func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound *bool, isStateWrong *bool, depth int) {
 	utils.NoVisitedStates++
 	utils.AvgDepth += float32(depth)
 	if depth > utils.MaxDepth {
@@ -227,6 +227,9 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 
 				newNode.TemplateGroup.ClearValue(g)
 				if !newNode.TemplateGroup.SetValue(false, newNode, g) {
+					*isStateWrong = true
+					debug.Println("WRONG STATE")
+					debug.Println(depth)
 					break
 				} else {
 					continue
@@ -235,7 +238,7 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 		}
 
 		/* Run recursion with new node */
-		loopSolveRecursion(newNode, g, cost-newNode.Cost, isSolutionFound, depth+1)
+		loopSolveRecursion(newNode, g, cost-newNode.Cost, isSolutionFound, isStateWrong, depth+1)
 
 		if *isSolutionFound {
 			return
@@ -245,6 +248,15 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 		if newNode.TemplateGroup != nil && newNode.TemplateGroup.SettingNode == newNode {
 			newNode.TemplateGroup.ClearValue(g)
 			if !newNode.TemplateGroup.SetValue(false, newNode, g) {
+				// debug.Println("WRONG STATE")
+				// debug.Println(depth)
+				// *isStateWrong = true
+				break
+			} else if *isStateWrong {
+				// fmt.Println("BREAK STATE")
+				// fmt.Println(depth)
+				// time.Sleep(1000 * time.Millisecond)
+				*isStateWrong = false
 				break
 			}
 		}
@@ -290,6 +302,7 @@ func LoopSolve(g *utils.Graph) {
 
 	g.VisitedNodes = stack.New()
 	isSolutionFound := new(bool)
+	isStateWrong := new(bool)
 
 	if debug.IsDebugMode {
 		g.PrintBoard(true)
@@ -331,7 +344,7 @@ func LoopSolve(g *utils.Graph) {
 		newNode.CanBeRemoved = false
 
 		/* Run recursion with new node */
-		loopSolveRecursion(newNode, g, cost-newNode.Cost, isSolutionFound, 1)
+		loopSolveRecursion(newNode, g, cost-newNode.Cost, isSolutionFound, isStateWrong, 1)
 
 		if *isSolutionFound {
 			break
