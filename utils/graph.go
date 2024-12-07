@@ -372,6 +372,95 @@ func (g *Graph) printTriangleBoard(isDebugMode bool) {
 
 		thisNode = lastLineNode.NextRow
 	}
+
+	if g.SizeY%2 == 1 {
+		fmt.Print("   ")
+		lastLineNode = thisNode
+		for m := 0; m < width; m++ {
+			fmt.Print("\\")
+			if thisNode.IsInLoop {
+				fmt.Printf("\033[42m")
+			}
+			if isDebugMode && thisNode.IsVisited {
+				fmt.Printf("x")
+			} else {
+				fmt.Printf(" ")
+			}
+
+			if thisNode.Value == -1 {
+				fmt.Printf(" ")
+			} else {
+				fmt.Printf("%d", thisNode.Value)
+			}
+
+			if thisNode.IsInLoop {
+				fmt.Printf("\033[42m")
+			} else {
+				fmt.Printf("\033[49m")
+			}
+
+			if isDebugMode && thisNode.CanBeRemoved {
+				fmt.Printf("#")
+			} else {
+				fmt.Printf(" ")
+			}
+			fmt.Printf("\033[49m/ ")
+
+			if thisNode.Neighbours[1] != nil {
+				thisNode = thisNode.Neighbours[1]
+				thisNode = thisNode.Neighbours[0]
+			}
+		}
+
+		fmt.Println()
+		fmt.Print("    ")
+		thisNode = lastLineNode
+
+		for m := 0; m < width-1; m++ {
+			thisNode = thisNode.Neighbours[1]
+
+			fmt.Print("\\ /")
+
+			if thisNode.IsInLoop {
+				fmt.Printf("\033[42m")
+			}
+			if isDebugMode && thisNode.IsVisited {
+				fmt.Printf("x")
+			} else {
+				fmt.Printf(" ")
+			}
+
+			if thisNode.Value == -1 {
+				fmt.Printf(" ")
+			} else {
+				fmt.Printf("%d", thisNode.Value)
+			}
+
+			if thisNode.IsInLoop {
+				fmt.Printf("\033[42m")
+			} else {
+				fmt.Printf("\033[49m")
+			}
+
+			if isDebugMode && thisNode.CanBeRemoved {
+				fmt.Printf("#")
+			} else {
+				fmt.Printf(" ")
+			}
+			fmt.Print("\033[49m")
+
+			thisNode = thisNode.Neighbours[0]
+
+		}
+		fmt.Println("\\ /")
+
+		fmt.Print("     ")
+		for m := 0; m < width-1; m++ {
+			fmt.Print("------")
+		}
+		fmt.Println("-")
+
+	}
 }
 
 func (g *Graph) PrintBoard(isDebugMode bool) {

@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -275,9 +276,9 @@ func constructTriangleBoard(board *Graph, puzzleContent string) {
 	_ = row
 
 	n = 0
-	for i := 0; i < board.SizeY/2; i++ {
+	for i := 0; i < (board.SizeY+1)/2; i++ {
 
-		if i != board.SizeY/2-1 || board.SizeY%2 == 0 {
+		if i != board.SizeY/2 || board.SizeY%2 == 0 {
 			prevNode := row[0]
 			for j := 0; j < width; j++ {
 				row[j] = &Node{
@@ -344,6 +345,47 @@ func constructTriangleBoard(board *Graph, puzzleContent string) {
 				row2[j] = thisNode
 
 				// fmt.Println(thisNode)
+			}
+		} else {
+			fmt.Println("HEJJJJ")
+			prevNode := row[0]
+			row[0] = nil
+			for j := 1; j < width-1; j++ {
+				row[j] = &Node{
+					Value:    content[n],
+					IsInLoop: true,
+				}
+				row[j].Neighbours = make([]*Node, board.MaxDegree)
+				n++
+			}
+			row[width-1] = nil
+
+			for j := 0; j < width-1; j++ {
+				thisNode := &Node{
+					Value:    content[n],
+					IsInLoop: true,
+				}
+				thisNode.Neighbours = make([]*Node, board.MaxDegree)
+				n++
+
+				if j == 0 && prevNode != nil {
+					fmt.Println(row[1])
+					prevNode.NextRow = thisNode
+				}
+
+				if row[j] != nil {
+					thisNode.Neighbours[0] = row[j]
+					row[j].Neighbours[0] = thisNode
+				}
+				if row[j+1] != nil {
+					thisNode.Neighbours[1] = row[j+1]
+					row[j+1].Neighbours[1] = thisNode
+				}
+
+				if row2[j] != nil {
+					thisNode.Neighbours[2] = row2[j]
+					row2[j].Neighbours[2] = thisNode
+				}
 			}
 		}
 	}
