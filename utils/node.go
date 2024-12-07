@@ -6,6 +6,7 @@ import (
 
 type Node struct {
 	Neighbours    []*Node
+	NextRow       *Node
 	Value         int8
 	IsInLoop      bool
 	IsVisited     bool

@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -236,6 +237,128 @@ func constructHexBoard(board *Graph, puzzleContent string) {
 	}
 }
 
+func constructTriangleBoard(board *Graph, puzzleContent string) {
+	fmt.Println(board)
+	thisNode := board.Root
+	// lastLineNode := thisNode
+	width := board.SizeX/2 + 1
+	noNodes := board.SizeX * board.SizeY
+	if board.SizeY%2 == 1 {
+		noNodes -= 2
+	}
+	row := make([]*Node, width)
+	row2 := make([]*Node, width-1)
+	content := make([]int8, noNodes)
+	// m := 0
+	// n := 0
+
+	board.MaxDegree = 3
+	thisNode.Neighbours = make([]*Node, board.MaxDegree)
+
+	/* Setting content*/
+	n := 0
+	for _, character := range strings.Split(puzzleContent, "") {
+
+		characterVal, err := strconv.Atoi(character)
+
+		/* Setting value of the node */
+		nodesCounter := 1
+		if err == nil {
+			content[n] = int8(characterVal)
+			n++
+			board.maxCost += characterVal
+		} else {
+			nodesCounter = int(character[0]) - int('a') + 1
+
+			for i := 0; i < nodesCounter; i++ {
+				content[n] = -1
+				n++
+			}
+		}
+	}
+
+	fmt.Println(content)
+
+	_ = row
+
+	n = 0
+	for i := 0; i < board.SizeY/2; i++ {
+
+		if i != board.SizeY/2-1 || board.SizeY%2 == 0 {
+			prevNode := row[0]
+			for j := 0; j < width; j++ {
+				row[j] = &Node{
+					Value:    content[n],
+					IsInLoop: true,
+				}
+				row[j].Neighbours = make([]*Node, board.MaxDegree)
+
+				fmt.Println(row[j])
+				n++
+			}
+
+			if prevNode != nil {
+				prevNode.NextRow = row[0]
+			}
+
+			for j := 0; j < width-1; j++ {
+				thisNode := &Node{
+					Value:    content[n],
+					IsInLoop: true,
+				}
+				thisNode.Neighbours = make([]*Node, board.MaxDegree)
+				n++
+
+				thisNode.Neighbours[0] = row[j]
+				row[j].Neighbours[0] = thisNode
+				thisNode.Neighbours[1] = row[j+1]
+				row[j+1].Neighbours[1] = thisNode
+
+				if row2[j] != nil {
+					thisNode.Neighbours[2] = row2[j]
+					row2[j].Neighbours[2] = thisNode
+				}
+
+				fmt.Println(thisNode)
+
+			}
+
+			for j := 0; j < width; j++ {
+				thisNode := &Node{
+					Value:    content[n],
+					IsInLoop: true,
+				}
+				thisNode.Neighbours = make([]*Node, board.MaxDegree)
+				n++
+
+				thisNode.Neighbours[2] = row[j]
+				row[j].Neighbours[2] = thisNode
+
+				row[j] = thisNode
+				fmt.Println(row[j])
+			}
+
+			for j := 0; j < width-1; j++ {
+				thisNode := &Node{
+					Value:    content[n],
+					IsInLoop: true,
+				}
+				thisNode.Neighbours = make([]*Node, board.MaxDegree)
+				n++
+
+				thisNode.Neighbours[0] = row[j]
+				row[j].Neighbours[0] = thisNode
+				thisNode.Neighbours[1] = row[j+1]
+				row[j+1].Neighbours[1] = thisNode
+
+				row2[j] = thisNode
+
+				fmt.Println(thisNode)
+			}
+		}
+	}
+}
+
 func ConstructBoardFromData(puzzleType string, puzzleSizeX int, puzzleSizeY int, puzzleContent string) *Graph {
 
 	board := new(Graph)
@@ -261,7 +384,7 @@ func ConstructBoardFromData(puzzleType string, puzzleSizeX int, puzzleSizeY int,
 		board.Shape = "triangle"
 		board.SizeX *= 2
 		board.SizeX += 1
-		constructHexBoard(board, puzzleContent)
+		constructTriangleBoard(board, puzzleContent)
 	}
 
 	return board
