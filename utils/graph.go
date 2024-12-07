@@ -182,11 +182,205 @@ func (g *Graph) printHoneycombBoard(isDebugMode bool) {
 	fmt.Println()
 }
 
+/* Prints full board - type: triangle */
+func (g *Graph) printTriangleBoard(isDebugMode bool) {
+	lastLineNode := g.Root
+	thisNode := g.Root
+	width := g.SizeX / 2
+
+	fmt.Print("  ")
+	for m := 0; m < width; m++ {
+		fmt.Print("------")
+	}
+	fmt.Println("-")
+
+	for n := 0; n < g.SizeY/2; n++ {
+		fmt.Print(" ")
+		lastLineNode = thisNode
+		for m := 0; m < width; m++ {
+			fmt.Print("/ \\")
+			thisNode = thisNode.Neighbours[0]
+
+			if thisNode.IsInLoop {
+				fmt.Printf("\033[42m")
+			}
+			if isDebugMode && thisNode.IsVisited {
+				fmt.Printf("x")
+			} else {
+				fmt.Printf(" ")
+			}
+
+			if thisNode.Value == -1 {
+				fmt.Printf(" ")
+			} else {
+				fmt.Printf("%d", thisNode.Value)
+			}
+
+			if thisNode.IsInLoop {
+				fmt.Printf("\033[42m")
+			} else {
+				fmt.Printf("\033[49m")
+			}
+
+			if isDebugMode && thisNode.CanBeRemoved {
+				fmt.Printf("#")
+			} else {
+				fmt.Printf(" ")
+			}
+			fmt.Printf("\033[49m")
+
+			thisNode = thisNode.Neighbours[1]
+		}
+
+		fmt.Print("/ \\")
+		fmt.Println()
+
+		thisNode = lastLineNode
+
+		for m := 0; m < width+1; m++ {
+			fmt.Print("/")
+
+			if thisNode.IsInLoop {
+				fmt.Printf("\033[42m")
+			}
+			if isDebugMode && thisNode.IsVisited {
+				fmt.Printf("x")
+			} else {
+				fmt.Printf(" ")
+			}
+
+			if thisNode.Value == -1 {
+				fmt.Printf(" ")
+			} else {
+				fmt.Printf("%d", thisNode.Value)
+			}
+
+			if thisNode.IsInLoop {
+				fmt.Printf("\033[42m")
+			} else {
+				fmt.Printf("\033[49m")
+			}
+
+			if isDebugMode && thisNode.CanBeRemoved {
+				fmt.Printf("#")
+			} else {
+				fmt.Printf(" ")
+			}
+			fmt.Print("\033[49m\\ ")
+
+			if thisNode.Neighbours[0] != nil {
+				thisNode = thisNode.Neighbours[0]
+				thisNode = thisNode.Neighbours[1]
+			}
+		}
+
+		thisNode = lastLineNode.Neighbours[2]
+		lastLineNode = thisNode
+		fmt.Println()
+
+		for m := 0; m < width; m++ {
+			fmt.Print("------")
+		}
+		fmt.Println("-----")
+
+		for m := 0; m < width+1; m++ {
+			fmt.Print("\\")
+
+			if thisNode.IsInLoop {
+				fmt.Printf("\033[42m")
+			}
+			if isDebugMode && thisNode.IsVisited {
+				fmt.Printf("x")
+			} else {
+				fmt.Printf(" ")
+			}
+
+			if thisNode.Value == -1 {
+				fmt.Printf(" ")
+			} else {
+				fmt.Printf("%d", thisNode.Value)
+			}
+
+			if thisNode.IsInLoop {
+				fmt.Printf("\033[42m")
+			} else {
+				fmt.Printf("\033[49m")
+			}
+
+			if isDebugMode && thisNode.CanBeRemoved {
+				fmt.Printf("#")
+			} else {
+				fmt.Printf(" ")
+			}
+			fmt.Printf("\033[49m")
+			fmt.Print("/ ")
+
+			if thisNode.Neighbours[1] != nil {
+				thisNode = thisNode.Neighbours[1]
+				thisNode = thisNode.Neighbours[0]
+			}
+		}
+
+		fmt.Println()
+
+		thisNode = lastLineNode
+
+		fmt.Print(" ")
+
+		for m := 0; m < width; m++ {
+			fmt.Print("\\ /")
+
+			thisNode = thisNode.Neighbours[1]
+
+			if thisNode.IsInLoop {
+				fmt.Printf("\033[42m")
+			}
+			if isDebugMode && thisNode.IsVisited {
+				fmt.Printf("x")
+			} else {
+				fmt.Printf(" ")
+			}
+
+			if thisNode.Value == -1 {
+				fmt.Printf(" ")
+			} else {
+				fmt.Printf("%d", thisNode.Value)
+			}
+
+			if thisNode.IsInLoop {
+				fmt.Printf("\033[42m")
+			} else {
+				fmt.Printf("\033[49m")
+			}
+
+			if isDebugMode && thisNode.CanBeRemoved {
+				fmt.Printf("#")
+			} else {
+				fmt.Printf(" ")
+			}
+			fmt.Print("\033[49m")
+
+			thisNode = thisNode.Neighbours[0]
+		}
+
+		fmt.Println("\\ /")
+		fmt.Print("  ")
+		for m := 0; m < width; m++ {
+			fmt.Print("------")
+		}
+		fmt.Println("-")
+
+		thisNode = lastLineNode.NextRow
+	}
+}
+
 func (g *Graph) PrintBoard(isDebugMode bool) {
 	if g.Shape == "square" {
 		g.printSquaresBoard(isDebugMode)
 	} else if g.Shape == "honeycomb" {
 		g.printHoneycombBoard(isDebugMode)
+	} else if g.Shape == "triangle" {
+		g.printTriangleBoard(isDebugMode)
 	}
 }
 
@@ -275,8 +469,15 @@ func (g *Graph) CalculateStartCost() int {
 	startCost := 0
 	thisNode := g.Root
 
+	fmt.Println("cost")
+
 	i := 0
+	if g.Shape == "triangle" {
+		i = 1
+	}
 	for {
+		// fmt.Println(i)
+		fmt.Println(thisNode)
 		thisNode.IsVisited = true
 
 		if thisNode.Value >= 0 {
@@ -293,12 +494,19 @@ func (g *Graph) CalculateStartCost() int {
 			} else if i == 5 || i == 2 {
 				i = (i + 1) % 6
 			}
+		} else if g.Shape == "triangle" {
+			// if i == 2 {
+			// 	i = 0
+			// } else {
+			i = (i + 1) % 2
+			// }
 		}
 
 		finished := false
 		j := i
 		for thisNode.Neighbours[i] == nil || thisNode.Neighbours[i].IsVisited {
 			i = (i + 1) % int(g.MaxDegree)
+			// fmt.Println(i)
 			if j == i {
 				finished = true
 				break
@@ -306,6 +514,13 @@ func (g *Graph) CalculateStartCost() int {
 		}
 
 		if finished {
+			if g.Shape == "triangle" && thisNode.NextRow != nil && !thisNode.NextRow.IsVisited {
+				fmt.Println()
+				thisNode = thisNode.NextRow
+				i = 1
+				continue
+			}
+
 			break
 		}
 

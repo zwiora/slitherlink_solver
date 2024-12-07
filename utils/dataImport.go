@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -238,9 +237,6 @@ func constructHexBoard(board *Graph, puzzleContent string) {
 }
 
 func constructTriangleBoard(board *Graph, puzzleContent string) {
-	fmt.Println(board)
-	thisNode := board.Root
-	// lastLineNode := thisNode
 	width := board.SizeX/2 + 1
 	noNodes := board.SizeX * board.SizeY
 	if board.SizeY%2 == 1 {
@@ -249,11 +245,8 @@ func constructTriangleBoard(board *Graph, puzzleContent string) {
 	row := make([]*Node, width)
 	row2 := make([]*Node, width-1)
 	content := make([]int8, noNodes)
-	// m := 0
-	// n := 0
 
 	board.MaxDegree = 3
-	thisNode.Neighbours = make([]*Node, board.MaxDegree)
 
 	/* Setting content*/
 	n := 0
@@ -277,7 +270,7 @@ func constructTriangleBoard(board *Graph, puzzleContent string) {
 		}
 	}
 
-	fmt.Println(content)
+	// fmt.Println(content)
 
 	_ = row
 
@@ -292,13 +285,13 @@ func constructTriangleBoard(board *Graph, puzzleContent string) {
 					IsInLoop: true,
 				}
 				row[j].Neighbours = make([]*Node, board.MaxDegree)
-
-				fmt.Println(row[j])
 				n++
 			}
 
 			if prevNode != nil {
 				prevNode.NextRow = row[0]
+			} else {
+				board.Root = row[0]
 			}
 
 			for j := 0; j < width-1; j++ {
@@ -318,9 +311,6 @@ func constructTriangleBoard(board *Graph, puzzleContent string) {
 					thisNode.Neighbours[2] = row2[j]
 					row2[j].Neighbours[2] = thisNode
 				}
-
-				fmt.Println(thisNode)
-
 			}
 
 			for j := 0; j < width; j++ {
@@ -335,7 +325,7 @@ func constructTriangleBoard(board *Graph, puzzleContent string) {
 				row[j].Neighbours[2] = thisNode
 
 				row[j] = thisNode
-				fmt.Println(row[j])
+				// fmt.Println(row[j])
 			}
 
 			for j := 0; j < width-1; j++ {
@@ -346,14 +336,14 @@ func constructTriangleBoard(board *Graph, puzzleContent string) {
 				thisNode.Neighbours = make([]*Node, board.MaxDegree)
 				n++
 
-				thisNode.Neighbours[0] = row[j]
-				row[j].Neighbours[0] = thisNode
-				thisNode.Neighbours[1] = row[j+1]
-				row[j+1].Neighbours[1] = thisNode
+				thisNode.Neighbours[1] = row[j]
+				row[j].Neighbours[1] = thisNode
+				thisNode.Neighbours[0] = row[j+1]
+				row[j+1].Neighbours[0] = thisNode
 
 				row2[j] = thisNode
 
-				fmt.Println(thisNode)
+				// fmt.Println(thisNode)
 			}
 		}
 	}

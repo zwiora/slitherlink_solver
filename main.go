@@ -54,6 +54,8 @@ func main() {
 		utils.Check(err)
 		code = data[i][3]
 		g := utils.ConstructBoardFromData(boardType, sizeX, sizeY, code)
+		g.PrintBoard(true)
+		return
 		solvers.LoopSolve(g)
 		g.PrintBoard(true)
 
