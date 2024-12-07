@@ -294,12 +294,13 @@ func LoopSolve(g *utils.Graph) {
 	debug.Println("START Loop Solver")
 
 	cost := g.CalculateStartCost()
-	return
-	g.FindTemplates()
+	// g.FindTemplates()
 
 	g.CalculateStartMoves()
 
-	g.PrintBoard(true)
+	// g.PrintBoard(true)
+
+	return
 
 	g.VisitedNodes = stack.New()
 	isSolutionFound := new(bool)

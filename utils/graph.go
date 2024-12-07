@@ -510,6 +510,48 @@ func (g *Graph) CheckIfSolutionOk() bool {
 			thisNode = lastLineNode.Neighbours[1]
 			lastLineNode = thisNode
 		}
+	} else if g.Shape == "triangle" {
+		thisNode := g.Root
+		i := 1
+		counter := 0
+		for {
+			if thisNode.Value != -1 && thisNode.Value != int8(thisNode.getLinesAround(int(g.MaxDegree))) {
+				fmt.Println(thisNode)
+				return false
+			}
+
+			i = (i + 1) % 2
+
+			if thisNode.Neighbours[i] == nil && counter%2 == 0 {
+				thisNode = thisNode.Neighbours[2]
+				counter++
+				i = 1
+			} else if thisNode.Neighbours[i] == nil && thisNode.NextRow != nil {
+				thisNode = thisNode.NextRow
+				counter++
+				if g.SizeY%2 == 1 && counter == g.SizeY-1 {
+					i = 0
+				} else {
+					i = 1
+				}
+			} else if thisNode.Neighbours[i] != nil {
+				thisNode = thisNode.Neighbours[i]
+			} else {
+				break
+			}
+
+			// if finished {
+			// 	if thisNode.NextRow != nil && !thisNode.NextRow.IsVisited {
+			// 		fmt.Println()
+			// 		thisNode = thisNode.NextRow
+			// 		i = 1
+			// 		continue
+			// 	}
+
+			// 	break
+			// }
+
+		}
 	}
 	return true
 
@@ -522,6 +564,9 @@ func (g *Graph) ClearIsVisited() {
 	thisNode := g.Root
 
 	i := 0
+	if g.Shape == "triangle" {
+		i = 1
+	}
 	for {
 		thisNode.IsVisited = false
 
@@ -531,6 +576,8 @@ func (g *Graph) ClearIsVisited() {
 			} else if i == 5 || i == 2 {
 				i = (i + 1) % 6
 			}
+		} else if g.Shape == "triangle" {
+			i = (i + 1) % 2
 		}
 
 		finished := false
@@ -544,6 +591,12 @@ func (g *Graph) ClearIsVisited() {
 		}
 
 		if finished {
+			if g.Shape == "triangle" && thisNode.NextRow != nil && thisNode.NextRow.IsVisited {
+				fmt.Println()
+				thisNode = thisNode.NextRow
+				i = 1
+				continue
+			}
 			break
 		}
 
@@ -555,6 +608,7 @@ func (g *Graph) ClearIsVisited() {
 Calculates sum of all visible values on the board and starting cost assuming there's a loop around the whole board
 */
 func (g *Graph) CalculateStartCost() int {
+
 	startCost := 0
 	thisNode := g.Root
 
@@ -565,9 +619,10 @@ func (g *Graph) CalculateStartCost() int {
 		i = 1
 	}
 	for {
-		// fmt.Println(i)
-		fmt.Println(thisNode)
+
 		thisNode.IsVisited = true
+		// g.PrintBoard(true)
+		// time.Sleep(time.Millisecond * 100)
 
 		if thisNode.Value >= 0 {
 			if thisNode.GetDegree() < int(g.MaxDegree) {
@@ -584,18 +639,13 @@ func (g *Graph) CalculateStartCost() int {
 				i = (i + 1) % 6
 			}
 		} else if g.Shape == "triangle" {
-			// if i == 2 {
-			// 	i = 0
-			// } else {
 			i = (i + 1) % 2
-			// }
 		}
 
 		finished := false
 		j := i
 		for thisNode.Neighbours[i] == nil || thisNode.Neighbours[i].IsVisited {
 			i = (i + 1) % int(g.MaxDegree)
-			// fmt.Println(i)
 			if j == i {
 				finished = true
 				break
@@ -667,7 +717,47 @@ func (g *Graph) CalculateStartMoves() {
 				break
 			}
 		}
+	} else if g.Shape == "triangle" {
+		thisNode := g.Root
+		i := 1
+		for {
 
+			thisNode.IsVisited = true
+
+			if thisNode.GetDegree() < int(g.MaxDegree) {
+				thisNode.SetNodeCost(g)
+				thisNode.CanBeRemoved = true
+				movesArr = append(movesArr, thisNode)
+
+			}
+
+			i = (i + 1) % 2
+
+			finished := false
+			j := i
+			for thisNode.Neighbours[i] == nil || thisNode.Neighbours[i].IsVisited {
+				i = (i + 1) % int(g.MaxDegree)
+				if j == i {
+					finished = true
+					break
+				}
+			}
+
+			if finished {
+				if thisNode.NextRow != nil && !thisNode.NextRow.IsVisited {
+					fmt.Println()
+					thisNode = thisNode.NextRow
+					i = 1
+					continue
+				}
+
+				break
+			}
+
+			thisNode = thisNode.Neighbours[i]
+		}
+
+		g.ClearIsVisited()
 	}
 
 	/* Transform array into heap */
