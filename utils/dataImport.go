@@ -245,6 +245,7 @@ func constructTriangleBoard(board *Graph, puzzleContent string) {
 	row := make([]*Node, width)
 	row2 := make([]*Node, width-1)
 	content := make([]int8, noNodes)
+	board.FieldsCount = noNodes
 
 	board.MaxDegree = 3
 
@@ -401,6 +402,7 @@ func ConstructBoardFromData(puzzleType string, puzzleSizeX int, puzzleSizeY int,
 	board.maxCost = 0
 	board.SizeX = puzzleSizeX
 	board.SizeY = puzzleSizeY
+	board.FieldsCount = puzzleSizeX * puzzleSizeY
 
 	/* Type: squares" */
 	if puzzleType == "0de" {

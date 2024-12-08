@@ -4,6 +4,7 @@ import (
 	"container/heap"
 	"slitherlink_solver/debug"
 	"slitherlink_solver/utils"
+	"time"
 
 	"github.com/golang-collections/collections/stack"
 )
@@ -240,7 +241,7 @@ func updateAvailableMoves(n *utils.Node, g *utils.Graph) bool {
 /* Main solver logic */
 func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound *bool, isStateWrong *bool, depth int) {
 	utils.NoVisitedStates++
-	utils.AvgDepth += float32(depth)
+	utils.AvgDepth += float64(depth)
 	if depth > utils.MaxDepth {
 		utils.MaxDepth = depth
 	}
@@ -382,6 +383,7 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 
 /* Solver preparation */
 func LoopSolve(g *utils.Graph) {
+	defer utils.TimeDuration(time.Now())
 	debug.Println("START Loop Solver")
 
 	cost := g.CalculateStartCost()
@@ -452,5 +454,5 @@ func LoopSolve(g *utils.Graph) {
 		newNode.IsInLoop = true
 	}
 
-	g.PrintBoard(false)
+	// g.PrintBoard(false)
 }

@@ -14,6 +14,7 @@ type Graph struct {
 	maxCost        int
 	SizeX          int
 	SizeY          int
+	FieldsCount    int
 	Shape          string
 	AvailableMoves *PriorityQueue
 	VisitedNodes   *stack.Stack

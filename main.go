@@ -58,7 +58,7 @@ func main() {
 		solvers.LoopSolve(g)
 		g.PrintBoard(true)
 
-		utils.AvgDepth /= float32(utils.NoVisitedStates)
+		utils.AvgDepth /= float64(utils.NoVisitedStates)
 		fmt.Println("Visited states: ", utils.NoVisitedStates)
 		fmt.Println("Average depth: ", utils.AvgDepth)
 		fmt.Println("Max depth: ", utils.MaxDepth)
@@ -69,7 +69,7 @@ func main() {
 			utils.AvgDepth = 0
 			utils.MaxDepth = 0
 			utils.NoVisitedStates = 0
-			fmt.Println(i, ": ", data[i])
+			// fmt.Println(i, ": ", data[i])
 			boardType = data[i][0]
 			sizeX, err = strconv.Atoi(data[i][1])
 			utils.Check(err)
@@ -78,15 +78,17 @@ func main() {
 			code = data[i][3]
 
 			g := utils.ConstructBoardFromData(boardType, sizeX, sizeY, code)
-			solvers.LoopSolve(g)
-			g.PrintBoard(true)
+			fmt.Print(g.FieldsCount, ";")
 
-			utils.AvgDepth /= float32(utils.NoVisitedStates)
-			fmt.Println("Visited states: ", utils.NoVisitedStates)
-			fmt.Println("Average depth: ", utils.AvgDepth)
-			fmt.Println("Max depth: ", utils.MaxDepth)
-			fmt.Println(g.CheckIfSolutionOk())
+			solvers.LoopSolve(g)
+			// g.PrintBoard(true)
+
+			utils.AvgDepth /= float64(utils.NoVisitedStates)
+			fmt.Print(";", utils.NoVisitedStates)
+			fmt.Print(";", utils.AvgDepth)
+			fmt.Print(";", utils.MaxDepth)
 			fmt.Println()
+			g.CheckIfSolutionOk()
 
 			if !g.CheckIfSolutionOk() {
 				fmt.Println("BŁĄD")
