@@ -1,7 +1,5 @@
 package utils
 
-import "fmt"
-
 func isTheSameState(n1 *Node, n2 *Node) bool {
 	if n1 != nil && n2 != nil && n1.TemplateGroup != nil && n1.TemplateGroup == n2.TemplateGroup {
 		return true
@@ -397,25 +395,23 @@ func (n *Node) findContinousSquareTemplates(g *Graph) bool {
 				secondNeighbour := n.Neighbours[(k+1)%3]
 				if isTheSameState(firstNeighbour, secondNeighbour) {
 					tmp := firstNeighbour
-					i := (k - 1 + 3) % 3
-					for tmp != n && tmp != nil {
+					i := k
+					for tmp != secondNeighbour && tmp != nil {
+						i = (i - 1 + 3) % 3
 						tmp = tmp.Neighbours[i]
 						if isDifferentState(tmp, firstNeighbour) {
 							return addNodeToGroup(n, firstNeighbour, g)
 						}
-						i = (i - 1 + 3) % 3
 					}
 
-					tmp = secondNeighbour
 					i = (k + 1) % 3
-					for tmp != n && tmp != nil {
-						tmp = tmp.Neighbours[i]
-						if isDifferentState(tmp, firstNeighbour) {
-							fmt.Println("a")
 
-							return addNodeToGroup(n, firstNeighbour, g)
+					for tmp != firstNeighbour && tmp != nil {
+						i = (i + 1 + 3) % 3
+						tmp = tmp.Neighbours[i]
+						if isDifferentState(tmp, secondNeighbour) {
+							return addNodeToGroup(n, secondNeighbour, g)
 						}
-						i = (i + 1) % 3
 					}
 				}
 
@@ -428,52 +424,98 @@ func (n *Node) findContinousSquareTemplates(g *Graph) bool {
 
 func (n *Node) find33Templates(g *Graph) bool {
 	isChangeMade := false
-	if n.Value == 3 {
-		m := n.Neighbours[0]
-		if m != nil && m.Value == 3 && !(n.IsDecided && m.IsDecided) {
-			if addNodeToGroup(n, m.Neighbours[0], g) {
-				isChangeMade = true
+	if g.Shape == "square" {
+		if n.Value == 3 {
+			m := n.Neighbours[0]
+			if m != nil && m.Value == 3 && !(n.IsDecided && m.IsDecided) {
+				if addNodeToGroup(n, m.Neighbours[0], g) {
+					isChangeMade = true
+				}
+				if addNodeToGroup(m, n.Neighbours[2], g) {
+					isChangeMade = true
+				}
+				if addNodeToOppositeGroup(n, m, g) {
+					isChangeMade = true
+				}
+				if addNodeToGroup(n.Neighbours[3], m.Neighbours[3], g) {
+					isChangeMade = true
+				}
+				if addNodeToGroup(n.Neighbours[1], m.Neighbours[1], g) {
+					isChangeMade = true
+				}
+				if addNodeToOppositeGroup(n.Neighbours[3], n.Neighbours[1], g) {
+					isChangeMade = true
+				}
 			}
-			if addNodeToGroup(m, n.Neighbours[2], g) {
-				isChangeMade = true
-			}
-			if addNodeToOppositeGroup(n, m, g) {
-				isChangeMade = true
-			}
-			if addNodeToGroup(n.Neighbours[3], m.Neighbours[3], g) {
-				isChangeMade = true
-			}
-			if addNodeToGroup(n.Neighbours[1], m.Neighbours[1], g) {
-				isChangeMade = true
-			}
-			if addNodeToOppositeGroup(n.Neighbours[3], n.Neighbours[1], g) {
-				isChangeMade = true
-			}
-		}
 
-		m = n.Neighbours[1]
-		if m != nil && m.Value == 3 && !(n.IsDecided && m.IsDecided) {
-			if addNodeToGroup(n, m.Neighbours[1], g) {
-				isChangeMade = true
+			m = n.Neighbours[1]
+			if m != nil && m.Value == 3 && !(n.IsDecided && m.IsDecided) {
+				if addNodeToGroup(n, m.Neighbours[1], g) {
+					isChangeMade = true
+				}
+				if addNodeToGroup(m, n.Neighbours[3], g) {
+					isChangeMade = true
+				}
+				if addNodeToOppositeGroup(n, m, g) {
+					isChangeMade = true
+				}
+				if addNodeToGroup(n.Neighbours[0], m.Neighbours[0], g) {
+					isChangeMade = true
+				}
+				if addNodeToGroup(n.Neighbours[2], m.Neighbours[2], g) {
+					isChangeMade = true
+				}
+				if addNodeToOppositeGroup(n.Neighbours[0], n.Neighbours[2], g) {
+					isChangeMade = true
+				}
 			}
-			if addNodeToGroup(m, n.Neighbours[3], g) {
-				isChangeMade = true
-			}
-			if addNodeToOppositeGroup(n, m, g) {
-				isChangeMade = true
-			}
-			if addNodeToGroup(n.Neighbours[0], m.Neighbours[0], g) {
-				isChangeMade = true
-			}
-			if addNodeToGroup(n.Neighbours[2], m.Neighbours[2], g) {
-				isChangeMade = true
-			}
-			if addNodeToOppositeGroup(n.Neighbours[0], n.Neighbours[2], g) {
-				isChangeMade = true
+
+		}
+	} else if g.Shape == "triangle" {
+		if n.Value == 2 {
+			for k := range n.Neighbours {
+				neighbour := n.Neighbours[k]
+				if neighbour != nil && neighbour.Value == 2 && !isDifferentState(n, neighbour) {
+					if addNodeToOppositeGroup(n, neighbour, g) {
+						isChangeMade = true
+					}
+
+					i := (k + 1) % 3
+					if addNodeToOppositeGroup(n.Neighbours[i], neighbour.Neighbours[i], g) {
+						isChangeMade = true
+					}
+
+					j := (k + 2) % 3
+					if addNodeToGroup(n.Neighbours[i], neighbour.Neighbours[j], g) {
+						isChangeMade = true
+					}
+					if addNodeToGroup(neighbour.Neighbours[i], n.Neighbours[j], g) {
+						isChangeMade = true
+					}
+
+					// tmp := n.Neighbours[i]
+					// i = k
+					// for tmp != neighbour && tmp != nil {
+					// 	i = (i - 1 + 3) % 3
+					// 	tmp = tmp.Neighbours[i]
+
+					// }
+
+					// i = (k + 1) % 3
+
+					// for tmp != firstNeighbour && tmp != nil {
+					// 	i = (i + 1 + 3) % 3
+					// 	tmp = tmp.Neighbours[i]
+					// 	if isDifferentState(tmp, secondNeighbour) {
+					// 		return addNodeToGroup(n, secondNeighbour, g)
+					// 	}
+					// }
+				}
 			}
 		}
 
 	}
+
 	return isChangeMade
 }
 

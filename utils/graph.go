@@ -870,9 +870,9 @@ func (g *Graph) FindTemplates() {
 			// 	newTemplatesFound++
 			// }
 
-			// if thisNode.find33Templates(g) {
-			// 	newTemplatesFound++
-			// }
+			if thisNode.find33Templates(g) {
+				newTemplatesFound++
+			}
 
 			// if thisNode.find33CornerTemplates(g) {
 			// 	newTemplatesFound++

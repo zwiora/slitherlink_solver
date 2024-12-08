@@ -384,14 +384,12 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 func LoopSolve(g *utils.Graph) {
 	debug.Println("START Loop Solver")
 
-	g.PrintBoard(true)
-
 	cost := g.CalculateStartCost()
-	g.FindTemplates()
+	if utils.IsHeuristicOn {
+		g.FindTemplates()
+	}
 
 	g.CalculateStartMoves()
-
-	g.PrintBoard(true)
 
 	// return
 
