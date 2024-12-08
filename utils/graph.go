@@ -539,18 +539,6 @@ func (g *Graph) CheckIfSolutionOk() bool {
 			} else {
 				break
 			}
-
-			// if finished {
-			// 	if thisNode.NextRow != nil && !thisNode.NextRow.IsVisited {
-			// 		fmt.Println()
-			// 		thisNode = thisNode.NextRow
-			// 		i = 1
-			// 		continue
-			// 	}
-
-			// 	break
-			// }
-
 		}
 	}
 	return true
@@ -592,7 +580,6 @@ func (g *Graph) ClearIsVisited() {
 
 		if finished {
 			if g.Shape == "triangle" && thisNode.NextRow != nil && thisNode.NextRow.IsVisited {
-				fmt.Println()
 				thisNode = thisNode.NextRow
 				i = 1
 				continue
@@ -612,18 +599,12 @@ func (g *Graph) CalculateStartCost() int {
 	startCost := 0
 	thisNode := g.Root
 
-	fmt.Println("cost")
-
 	i := 0
 	if g.Shape == "triangle" {
 		i = 1
 	}
 	for {
-
 		thisNode.IsVisited = true
-		// g.PrintBoard(true)
-		// time.Sleep(time.Millisecond * 100)
-
 		if thisNode.Value >= 0 {
 			if thisNode.GetDegree() < int(g.MaxDegree) {
 				startCost += thisNode.getCostOfField(int(g.MaxDegree))
@@ -654,7 +635,6 @@ func (g *Graph) CalculateStartCost() int {
 
 		if finished {
 			if g.Shape == "triangle" && thisNode.NextRow != nil && !thisNode.NextRow.IsVisited {
-				fmt.Println()
 				thisNode = thisNode.NextRow
 				i = 1
 				continue
@@ -745,7 +725,6 @@ func (g *Graph) CalculateStartMoves() {
 
 			if finished {
 				if thisNode.NextRow != nil && !thisNode.NextRow.IsVisited {
-					fmt.Println()
 					thisNode = thisNode.NextRow
 					i = 1
 					continue
@@ -829,7 +808,7 @@ func (g *Graph) FindTemplates() {
 					newTemplatesFound++
 				}
 
-				if thisNode.find3and3Templates(g) {
+				if thisNode.find33CornerTemplates(g) {
 					newTemplatesFound++
 				}
 

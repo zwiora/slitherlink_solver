@@ -51,22 +51,24 @@ func checkIfCanBeRemoved(n *utils.Node, g *utils.Graph) (bool, bool) {
 	debug.Println("\t- neighbour isn't a leaf")
 
 	/* Checking if is between two sides of graph*/
-	sidesCounter := 0
-	for i := 0; i < len(n.Neighbours); i++ {
-		thisNeighbour := n.Neighbours[i]
-		nextNeighbour := n.Neighbours[(i+1)%int(g.MaxDegree)]
-		if ((thisNeighbour == nil || !thisNeighbour.IsInLoop) && (nextNeighbour != nil && nextNeighbour.IsInLoop)) || ((nextNeighbour == nil || !nextNeighbour.IsInLoop) && (thisNeighbour != nil && thisNeighbour.IsInLoop)) {
-			sidesCounter++
+	if g.Shape != "triangle" {
+		sidesCounter := 0
+		for i := 0; i < len(n.Neighbours); i++ {
+			thisNeighbour := n.Neighbours[i]
+			nextNeighbour := n.Neighbours[(i+1)%int(g.MaxDegree)]
+			if ((thisNeighbour == nil || !thisNeighbour.IsInLoop) && (nextNeighbour != nil && nextNeighbour.IsInLoop)) || ((nextNeighbour == nil || !nextNeighbour.IsInLoop) && (thisNeighbour != nil && thisNeighbour.IsInLoop)) {
+				sidesCounter++
+			}
+			if sidesCounter == 3 {
+				debug.Println("\t- SKIP: deletion would create two separate graphs")
+				return false, false
+			}
 		}
-		if sidesCounter == 3 {
-			debug.Println("\t- SKIP: deletion would create two separate graphs")
-			return false, false
-		}
+		debug.Println("\t- deletion wouldn't create two separate graphs")
 	}
-	debug.Println("\t- deletion wouldn't create two separate graphs")
 
-	if g.Shape != "honeycomb" {
-		/* Checking if is connected via corner*/
+	/* Checking if is connected via corner*/
+	if g.Shape == "square" {
 		for k, v := range n.Neighbours {
 			if v != nil && v.IsInLoop {
 				diagonalNode := v.Neighbours[(k+1)%int(g.MaxDegree)]
@@ -76,6 +78,23 @@ func checkIfCanBeRemoved(n *utils.Node, g *utils.Graph) (bool, bool) {
 						debug.Println("\t- SKIP: deletion would create two graphs with common corner")
 						return false, false
 					}
+				}
+			}
+		}
+	} else if g.Shape == "triangle" {
+		for k := range n.Neighbours {
+			firstNeighbour := n.Neighbours[k]
+			secondNeighbour := n.Neighbours[(k+1)%3]
+			if firstNeighbour != nil && firstNeighbour.IsInLoop && secondNeighbour != nil && secondNeighbour.IsInLoop {
+				tmp := firstNeighbour
+				i := (k - 1 + 3) % 3
+				for tmp != secondNeighbour {
+					tmp = tmp.Neighbours[i]
+					if tmp == nil || !tmp.IsInLoop {
+						debug.Println("\t- SKIP: deletion would create two graphs with common corner")
+						return false, false
+					}
+					i = (i - 1 + 3) % 3
 				}
 			}
 		}
@@ -92,49 +111,10 @@ func updateAvailableMoves(n *utils.Node, g *utils.Graph) bool {
 	for i := 0; i < int(g.MaxDegree); i++ {
 		/* neighbouring node */
 		thisNode := n.Neighbours[(i)%int(g.MaxDegree)]
-		if thisNode != nil {
+		if g.Shape != "triangle" {
+			if thisNode != nil {
 
-			if thisNode.IsInLoop && !thisNode.IsVisited && !(thisNode.IsDecided && !thisNode.IsForRemoval && thisNode.TemplateGroup == nil) {
-				canBeRemoved, stopTesting = checkIfCanBeRemoved(thisNode, g)
-				if canBeRemoved {
-					if !thisNode.CanBeRemoved {
-						thisNode.SetNodeCost(g)
-						heap.Push(g.AvailableMoves, thisNode)
-						thisNode.CanBeRemoved = true
-					} else {
-						thisNode.UpdateNodeCost(g)
-					}
-				} else if !canBeRemoved && thisNode.CanBeRemoved {
-					// g.PrintSquaresBoard(true)
-					// fmt.Println(thisNode)
-					heap.Remove(g.AvailableMoves, thisNode.QueueIndex)
-					thisNode.CanBeRemoved = false
-				}
-			}
-
-			/* neighbour of the neighbour - only updates cost*/
-			nextNode := thisNode.Neighbours[(i)%int(g.MaxDegree)]
-			if nextNode != nil && nextNode.IsInLoop && nextNode.CanBeRemoved && !nextNode.IsVisited && !(nextNode.IsDecided && !nextNode.IsForRemoval && nextNode.TemplateGroup == nil) {
-				nextNode.UpdateNodeCost(g)
-			}
-			/* another neighbour of the neighbour - in case of honeycomb */
-			nextNode = thisNode.Neighbours[(i+1)%int(g.MaxDegree)]
-			if nextNode != nil && nextNode.IsInLoop && nextNode.CanBeRemoved && !nextNode.IsVisited && !(nextNode.IsDecided && !nextNode.IsForRemoval && nextNode.TemplateGroup == nil) {
-				nextNode.UpdateNodeCost(g)
-			}
-
-			previousNode := n.Neighbours[(i-1+int(g.MaxDegree))%int(g.MaxDegree)]
-			if previousNode == nil {
-				nextNode = thisNode.Neighbours[(i-1+int(g.MaxDegree))%int(g.MaxDegree)]
-				if nextNode != nil && nextNode.IsInLoop && nextNode.CanBeRemoved && !nextNode.IsVisited && !(nextNode.IsDecided && !nextNode.IsForRemoval && nextNode.TemplateGroup == nil) {
-					nextNode.UpdateNodeCost(g)
-				}
-			}
-
-			/* diagonal node */
-			if g.Shape != "honeycomb" {
-				thisNode := thisNode.Neighbours[(i+1)%int(g.MaxDegree)]
-				if thisNode != nil && thisNode.IsInLoop && !thisNode.IsVisited && !(thisNode.IsDecided && !thisNode.IsForRemoval && thisNode.TemplateGroup == nil) {
+				if thisNode.IsInLoop && !thisNode.IsVisited && !(thisNode.IsDecided && !thisNode.IsForRemoval && thisNode.TemplateGroup == nil) {
 					canBeRemoved, stopTesting = checkIfCanBeRemoved(thisNode, g)
 					if canBeRemoved {
 						if !thisNode.CanBeRemoved {
@@ -145,10 +125,110 @@ func updateAvailableMoves(n *utils.Node, g *utils.Graph) bool {
 							thisNode.UpdateNodeCost(g)
 						}
 					} else if !canBeRemoved && thisNode.CanBeRemoved {
+						// g.PrintSquaresBoard(true)
+						// fmt.Println(thisNode)
 						heap.Remove(g.AvailableMoves, thisNode.QueueIndex)
 						thisNode.CanBeRemoved = false
 					}
 				}
+
+				/* neighbour of the neighbour - only updates cost*/
+				nextNode := thisNode.Neighbours[(i)%int(g.MaxDegree)]
+				if nextNode != nil && nextNode.IsInLoop && nextNode.CanBeRemoved && !nextNode.IsVisited && !(nextNode.IsDecided && !nextNode.IsForRemoval && nextNode.TemplateGroup == nil) {
+					nextNode.UpdateNodeCost(g)
+				}
+				/* another neighbour of the neighbour - in case of honeycomb */
+				if g.Shape == "honeycomb" {
+					nextNode = thisNode.Neighbours[(i+1)%int(g.MaxDegree)]
+					if nextNode != nil && nextNode.IsInLoop && nextNode.CanBeRemoved && !nextNode.IsVisited && !(nextNode.IsDecided && !nextNode.IsForRemoval && nextNode.TemplateGroup == nil) {
+						nextNode.UpdateNodeCost(g)
+					}
+
+					previousNode := n.Neighbours[(i-1+int(g.MaxDegree))%int(g.MaxDegree)]
+					if previousNode == nil {
+						nextNode = thisNode.Neighbours[(i-1+int(g.MaxDegree))%int(g.MaxDegree)]
+						if nextNode != nil && nextNode.IsInLoop && nextNode.CanBeRemoved && !nextNode.IsVisited && !(nextNode.IsDecided && !nextNode.IsForRemoval && nextNode.TemplateGroup == nil) {
+							nextNode.UpdateNodeCost(g)
+						}
+					}
+				}
+
+				/* diagonal node */
+				if g.Shape == "square" {
+					thisNode := thisNode.Neighbours[(i+1)%int(g.MaxDegree)]
+					if thisNode != nil && thisNode.IsInLoop && !thisNode.IsVisited && !(thisNode.IsDecided && !thisNode.IsForRemoval && thisNode.TemplateGroup == nil) {
+						canBeRemoved, stopTesting = checkIfCanBeRemoved(thisNode, g)
+						if canBeRemoved {
+							if !thisNode.CanBeRemoved {
+								thisNode.SetNodeCost(g)
+								heap.Push(g.AvailableMoves, thisNode)
+								thisNode.CanBeRemoved = true
+							} else {
+								thisNode.UpdateNodeCost(g)
+							}
+						} else if !canBeRemoved && thisNode.CanBeRemoved {
+							heap.Remove(g.AvailableMoves, thisNode.QueueIndex)
+							thisNode.CanBeRemoved = false
+						}
+					}
+				}
+
+			}
+
+		} else {
+			neighbour := n.Neighbours[i]
+			// secondNeighbour := n.Neighbours[(i+1)%3]
+			tmp := neighbour
+			j := i
+			for x := 0; x < 3; x++ {
+				if tmp == nil {
+					break
+				}
+				if tmp.IsInLoop && !tmp.IsVisited && !(tmp.IsDecided && !tmp.IsForRemoval && tmp.TemplateGroup == nil) {
+					canBeRemoved, stopTesting = checkIfCanBeRemoved(tmp, g)
+					if canBeRemoved {
+						if !tmp.CanBeRemoved {
+							tmp.SetNodeCost(g)
+							heap.Push(g.AvailableMoves, tmp)
+							tmp.CanBeRemoved = true
+						} else {
+							tmp.UpdateNodeCost(g)
+						}
+					} else if !canBeRemoved && tmp.CanBeRemoved {
+						heap.Remove(g.AvailableMoves, tmp.QueueIndex)
+						tmp.CanBeRemoved = false
+					}
+				}
+				j = (j - 1 + 3) % 3
+				tmp = tmp.Neighbours[j]
+			}
+
+			neighbour = n.Neighbours[(i+1)%3]
+			tmp = neighbour
+			j = (i + 1) % 3
+			for x := 0; x < 3; x++ {
+				if tmp == nil {
+					break
+				}
+				if tmp.IsInLoop && !tmp.IsVisited && !(tmp.IsDecided && !tmp.IsForRemoval && tmp.TemplateGroup == nil) {
+					canBeRemoved, stopTesting = checkIfCanBeRemoved(tmp, g)
+					if canBeRemoved {
+						if !tmp.CanBeRemoved {
+							tmp.SetNodeCost(g)
+							heap.Push(g.AvailableMoves, tmp)
+							tmp.CanBeRemoved = true
+						} else {
+							tmp.UpdateNodeCost(g)
+						}
+					} else if !canBeRemoved && tmp.CanBeRemoved {
+						heap.Remove(g.AvailableMoves, tmp.QueueIndex)
+						tmp.CanBeRemoved = false
+					}
+				}
+				j = (j + 1) % 3
+
+				tmp = tmp.Neighbours[j]
+
 			}
 
 		}
@@ -298,9 +378,9 @@ func LoopSolve(g *utils.Graph) {
 
 	g.CalculateStartMoves()
 
-	// g.PrintBoard(true)
+	g.PrintBoard(true)
 
-	return
+	// return
 
 	g.VisitedNodes = stack.New()
 	isSolutionFound := new(bool)

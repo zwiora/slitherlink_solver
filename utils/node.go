@@ -106,9 +106,34 @@ func (n *Node) SetNodeCost(g *Graph) {
 
 	if IsHeuristicOn {
 		if n.IsForRemoval {
-			n.QueuePriority = 1000
+			n.QueuePriority = 10000
 		} else if n.TemplateGroup != nil {
 			n.QueuePriority = newCost + 100
+			if HeuristicType == 1 {
+				n.QueuePriority = newCost + 1000
+			} else if HeuristicType == 2 {
+				groupSize := 0
+				if n.TemplateGroup != nil {
+					groupSize += n.TemplateGroup.Length
+
+					if n.TemplateGroup.OppositeList != nil {
+						groupSize += n.TemplateGroup.OppositeList.Length
+					}
+				}
+				n.QueuePriority = 1000 + groupSize
+			} else if HeuristicType == 3 {
+				groupSize := 0
+				if n.TemplateGroup != nil {
+					groupSize += n.TemplateGroup.Length
+
+					if n.TemplateGroup.OppositeList != nil {
+						groupSize += n.TemplateGroup.OppositeList.Length
+					}
+				}
+				n.QueuePriority = 1000 + groupSize*10 + newCost
+			} else {
+				n.QueuePriority = newCost
+			}
 		} else {
 			n.QueuePriority = newCost
 		}

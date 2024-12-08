@@ -410,6 +410,9 @@ func (n *Node) find33Templates(g *Graph) bool {
 			if addNodeToGroup(n.Neighbours[1], m.Neighbours[1], g) {
 				isChangeMade = true
 			}
+			if addNodeToOppositeGroup(n.Neighbours[3], n.Neighbours[1], g) {
+				isChangeMade = true
+			}
 		}
 
 		m = n.Neighbours[1]
@@ -429,13 +432,16 @@ func (n *Node) find33Templates(g *Graph) bool {
 			if addNodeToGroup(n.Neighbours[2], m.Neighbours[2], g) {
 				isChangeMade = true
 			}
+			if addNodeToOppositeGroup(n.Neighbours[0], n.Neighbours[2], g) {
+				isChangeMade = true
+			}
 		}
 
 	}
 	return isChangeMade
 }
 
-func (n *Node) find3and3Templates(g *Graph) bool {
+func (n *Node) find33CornerTemplates(g *Graph) bool {
 	isChangeMade := false
 	if n.Value == 3 {
 		tmp := n.Neighbours[0]
