@@ -327,29 +327,38 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 		/* If the solution withut node wasn't found, then group must be in the loop */
 		if newNode.TemplateGroup != nil && newNode.TemplateGroup.SettingNode == newNode {
 			newNode.TemplateGroup.ClearValue(g)
+
 			if !newNode.TemplateGroup.SetValue(false, newNode, g) {
-				// debug.Println("WRONG STATE")
-				// debug.Println(depth)
+				debug.Println("WRONG STATE")
+				debug.Println(newNode)
+				debug.Println(depth)
 				// *isStateWrong = true
 				break
-			} else if *isStateWrong {
-				// fmt.Println("BREAK STATE")
-				// fmt.Println(depth)
-				// time.Sleep(1000 * time.Millisecond)
-				*isStateWrong = false
-				break
 			}
+
+		}
+
+		if *isStateWrong {
+			debug.Println("BREAK STATE")
+			debug.Println(depth)
+			*isStateWrong = false
+			break
 		}
 	}
 
+	debug.Println("Clearing changes")
+
 	for {
-		debug.Println("Clearing changes")
 		thisElement := g.VisitedNodes.Pop()
+
 		if thisElement == nil {
 			break
 		}
 
 		thisNode := thisElement.(*utils.Node)
+
+		debug.Println("Popped:")
+		debug.Println(thisNode)
 
 		/* Clear value of the group */
 		if thisNode.IsVisited && thisNode.TemplateGroup != nil && thisNode.TemplateGroup.SettingNode == n {
@@ -367,11 +376,15 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 	n.IsInLoop = true
 	updateAvailableMoves(n, g)
 
+	debug.Println("RETURN")
+
 }
 
 /* Solver preparation */
 func LoopSolve(g *utils.Graph) {
 	debug.Println("START Loop Solver")
+
+	g.PrintBoard(true)
 
 	cost := g.CalculateStartCost()
 	g.FindTemplates()

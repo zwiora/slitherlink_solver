@@ -551,7 +551,6 @@ func (g *Graph) CheckIfSolutionOk() bool {
 			direction := 5
 			for m := 0; m < g.SizeX; m++ {
 				if thisNode.Value != -1 && thisNode.Value != int8(thisNode.getLinesAround(int(g.MaxDegree))) {
-					fmt.Println(thisNode)
 					return false
 				}
 				if direction == 0 {
@@ -570,7 +569,6 @@ func (g *Graph) CheckIfSolutionOk() bool {
 		counter := 0
 		for {
 			if thisNode.Value != -1 && thisNode.Value != int8(thisNode.getLinesAround(int(g.MaxDegree))) {
-				fmt.Println(thisNode)
 				return false
 			}
 
@@ -856,58 +854,81 @@ func (g *Graph) FindTemplates() {
 
 	g.ClearIsVisited()
 
-	if g.Shape == "square" {
+	// if g.Shape == "square" {
+	for {
+		newTemplatesFound := 0
+		thisNode := g.Root
+
+		i := 0
+		if g.Shape == "triangle" {
+			i = 1
+		}
 		for {
-			newTemplatesFound := 0
-			thisNode := g.Root
+			thisNode.IsVisited = true
 
-			for {
-				thisNode.IsVisited = true
+			// if thisNode.findNumberTemplates(g) {
+			// 	newTemplatesFound++
+			// }
 
-				if thisNode.findNumberTemplates(g) {
-					newTemplatesFound++
+			// if thisNode.find33Templates(g) {
+			// 	newTemplatesFound++
+			// }
+
+			// if thisNode.find33CornerTemplates(g) {
+			// 	newTemplatesFound++
+			// }
+
+			// if thisNode.find31Templates(g) {
+			// 	newTemplatesFound++
+			// }
+
+			// if thisNode.findloopReachingNumberTemplates(g) {
+			// 	newTemplatesFound++
+			// }
+
+			if thisNode.findContinousSquareTemplates(g) {
+				newTemplatesFound++
+			}
+
+			if g.Shape == "honeycomb" {
+				if i == 0 || i == 3 {
+					i = (i - 1 + 6) % 6
+				} else if i == 5 || i == 2 {
+					i = (i + 1) % 6
 				}
+			} else if g.Shape == "triangle" {
+				i = (i + 1) % 2
+			}
 
-				if thisNode.find33Templates(g) {
-					newTemplatesFound++
-				}
-
-				if thisNode.find33CornerTemplates(g) {
-					newTemplatesFound++
-				}
-
-				if thisNode.find31Templates(g) {
-					newTemplatesFound++
-				}
-
-				if thisNode.findloopReachingNumberTemplates(g) {
-					newTemplatesFound++
-				}
-
-				if thisNode.findContinousSquareTemplates(g) {
-					newTemplatesFound++
-				}
-
-				isNewNode := false
-				for _, v := range thisNode.Neighbours {
-					if v != nil && !v.IsVisited {
-						thisNode = v
-						isNewNode = true
-						break
-					}
-				}
-
-				if !isNewNode {
+			finished := false
+			j := i
+			for thisNode.Neighbours[i] == nil || thisNode.Neighbours[i].IsVisited {
+				i = (i + 1) % int(g.MaxDegree)
+				if j == i {
+					finished = true
 					break
 				}
 			}
 
-			g.ClearIsVisited()
-
-			if newTemplatesFound == 0 {
+			if finished {
+				if g.Shape == "triangle" && thisNode.NextRow != nil && !thisNode.NextRow.IsVisited {
+					thisNode = thisNode.NextRow
+					i = 1
+					continue
+				}
 				break
 			}
+
+			thisNode = thisNode.Neighbours[i]
+		}
+
+		g.PrintBoard(true)
+		g.ClearIsVisited()
+
+		if newTemplatesFound == 0 {
+			break
 		}
 	}
+	// }
 
 }

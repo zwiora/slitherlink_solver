@@ -1,5 +1,7 @@
 package utils
 
+import "fmt"
+
 func isTheSameState(n1 *Node, n2 *Node) bool {
 	if n1 != nil && n2 != nil && n1.TemplateGroup != nil && n1.TemplateGroup == n2.TemplateGroup {
 		return true
@@ -200,6 +202,7 @@ func (n *Node) findNumberTemplates(g *Graph) bool {
 
 	/* ! DZIAŁA TYLKO DLA KWADRATÓW */
 	if n.Value != -1 && n.Value != 0 {
+		/* Based on the state of n */
 		if n.IsDecided || n.TemplateGroup != nil {
 			nState := nodeState(n)
 
@@ -376,13 +379,46 @@ func (n *Node) findNumberTemplates(g *Graph) bool {
 }
 
 func (n *Node) findContinousSquareTemplates(g *Graph) bool {
-	if !n.IsDecided {
-		for i := range n.Neighbours {
-			j := (i + 1) % len(n.Neighbours)
-			if n.Neighbours[i] != nil && n.Neighbours[j] != nil && n.Neighbours[i].Neighbours[j] != nil {
-				if isTheSameState(n.Neighbours[i], n.Neighbours[j]) && isDifferentState(n.Neighbours[i], n.Neighbours[i].Neighbours[j]) {
-					return addNodeToGroup(n, n.Neighbours[i], g)
+	if g.Shape == "square" {
+		if !n.IsDecided {
+			for i := range n.Neighbours {
+				j := (i + 1) % len(n.Neighbours)
+				if n.Neighbours[i] != nil && n.Neighbours[j] != nil && n.Neighbours[i].Neighbours[j] != nil {
+					if isTheSameState(n.Neighbours[i], n.Neighbours[j]) && isDifferentState(n.Neighbours[i], n.Neighbours[i].Neighbours[j]) {
+						return addNodeToGroup(n, n.Neighbours[i], g)
+					}
 				}
+			}
+		}
+	} else if g.Shape == "triangle" {
+		if !n.IsDecided {
+			for k := range n.Neighbours {
+				firstNeighbour := n.Neighbours[k]
+				secondNeighbour := n.Neighbours[(k+1)%3]
+				if isTheSameState(firstNeighbour, secondNeighbour) {
+					tmp := firstNeighbour
+					i := (k - 1 + 3) % 3
+					for tmp != n && tmp != nil {
+						tmp = tmp.Neighbours[i]
+						if isDifferentState(tmp, firstNeighbour) {
+							return addNodeToGroup(n, firstNeighbour, g)
+						}
+						i = (i - 1 + 3) % 3
+					}
+
+					tmp = secondNeighbour
+					i = (k + 1) % 3
+					for tmp != n && tmp != nil {
+						tmp = tmp.Neighbours[i]
+						if isDifferentState(tmp, firstNeighbour) {
+							fmt.Println("a")
+
+							return addNodeToGroup(n, firstNeighbour, g)
+						}
+						i = (i + 1) % 3
+					}
+				}
+
 			}
 		}
 	}
