@@ -374,7 +374,7 @@ func LoopSolve(g *utils.Graph) {
 	debug.Println("START Loop Solver")
 
 	cost := g.CalculateStartCost()
-	// g.FindTemplates()
+	g.FindTemplates()
 
 	g.CalculateStartMoves()
 

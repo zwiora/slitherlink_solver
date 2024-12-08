@@ -210,6 +210,15 @@ func (g *Graph) printTriangleBoard(isDebugMode bool) {
 				fmt.Printf(" ")
 			}
 
+			if isDebugMode && thisNode.IsDecided {
+
+				if thisNode.IsForRemoval {
+					fmt.Printf("\033[43m")
+				} else {
+					fmt.Printf("\033[41m")
+				}
+			}
+
 			if thisNode.Value == -1 {
 				fmt.Printf(" ")
 			} else {
@@ -247,6 +256,15 @@ func (g *Graph) printTriangleBoard(isDebugMode bool) {
 				fmt.Printf("x")
 			} else {
 				fmt.Printf(" ")
+			}
+
+			if isDebugMode && thisNode.IsDecided {
+
+				if thisNode.IsForRemoval {
+					fmt.Printf("\033[43m")
+				} else {
+					fmt.Printf("\033[41m")
+				}
 			}
 
 			if thisNode.Value == -1 {
@@ -295,6 +313,15 @@ func (g *Graph) printTriangleBoard(isDebugMode bool) {
 				fmt.Printf(" ")
 			}
 
+			if isDebugMode && thisNode.IsDecided {
+
+				if thisNode.IsForRemoval {
+					fmt.Printf("\033[43m")
+				} else {
+					fmt.Printf("\033[41m")
+				}
+			}
+
 			if thisNode.Value == -1 {
 				fmt.Printf(" ")
 			} else {
@@ -339,6 +366,15 @@ func (g *Graph) printTriangleBoard(isDebugMode bool) {
 				fmt.Printf("x")
 			} else {
 				fmt.Printf(" ")
+			}
+
+			if isDebugMode && thisNode.IsDecided {
+
+				if thisNode.IsForRemoval {
+					fmt.Printf("\033[43m")
+				} else {
+					fmt.Printf("\033[41m")
+				}
 			}
 
 			if thisNode.Value == -1 {
@@ -387,6 +423,15 @@ func (g *Graph) printTriangleBoard(isDebugMode bool) {
 				fmt.Printf(" ")
 			}
 
+			if isDebugMode && thisNode.IsDecided {
+
+				if thisNode.IsForRemoval {
+					fmt.Printf("\033[43m")
+				} else {
+					fmt.Printf("\033[41m")
+				}
+			}
+
 			if thisNode.Value == -1 {
 				fmt.Printf(" ")
 			} else {
@@ -428,6 +473,15 @@ func (g *Graph) printTriangleBoard(isDebugMode bool) {
 				fmt.Printf("x")
 			} else {
 				fmt.Printf(" ")
+			}
+
+			if isDebugMode && thisNode.IsDecided {
+
+				if thisNode.IsForRemoval {
+					fmt.Printf("\033[43m")
+				} else {
+					fmt.Printf("\033[41m")
+				}
 			}
 
 			if thisNode.Value == -1 {
@@ -760,6 +814,9 @@ func (g *Graph) FindTemplates() {
 	thisNode := g.Root
 
 	i := 0
+	if g.Shape == "triangle" {
+		i = 1
+	}
 	for {
 		thisNode.IsVisited = true
 
@@ -771,6 +828,8 @@ func (g *Graph) FindTemplates() {
 			} else if i == 5 || i == 2 {
 				i = (i + 1) % 6
 			}
+		} else if g.Shape == "triangle" {
+			i = (i + 1) % 2
 		}
 
 		finished := false
@@ -784,6 +843,11 @@ func (g *Graph) FindTemplates() {
 		}
 
 		if finished {
+			if g.Shape == "triangle" && thisNode.NextRow != nil && !thisNode.NextRow.IsVisited {
+				thisNode = thisNode.NextRow
+				i = 1
+				continue
+			}
 			break
 		}
 

@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -347,7 +346,6 @@ func constructTriangleBoard(board *Graph, puzzleContent string) {
 				// fmt.Println(thisNode)
 			}
 		} else {
-			fmt.Println("HEJJJJ")
 			prevNode := row[0]
 			row[0] = nil
 			for j := 1; j < width-1; j++ {
@@ -369,7 +367,6 @@ func constructTriangleBoard(board *Graph, puzzleContent string) {
 				n++
 
 				if j == 0 && prevNode != nil {
-					fmt.Println(row[1])
 					prevNode.NextRow = thisNode
 				}
 
