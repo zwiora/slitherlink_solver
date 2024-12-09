@@ -325,7 +325,7 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 			return
 		}
 
-		/* If the solution withut node wasn't found, then group must be in the loop */
+		/* If the solution without node wasn't found, then group must be in the loop */
 		if newNode.TemplateGroup != nil && newNode.TemplateGroup.SettingNode == newNode {
 			newNode.TemplateGroup.ClearValue(g)
 
@@ -387,7 +387,7 @@ func LoopSolve(g *utils.Graph) {
 	debug.Println("START Loop Solver")
 
 	cost := g.CalculateStartCost()
-	if utils.IsHeuristicOn {
+	if utils.IsTemplatesOn {
 		g.FindTemplates()
 	}
 

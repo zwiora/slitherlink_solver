@@ -160,7 +160,6 @@ func concatLists(l1 *List, l2 *List) *List {
 }
 
 func addLists(l1 *List, l2 *List) {
-
 	if l1 == l2 {
 		return
 	}
@@ -170,14 +169,6 @@ func addLists(l1 *List, l2 *List) {
 		list.OppositeList = opposite
 		opposite.OppositeList = list
 	}
-
-	// if l1.OppositeList == nil && l2.OppositeList != nil {
-	// 	l1.OppositeList = l2.OppositeList
-	// } else if l2.OppositeList == nil && l1.OppositeList != nil {
-	// 	l2.OppositeList = l1.OppositeList
-	// } else if l1.OppositeList != nil && l2.OppositeList != nil {
-	// 	concatLists(l1.OppositeList, l2.OppositeList)
-	// }
 }
 
 func addOppositeLists(l1 *List, l2 *List) {
@@ -192,16 +183,4 @@ func addOppositeLists(l1 *List, l2 *List) {
 	list := concatLists(op1, l2)
 	list.OppositeList = opposite
 	opposite.OppositeList = list
-
-	// if l1.OppositeList == nil {
-	// 	l1.OppositeList = l2
-	// } else {
-	// 	concatLists(l1.OppositeList, l2)
-	// }
-
-	// if l2.OppositeList == nil {
-	// 	l2.OppositeList = l1
-	// } else {
-	// 	concatLists(l2.OppositeList, l1)
-	// }
 }

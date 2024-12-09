@@ -20,7 +20,7 @@ func isTheSameState(n1 *Node, n2 *Node) bool {
 	return false
 }
 
-func isDifferentState(n1 *Node, n2 *Node) bool {
+func isOppositeState(n1 *Node, n2 *Node) bool {
 	if n1 != nil && n2 != nil && n1.TemplateGroup != nil && n2.TemplateGroup != nil && n1.TemplateGroup == n2.TemplateGroup.OppositeList {
 		return true
 	}
@@ -124,7 +124,7 @@ func addNodeToGroup(n1 *Node, n2 *Node, g *Graph) bool {
 /* Returns true if any changes have been applied */
 func addNodeToOppositeGroup(n1 *Node, n2 *Node, g *Graph) bool {
 
-	if isNodeDecided(n1) && isNodeDecided(n2) || isDifferentState(n1, n2) {
+	if isNodeDecided(n1) && isNodeDecided(n2) || isOppositeState(n1, n2) {
 		return false
 	}
 
@@ -382,7 +382,7 @@ func (n *Node) findContinousSquareTemplates(g *Graph) bool {
 			for i := range n.Neighbours {
 				j := (i + 1) % len(n.Neighbours)
 				if n.Neighbours[i] != nil && n.Neighbours[j] != nil && n.Neighbours[i].Neighbours[j] != nil {
-					if isTheSameState(n.Neighbours[i], n.Neighbours[j]) && isDifferentState(n.Neighbours[i], n.Neighbours[i].Neighbours[j]) {
+					if isTheSameState(n.Neighbours[i], n.Neighbours[j]) && isOppositeState(n.Neighbours[i], n.Neighbours[i].Neighbours[j]) {
 						return addNodeToGroup(n, n.Neighbours[i], g)
 					}
 				}
@@ -399,7 +399,7 @@ func (n *Node) findContinousSquareTemplates(g *Graph) bool {
 					for tmp != secondNeighbour && tmp != nil {
 						i = (i - 1 + 3) % 3
 						tmp = tmp.Neighbours[i]
-						if isDifferentState(tmp, firstNeighbour) {
+						if isOppositeState(tmp, firstNeighbour) {
 							return addNodeToGroup(n, firstNeighbour, g)
 						}
 					}
@@ -409,7 +409,7 @@ func (n *Node) findContinousSquareTemplates(g *Graph) bool {
 					for tmp != firstNeighbour && tmp != nil {
 						i = (i + 1 + 3) % 3
 						tmp = tmp.Neighbours[i]
-						if isDifferentState(tmp, secondNeighbour) {
+						if isOppositeState(tmp, secondNeighbour) {
 							return addNodeToGroup(n, secondNeighbour, g)
 						}
 					}
@@ -475,7 +475,7 @@ func (n *Node) find33Templates(g *Graph) bool {
 		if n.Value == 2 {
 			for k := range n.Neighbours {
 				neighbour := n.Neighbours[k]
-				if neighbour != nil && neighbour.Value == 2 && !isDifferentState(n, neighbour) {
+				if neighbour != nil && neighbour.Value == 2 && !isOppositeState(n, neighbour) {
 					if addNodeToOppositeGroup(n, neighbour, g) {
 						isChangeMade = true
 					}
@@ -570,7 +570,7 @@ func (n *Node) findloopReachingNumberTemplates(g *Graph) bool {
 		for i, v := range n.Neighbours {
 			if v != nil {
 				w := v.Neighbours[(i+1)%len(n.Neighbours)]
-				if isDifferentState(v, w) {
+				if isOppositeState(v, w) {
 					if n.Neighbours[(i+1)%len(n.Neighbours)] != nil {
 						if addNodeToGroup(n.Neighbours[(i+1)%len(n.Neighbours)], w, g) {
 							isChangeMade = true
@@ -585,7 +585,7 @@ func (n *Node) findloopReachingNumberTemplates(g *Graph) bool {
 				}
 
 				w = v.Neighbours[(i-1+len(n.Neighbours))%len(n.Neighbours)]
-				if isDifferentState(v, w) {
+				if isOppositeState(v, w) {
 					if n.Neighbours[(i-1+len(n.Neighbours))%len(n.Neighbours)] != nil {
 						if addNodeToGroup(n.Neighbours[(i-1+len(n.Neighbours))%len(n.Neighbours)], w, g) {
 							isChangeMade = true
@@ -605,7 +605,7 @@ func (n *Node) findloopReachingNumberTemplates(g *Graph) bool {
 			if v != nil {
 				w := v.Neighbours[(i+1)%len(n.Neighbours)]
 				x := n.Neighbours[(i+1)%len(n.Neighbours)]
-				if isDifferentState(v, w) && isTheSameState(w, x) {
+				if isOppositeState(v, w) && isTheSameState(w, x) {
 					if addNodeToGroup(n, n.Neighbours[(i+2)%len(n.Neighbours)], g) {
 						isChangeMade = true
 					}
@@ -616,7 +616,7 @@ func (n *Node) findloopReachingNumberTemplates(g *Graph) bool {
 
 				w = v.Neighbours[(i-1+len(n.Neighbours))%len(n.Neighbours)]
 				x = n.Neighbours[(i-1+len(n.Neighbours))%len(n.Neighbours)]
-				if isDifferentState(v, w) && isTheSameState(w, x) {
+				if isOppositeState(v, w) && isTheSameState(w, x) {
 					if addNodeToGroup(n, n.Neighbours[(i+1)%len(n.Neighbours)], g) {
 						isChangeMade = true
 					}

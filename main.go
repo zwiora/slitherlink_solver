@@ -29,6 +29,10 @@ func main() {
 		var err error
 		utils.HeuristicType, err = strconv.Atoi(args[3])
 		utils.Check(err)
+
+		if utils.HeuristicType > 0 {
+			utils.IsTemplatesOn = true
+		}
 	}
 
 	if len(args) > 5 && args[5] == "d" {
@@ -45,7 +49,7 @@ func main() {
 	if len(args) > 4 {
 		i, err := strconv.Atoi(args[4])
 		utils.Check(err)
-		fmt.Println(i, ": ", data[i])
+		// fmt.Println(i, ": ", data[i])
 
 		boardType = data[i][0]
 		sizeX, err = strconv.Atoi(data[i][1])
@@ -54,9 +58,14 @@ func main() {
 		utils.Check(err)
 		code = data[i][3]
 		g := utils.ConstructBoardFromData(boardType, sizeX, sizeY, code)
+		g.PrintBoard(false)
+		fmt.Println()
+
 		// return
 		solvers.LoopSolve(g)
-		g.PrintBoard(true)
+		fmt.Println()
+		g.PrintBoard(false)
+		fmt.Println()
 
 		utils.AvgDepth /= float64(utils.NoVisitedStates)
 		fmt.Println("Visited states: ", utils.NoVisitedStates)

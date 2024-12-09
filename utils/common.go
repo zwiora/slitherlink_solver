@@ -7,6 +7,7 @@ import (
 )
 
 var IsHeuristicOn bool
+var IsTemplatesOn bool
 var HeuristicType int
 var NoVisitedStates int
 var AvgDepth float64
