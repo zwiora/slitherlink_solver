@@ -471,6 +471,43 @@ func (n *Node) find33Templates(g *Graph) bool {
 			}
 
 		}
+	} else if g.Shape == "honeycomb" {
+		if n.Value == 5 {
+
+			for i := 0; i < 3; i++ {
+				m := n.Neighbours[i]
+				if m != nil && m.Value == 5 && !(n.IsDecided && m.IsDecided) {
+					if addNodeToOppositeGroup(n, m, g) {
+						isChangeMade = true
+					}
+
+					if addNodeToOppositeGroup(n.Neighbours[(i-1+6)%6], n.Neighbours[(i+1)%6], g) {
+						isChangeMade = true
+					}
+
+					if addNodeToGroup(n, m.Neighbours[i], g) {
+						isChangeMade = true
+					}
+					if addNodeToGroup(n, m.Neighbours[(i-1+6)%6], g) {
+						isChangeMade = true
+					}
+					if addNodeToGroup(n, m.Neighbours[(i+1)%6], g) {
+						isChangeMade = true
+					}
+
+					if addNodeToGroup(m, n.Neighbours[(i+2)%6], g) {
+						isChangeMade = true
+					}
+					if addNodeToGroup(m, n.Neighbours[(i+3)%6], g) {
+						isChangeMade = true
+					}
+					if addNodeToGroup(m, n.Neighbours[(i+4)%6], g) {
+						isChangeMade = true
+					}
+				}
+			}
+
+		}
 	} else if g.Shape == "triangle" {
 		if n.Value == 2 {
 			for k := range n.Neighbours {

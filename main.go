@@ -99,6 +99,8 @@ func main() {
 			fmt.Println()
 			g.CheckIfSolutionOk()
 
+			g.PrintBoard(true)
+
 			if !g.CheckIfSolutionOk() {
 				fmt.Println("BŁĄD")
 				break
