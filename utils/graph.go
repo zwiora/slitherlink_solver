@@ -866,9 +866,9 @@ func (g *Graph) FindTemplates() {
 		for {
 			thisNode.IsVisited = true
 
-			// if thisNode.findNumberTemplates(g) {
-			// 	newTemplatesFound++
-			// }
+			if thisNode.findNumberTemplates(g) {
+				newTemplatesFound++
+			}
 
 			if thisNode.find33Templates(g) {
 				newTemplatesFound++
@@ -878,13 +878,13 @@ func (g *Graph) FindTemplates() {
 				newTemplatesFound++
 			}
 
-			// if thisNode.find31Templates(g) {
-			// 	newTemplatesFound++
-			// }
+			if thisNode.find31Templates(g) {
+				newTemplatesFound++
+			}
 
-			// if thisNode.findloopReachingNumberTemplates(g) {
-			// 	newTemplatesFound++
-			// }
+			if thisNode.findloopReachingNumberTemplates(g) {
+				newTemplatesFound++
+			}
 
 			if thisNode.findContinousSquareTemplates(g) {
 				newTemplatesFound++
@@ -923,7 +923,6 @@ func (g *Graph) FindTemplates() {
 		}
 
 		g.ClearIsVisited()
-		g.PrintBoard(true)
 
 		if newTemplatesFound == 0 {
 			break
