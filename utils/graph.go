@@ -855,7 +855,6 @@ func (g *Graph) FindTemplates() {
 
 	g.ClearIsVisited()
 
-	// if g.Shape == "square" {
 	for {
 		newTemplatesFound := 0
 		thisNode := g.Root
@@ -867,25 +866,25 @@ func (g *Graph) FindTemplates() {
 		for {
 			thisNode.IsVisited = true
 
-			if thisNode.findNumberTemplates(g) {
-				newTemplatesFound++
-			}
+			// if thisNode.findNumberTemplates(g) {
+			// 	newTemplatesFound++
+			// }
 
 			if thisNode.find33Templates(g) {
 				newTemplatesFound++
 			}
 
-			if thisNode.find33CornerTemplates(g) {
-				newTemplatesFound++
-			}
+			// if thisNode.find33CornerTemplates(g) {
+			// 	newTemplatesFound++
+			// }
 
-			if thisNode.find31Templates(g) {
-				newTemplatesFound++
-			}
+			// if thisNode.find31Templates(g) {
+			// 	newTemplatesFound++
+			// }
 
-			if thisNode.findloopReachingNumberTemplates(g) {
-				newTemplatesFound++
-			}
+			// if thisNode.findloopReachingNumberTemplates(g) {
+			// 	newTemplatesFound++
+			// }
 
 			if thisNode.findContinousSquareTemplates(g) {
 				newTemplatesFound++
@@ -924,11 +923,11 @@ func (g *Graph) FindTemplates() {
 		}
 
 		g.ClearIsVisited()
+		g.PrintBoard(true)
 
 		if newTemplatesFound == 0 {
 			break
 		}
 	}
-	// }
 
 }

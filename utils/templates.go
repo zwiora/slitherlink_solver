@@ -485,35 +485,63 @@ func (n *Node) find33Templates(g *Graph) bool {
 						isChangeMade = true
 					}
 
-					j := (k + 2) % 3
-					if addNodeToGroup(n.Neighbours[i], neighbour.Neighbours[j], g) {
-						isChangeMade = true
+					base := n.Neighbours[i]
+					tmp := base
+					for tmp != nil {
+						i = (i + 1) % 3
+						tmp = tmp.Neighbours[i]
+						if tmp == neighbour {
+							break
+						}
+						if addNodeToGroup(tmp, base, g) {
+							isChangeMade = true
+						}
 					}
-					if addNodeToGroup(neighbour.Neighbours[i], n.Neighbours[j], g) {
-						isChangeMade = true
+
+					i = (k + 2) % 3
+					base = n.Neighbours[i]
+					tmp = base
+					for tmp != nil {
+						i = (i - 1 + 3) % 3
+						tmp = tmp.Neighbours[i]
+						if tmp == neighbour {
+							break
+						}
+						if addNodeToGroup(tmp, base, g) {
+							isChangeMade = true
+						}
 					}
 
-					// tmp := n.Neighbours[i]
-					// i = k
-					// for tmp != neighbour && tmp != nil {
-					// 	i = (i - 1 + 3) % 3
-					// 	tmp = tmp.Neighbours[i]
+					i = (k + 1) % 3
+					base = neighbour.Neighbours[i]
+					tmp = base
+					for tmp != nil {
+						i = (i + 1) % 3
+						tmp = tmp.Neighbours[i]
+						if tmp == n {
+							break
+						}
+						if addNodeToGroup(tmp, base, g) {
+							isChangeMade = true
+						}
+					}
 
-					// }
-
-					// i = (k + 1) % 3
-
-					// for tmp != firstNeighbour && tmp != nil {
-					// 	i = (i + 1 + 3) % 3
-					// 	tmp = tmp.Neighbours[i]
-					// 	if isDifferentState(tmp, secondNeighbour) {
-					// 		return addNodeToGroup(n, secondNeighbour, g)
-					// 	}
-					// }
+					i = (k + 2) % 3
+					base = neighbour.Neighbours[i]
+					tmp = base
+					for tmp != nil {
+						i = (i - 1 + 3) % 3
+						tmp = tmp.Neighbours[i]
+						if tmp == n {
+							break
+						}
+						if addNodeToGroup(tmp, base, g) {
+							isChangeMade = true
+						}
+					}
 				}
 			}
 		}
-
 	}
 
 	return isChangeMade
