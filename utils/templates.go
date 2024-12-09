@@ -586,41 +586,148 @@ func (n *Node) find33Templates(g *Graph) bool {
 
 func (n *Node) find33CornerTemplates(g *Graph) bool {
 	isChangeMade := false
-	if n.Value == 3 {
-		tmp := n.Neighbours[0]
-		if tmp != nil {
-			m := tmp.Neighbours[1]
-			if m != nil && m.Value == 3 && !(n.IsDecided && m.IsDecided) {
-				if addNodeToOppositeGroup(n, n.Neighbours[2], g) {
-					isChangeMade = true
+	if g.Shape == "square" {
+		if n.Value == 3 {
+			tmp := n.Neighbours[0]
+			if tmp != nil {
+				m := tmp.Neighbours[1]
+				if m != nil && m.Value == 3 && !(n.IsDecided && m.IsDecided) {
+					if addNodeToOppositeGroup(n, n.Neighbours[2], g) {
+						isChangeMade = true
+					}
+					if addNodeToOppositeGroup(n, n.Neighbours[3], g) {
+						isChangeMade = true
+					}
+					if addNodeToOppositeGroup(m, m.Neighbours[0], g) {
+						isChangeMade = true
+					}
+					if addNodeToOppositeGroup(m, m.Neighbours[1], g) {
+						isChangeMade = true
+					}
 				}
-				if addNodeToOppositeGroup(n, n.Neighbours[3], g) {
-					isChangeMade = true
-				}
-				if addNodeToOppositeGroup(m, m.Neighbours[0], g) {
-					isChangeMade = true
-				}
-				if addNodeToOppositeGroup(m, m.Neighbours[1], g) {
-					isChangeMade = true
+			}
+
+			tmp = n.Neighbours[1]
+			if tmp != nil {
+				m := tmp.Neighbours[2]
+				if m != nil && m.Value == 3 && !(n.IsDecided && m.IsDecided) {
+					if addNodeToOppositeGroup(n, n.Neighbours[0], g) {
+						isChangeMade = true
+					}
+					if addNodeToOppositeGroup(n, n.Neighbours[3], g) {
+						isChangeMade = true
+					}
+					if addNodeToOppositeGroup(m, m.Neighbours[2], g) {
+						isChangeMade = true
+					}
+					if addNodeToOppositeGroup(m, m.Neighbours[1], g) {
+						isChangeMade = true
+					}
 				}
 			}
 		}
+	} else if g.Shape == "triangle" {
+		if n.Value == 2 {
+			for k := 0; k < 3; k++ {
 
-		tmp = n.Neighbours[1]
-		if tmp != nil {
-			m := tmp.Neighbours[2]
-			if m != nil && m.Value == 3 && !(n.IsDecided && m.IsDecided) {
-				if addNodeToOppositeGroup(n, n.Neighbours[0], g) {
+				i := k
+				tmp := n.Neighbours[i]
+				var m *Node
+				for tmp != nil {
+					i = (i + 1) % 3
+					tmp = tmp.Neighbours[i]
+
+					if tmp == n.Neighbours[(k+2)%3] || tmp == nil {
+						break
+					}
+					if tmp.Value == 2 {
+						m = tmp
+						if addNodeToOppositeGroup(m, m.Neighbours[(i-1+3)%3], g) {
+							isChangeMade = true
+						}
+						break
+					}
+				}
+
+				if m == nil {
+					i = (k - 1 + 3) % 3
+					tmp = n.Neighbours[i]
+					for tmp != nil {
+						i = (i - 1 + 3) % 3
+						tmp = tmp.Neighbours[i]
+
+						if tmp == n.Neighbours[k] || tmp == nil {
+							break
+						}
+						if tmp.Value == 2 {
+							m = tmp
+							if addNodeToOppositeGroup(m, m.Neighbours[(i+1)%3], g) {
+								isChangeMade = true
+							}
+							break
+						}
+
+					}
+				}
+
+				if m == nil {
+					continue
+				}
+
+				if addNodeToOppositeGroup(n, n.Neighbours[(k+1)%3], g) {
 					isChangeMade = true
 				}
-				if addNodeToOppositeGroup(n, n.Neighbours[3], g) {
-					isChangeMade = true
+
+				i = k
+				tmp = n.Neighbours[i]
+				base := tmp
+				isOppositeOn := false
+				for tmp != nil {
+					i = (i + 1) % 3
+					tmp = tmp.Neighbours[i]
+
+					if tmp == n {
+						break
+					}
+					if tmp == m {
+						isOppositeOn = true
+						continue
+					}
+					if isOppositeOn {
+						if addNodeToOppositeGroup(tmp, base, g) {
+							isChangeMade = true
+						}
+					} else {
+						if addNodeToGroup(tmp, base, g) {
+							isChangeMade = true
+						}
+					}
 				}
-				if addNodeToOppositeGroup(m, m.Neighbours[2], g) {
-					isChangeMade = true
-				}
-				if addNodeToOppositeGroup(m, m.Neighbours[1], g) {
-					isChangeMade = true
+
+				if !isOppositeState(n.Neighbours[k], n.Neighbours[(k+2)%3]) {
+					i = (k - 1 + 3) % 3
+					tmp = n.Neighbours[i]
+					for tmp != nil {
+						i = (i - 1 + 3) % 3
+						tmp = tmp.Neighbours[i]
+
+						if tmp == n {
+							break
+						}
+						if tmp == m {
+							isOppositeOn = true
+							continue
+						}
+						if isOppositeOn {
+							if addNodeToOppositeGroup(tmp, base, g) {
+								isChangeMade = true
+							}
+						} else {
+							if addNodeToGroup(tmp, base, g) {
+								isChangeMade = true
+							}
+						}
+					}
 				}
 			}
 		}
