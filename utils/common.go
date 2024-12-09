@@ -20,5 +20,5 @@ func Check(e error) {
 
 func TimeDuration(start time.Time) {
 	elapsed := time.Since(start)
-	fmt.Printf("%d", elapsed.Nanoseconds())
+	fmt.Printf("%d", elapsed.Microseconds())
 }
