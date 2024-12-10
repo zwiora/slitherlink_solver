@@ -822,6 +822,98 @@ func (n *Node) findloopReachingNumberTemplates(g *Graph) bool {
 				}
 			}
 		}
+	} else if g.Shape == "triangle" {
+		if n.Value == 2 {
+
+			for k := 0; k < 3; k++ {
+				i := k
+				tmp := n.Neighbours[i]
+				old := tmp
+				var m *Node
+				for tmp != nil {
+
+					if m != nil {
+						if addNodeToOppositeGroup(m, tmp, g) {
+							isChangeMade = true
+						}
+					}
+
+					i = (i + 1) % 3
+					tmp = tmp.Neighbours[i]
+
+					if tmp == n {
+						break
+					}
+
+					if isOppositeState(old, tmp) {
+						if addNodeToOppositeGroup(n, n.Neighbours[(k+1)%3], g) {
+							isChangeMade = true
+						}
+						m = old
+					}
+
+					old = tmp
+				}
+
+				if m != nil {
+					i = k
+					tmp = n.Neighbours[i]
+					for {
+						if addNodeToOppositeGroup(old, tmp, g) {
+							isChangeMade = true
+						}
+						if tmp == nil || tmp == m {
+							break
+						}
+						i = (i + 1) % 3
+						tmp = tmp.Neighbours[i]
+					}
+				} else {
+					i = (k - 1 + 3) % 3
+					tmp = n.Neighbours[i]
+					old = tmp
+					for tmp != nil {
+
+						if m != nil {
+							if addNodeToOppositeGroup(m, tmp, g) {
+								isChangeMade = true
+							}
+						}
+
+						i = (i - 1 + 3) % 3
+						tmp = tmp.Neighbours[i]
+
+						if tmp == n {
+							break
+						}
+						if isOppositeState(old, tmp) {
+							if addNodeToOppositeGroup(n, n.Neighbours[(k+1)%3], g) {
+								isChangeMade = true
+							}
+							m = old
+						}
+
+						old = tmp
+					}
+
+					if m != nil {
+						i = (k - 1 + 3) % 3
+						tmp = n.Neighbours[i]
+						for {
+							if addNodeToOppositeGroup(old, tmp, g) {
+								isChangeMade = true
+							}
+
+							if tmp == nil || tmp == m {
+								break
+							}
+							i = (i - 1 + 3) % 3
+							tmp = tmp.Neighbours[i]
+						}
+					}
+				}
+			}
+		}
 	}
 
 	return isChangeMade
