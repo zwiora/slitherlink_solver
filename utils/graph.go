@@ -866,19 +866,15 @@ func (g *Graph) FindTemplates() {
 		for {
 			thisNode.IsVisited = true
 
-			if thisNode.findNumberTemplates(g) {
-				newTemplatesFound++
-			}
+			// if thisNode.findNumberTemplates(g) {
+			// 	newTemplatesFound++
+			// }
 
 			if thisNode.find33Templates(g) {
 				newTemplatesFound++
 			}
 
 			if thisNode.find33CornerTemplates(g) {
-				newTemplatesFound++
-			}
-
-			if thisNode.find31Templates(g) {
 				newTemplatesFound++
 			}
 

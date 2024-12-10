@@ -738,62 +738,86 @@ func (n *Node) find33CornerTemplates(g *Graph) bool {
 func (n *Node) findloopReachingNumberTemplates(g *Graph) bool {
 	isChangeMade := false
 
-	if n.Value == 3 {
-		for i, v := range n.Neighbours {
-			if v != nil {
-				w := v.Neighbours[(i+1)%len(n.Neighbours)]
-				if isOppositeState(v, w) {
-					if n.Neighbours[(i+1)%len(n.Neighbours)] != nil {
-						if addNodeToGroup(n.Neighbours[(i+1)%len(n.Neighbours)], w, g) {
+	if g.Shape == "square" {
+		if n.Value == 3 {
+			for i, v := range n.Neighbours {
+				if v != nil {
+					w := v.Neighbours[(i+1)%len(n.Neighbours)]
+					if isOppositeState(v, w) {
+						if n.Neighbours[(i+1)%len(n.Neighbours)] != nil {
+							if addNodeToGroup(n.Neighbours[(i+1)%len(n.Neighbours)], w, g) {
+								isChangeMade = true
+							}
+						}
+						if addNodeToOppositeGroup(n, n.Neighbours[(i+2)%len(n.Neighbours)], g) {
+							isChangeMade = true
+						}
+						if addNodeToOppositeGroup(n, n.Neighbours[(i+3)%len(n.Neighbours)], g) {
 							isChangeMade = true
 						}
 					}
-					if addNodeToOppositeGroup(n, n.Neighbours[(i+2)%len(n.Neighbours)], g) {
-						isChangeMade = true
-					}
-					if addNodeToOppositeGroup(n, n.Neighbours[(i+3)%len(n.Neighbours)], g) {
-						isChangeMade = true
+
+					w = v.Neighbours[(i-1+len(n.Neighbours))%len(n.Neighbours)]
+					if isOppositeState(v, w) {
+						if n.Neighbours[(i-1+len(n.Neighbours))%len(n.Neighbours)] != nil {
+							if addNodeToGroup(n.Neighbours[(i-1+len(n.Neighbours))%len(n.Neighbours)], w, g) {
+								isChangeMade = true
+							}
+						}
+						if addNodeToOppositeGroup(n, n.Neighbours[(i+1)%len(n.Neighbours)], g) {
+							isChangeMade = true
+						}
+						if addNodeToOppositeGroup(n, n.Neighbours[(i+2)%len(n.Neighbours)], g) {
+							isChangeMade = true
+						}
 					}
 				}
-
-				w = v.Neighbours[(i-1+len(n.Neighbours))%len(n.Neighbours)]
-				if isOppositeState(v, w) {
-					if n.Neighbours[(i-1+len(n.Neighbours))%len(n.Neighbours)] != nil {
-						if addNodeToGroup(n.Neighbours[(i-1+len(n.Neighbours))%len(n.Neighbours)], w, g) {
+			}
+		} else if n.Value == 1 {
+			for i, v := range n.Neighbours {
+				if v != nil {
+					w := v.Neighbours[(i+1)%len(n.Neighbours)]
+					x := n.Neighbours[(i+1)%len(n.Neighbours)]
+					if isOppositeState(v, w) && isTheSameState(w, x) {
+						if addNodeToGroup(n, n.Neighbours[(i+2)%len(n.Neighbours)], g) {
+							isChangeMade = true
+						}
+						if addNodeToGroup(n, n.Neighbours[(i+3)%len(n.Neighbours)], g) {
 							isChangeMade = true
 						}
 					}
-					if addNodeToOppositeGroup(n, n.Neighbours[(i+1)%len(n.Neighbours)], g) {
-						isChangeMade = true
-					}
-					if addNodeToOppositeGroup(n, n.Neighbours[(i+2)%len(n.Neighbours)], g) {
-						isChangeMade = true
+
+					w = v.Neighbours[(i-1+len(n.Neighbours))%len(n.Neighbours)]
+					x = n.Neighbours[(i-1+len(n.Neighbours))%len(n.Neighbours)]
+					if isOppositeState(v, w) && isTheSameState(w, x) {
+						if addNodeToGroup(n, n.Neighbours[(i+1)%len(n.Neighbours)], g) {
+							isChangeMade = true
+						}
+						if addNodeToGroup(n, n.Neighbours[(i+2)%len(n.Neighbours)], g) {
+							isChangeMade = true
+						}
 					}
 				}
 			}
 		}
-	} else if n.Value == 1 {
-		for i, v := range n.Neighbours {
-			if v != nil {
-				w := v.Neighbours[(i+1)%len(n.Neighbours)]
-				x := n.Neighbours[(i+1)%len(n.Neighbours)]
-				if isOppositeState(v, w) && isTheSameState(w, x) {
-					if addNodeToGroup(n, n.Neighbours[(i+2)%len(n.Neighbours)], g) {
-						isChangeMade = true
-					}
-					if addNodeToGroup(n, n.Neighbours[(i+3)%len(n.Neighbours)], g) {
-						isChangeMade = true
+	} else if g.Shape == "honeycomb" {
+		if n.Value == 5 {
+			for k, v := range n.Neighbours {
+				if v != nil && isOppositeState(v, n.Neighbours[(k+1)%6]) {
+					for j := 2; j < 6; j++ {
+						if addNodeToOppositeGroup(n, n.Neighbours[(k+j)%6], g) {
+							isChangeMade = true
+						}
 					}
 				}
-
-				w = v.Neighbours[(i-1+len(n.Neighbours))%len(n.Neighbours)]
-				x = n.Neighbours[(i-1+len(n.Neighbours))%len(n.Neighbours)]
-				if isOppositeState(v, w) && isTheSameState(w, x) {
-					if addNodeToGroup(n, n.Neighbours[(i+1)%len(n.Neighbours)], g) {
-						isChangeMade = true
-					}
-					if addNodeToGroup(n, n.Neighbours[(i+2)%len(n.Neighbours)], g) {
-						isChangeMade = true
+			}
+		} else if n.Value == 1 {
+			for k, v := range n.Neighbours {
+				if v != nil && isOppositeState(v, n.Neighbours[(k+1)%6]) {
+					for j := 2; j < 6; j++ {
+						if addNodeToGroup(n, n.Neighbours[(k+j)%6], g) {
+							isChangeMade = true
+						}
 					}
 				}
 			}
