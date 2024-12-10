@@ -49,7 +49,6 @@ func main() {
 	if len(args) > 4 {
 		i, err := strconv.Atoi(args[4])
 		utils.Check(err)
-		// fmt.Println(i, ": ", data[i])
 
 		boardType = data[i][0]
 		sizeX, err = strconv.Atoi(data[i][1])
@@ -78,7 +77,6 @@ func main() {
 			utils.AvgDepth = 0
 			utils.MaxDepth = 0
 			utils.NoVisitedStates = 0
-			// fmt.Println(i, ": ", data[i])
 			boardType = data[i][0]
 			sizeX, err = strconv.Atoi(data[i][1])
 			utils.Check(err)
@@ -90,7 +88,6 @@ func main() {
 			fmt.Print(g.FieldsCount, ";")
 
 			solvers.LoopSolve(g)
-			// g.PrintBoard(true)
 
 			utils.AvgDepth /= float64(utils.NoVisitedStates)
 			fmt.Print(";", utils.NoVisitedStates)
@@ -99,10 +96,8 @@ func main() {
 			fmt.Println()
 			g.CheckIfSolutionOk()
 
-			g.PrintBoard(true)
-
 			if !g.CheckIfSolutionOk() {
-				fmt.Println("BŁĄD")
+				fmt.Println("WRONG SOLUTION")
 				break
 			}
 		}

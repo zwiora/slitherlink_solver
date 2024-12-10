@@ -26,7 +26,6 @@ func (g *Graph) printSquaresBoard(isDebugMode bool) {
 	thisNode := g.Root
 
 	fmt.Printf("-")
-
 	for m := 0; m < g.SizeX; m++ {
 		fmt.Printf("----")
 	}
@@ -44,7 +43,6 @@ func (g *Graph) printSquaresBoard(isDebugMode bool) {
 			}
 
 			if isDebugMode && thisNode.IsDecided {
-
 				if thisNode.IsForRemoval {
 					fmt.Printf("\033[43m")
 				} else {
@@ -90,7 +88,6 @@ func (g *Graph) printHoneycombBoard(isDebugMode bool) {
 	thisNode := g.Root
 
 	fmt.Printf(" ")
-
 	for m := 0; m < g.SizeX; m++ {
 		if m%2 == 0 {
 			fmt.Printf("___ ")
@@ -159,19 +156,16 @@ func (g *Graph) printHoneycombBoard(isDebugMode bool) {
 				if thisNode.Neighbours[5] != nil {
 					if thisNode.Neighbours[5].Neighbours[0] != nil {
 						thisNode = thisNode.Neighbours[5].Neighbours[0]
-
 					} else if n != g.SizeY-1 || m == (g.SizeX-1) {
 						fmt.Print("___/")
 					} else {
 						fmt.Print("/")
 					}
-
 				}
 			}
 		}
 
 		fmt.Println()
-
 		thisNode = lastLineNode.Neighbours[1]
 		lastLineNode = thisNode
 	}
@@ -179,7 +173,6 @@ func (g *Graph) printHoneycombBoard(isDebugMode bool) {
 	for m := 0; m < g.SizeX/2; m++ {
 		fmt.Print("\\___/   ")
 	}
-
 	fmt.Println()
 }
 
@@ -212,7 +205,6 @@ func (g *Graph) printTriangleBoard(isDebugMode bool) {
 			}
 
 			if isDebugMode && thisNode.IsDecided {
-
 				if thisNode.IsForRemoval {
 					fmt.Printf("\033[43m")
 				} else {
@@ -315,7 +307,6 @@ func (g *Graph) printTriangleBoard(isDebugMode bool) {
 			}
 
 			if isDebugMode && thisNode.IsDecided {
-
 				if thisNode.IsForRemoval {
 					fmt.Printf("\033[43m")
 				} else {
@@ -350,9 +341,7 @@ func (g *Graph) printTriangleBoard(isDebugMode bool) {
 		}
 
 		fmt.Println()
-
 		thisNode = lastLineNode
-
 		fmt.Print(" ")
 
 		for m := 0; m < width; m++ {
@@ -370,7 +359,6 @@ func (g *Graph) printTriangleBoard(isDebugMode bool) {
 			}
 
 			if isDebugMode && thisNode.IsDecided {
-
 				if thisNode.IsForRemoval {
 					fmt.Printf("\033[43m")
 				} else {
@@ -425,7 +413,6 @@ func (g *Graph) printTriangleBoard(isDebugMode bool) {
 			}
 
 			if isDebugMode && thisNode.IsDecided {
-
 				if thisNode.IsForRemoval {
 					fmt.Printf("\033[43m")
 				} else {
@@ -466,7 +453,6 @@ func (g *Graph) printTriangleBoard(isDebugMode bool) {
 			thisNode = thisNode.Neighbours[1]
 
 			fmt.Print("\\ /")
-
 			if thisNode.IsInLoop {
 				fmt.Printf("\033[42m")
 			}
@@ -477,7 +463,6 @@ func (g *Graph) printTriangleBoard(isDebugMode bool) {
 			}
 
 			if isDebugMode && thisNode.IsDecided {
-
 				if thisNode.IsForRemoval {
 					fmt.Printf("\033[43m")
 				} else {
@@ -503,9 +488,7 @@ func (g *Graph) printTriangleBoard(isDebugMode bool) {
 				fmt.Printf(" ")
 			}
 			fmt.Print("\033[49m")
-
 			thisNode = thisNode.Neighbours[0]
-
 		}
 		fmt.Println("\\ /")
 
@@ -514,7 +497,6 @@ func (g *Graph) printTriangleBoard(isDebugMode bool) {
 			fmt.Print("------")
 		}
 		fmt.Println("-")
-
 	}
 }
 
@@ -692,13 +674,10 @@ func (g *Graph) CalculateStartCost() int {
 				i = 1
 				continue
 			}
-
 			break
 		}
-
 		thisNode = thisNode.Neighbours[i]
 	}
-
 	g.ClearIsVisited()
 
 	return startCost
@@ -754,7 +733,6 @@ func (g *Graph) CalculateStartMoves() {
 		thisNode := g.Root
 		i := 1
 		for {
-
 			thisNode.IsVisited = true
 
 			if thisNode.GetDegree() < int(g.MaxDegree) {
@@ -788,7 +766,6 @@ func (g *Graph) CalculateStartMoves() {
 
 			thisNode = thisNode.Neighbours[i]
 		}
-
 		g.ClearIsVisited()
 	}
 
@@ -811,14 +788,12 @@ func (g *Graph) FindTemplates() {
 	debug.Println("check templates")
 
 	thisNode := g.Root
-
 	i := 0
 	if g.Shape == "triangle" {
 		i = 1
 	}
 	for {
 		thisNode.IsVisited = true
-
 		thisNode.findZeroTemplates(g)
 
 		if g.Shape == "honeycomb" {
@@ -924,5 +899,4 @@ func (g *Graph) FindTemplates() {
 			break
 		}
 	}
-
 }

@@ -27,7 +27,6 @@ func (l *List) addElement(node *Node) {
 	} else {
 		newElement.Next = l.Root.Next
 		l.Root.Next = newElement
-
 	}
 }
 
@@ -79,10 +78,8 @@ func (l *List) SetValue(isForRemoval bool, settingNode *Node, g *Graph) bool {
 				break
 			}
 		}
-
 		result = l.OppositeList.SetValue(!isForRemoval, settingNode, g)
 	}
-
 	return result
 }
 
@@ -91,7 +88,6 @@ func (l *List) ClearValue(g *Graph) {
 
 		thisElement := l.Root
 		for {
-
 			if thisElement.Value.IsDecided {
 				thisElement.Value.IsDecided = false
 				thisElement.Value.IsForRemoval = false
@@ -107,7 +103,6 @@ func (l *List) ClearValue(g *Graph) {
 				break
 			}
 		}
-
 		l.OppositeList.ClearValue(g)
 	}
 }

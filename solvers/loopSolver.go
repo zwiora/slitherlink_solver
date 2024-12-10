@@ -100,7 +100,6 @@ func checkIfCanBeRemoved(n *utils.Node, g *utils.Graph) (bool, bool) {
 			}
 		}
 	}
-
 	/* No troubles found - node can be deleted */
 	return true, false
 }
@@ -126,8 +125,6 @@ func updateAvailableMoves(n *utils.Node, g *utils.Graph) bool {
 							thisNode.UpdateNodeCost(g)
 						}
 					} else if !canBeRemoved && thisNode.CanBeRemoved {
-						// g.PrintSquaresBoard(true)
-						// fmt.Println(thisNode)
 						heap.Remove(g.AvailableMoves, thisNode.QueueIndex)
 						thisNode.CanBeRemoved = false
 					}
@@ -173,12 +170,9 @@ func updateAvailableMoves(n *utils.Node, g *utils.Graph) bool {
 						}
 					}
 				}
-
 			}
-
 		} else {
 			neighbour := n.Neighbours[i]
-			// secondNeighbour := n.Neighbours[(i+1)%3]
 			tmp := neighbour
 			j := i
 			for x := 0; x < 3; x++ {
@@ -227,11 +221,8 @@ func updateAvailableMoves(n *utils.Node, g *utils.Graph) bool {
 					}
 				}
 				j = (j + 1) % 3
-
 				tmp = tmp.Neighbours[j]
-
 			}
-
 		}
 	}
 
@@ -333,10 +324,8 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 				debug.Println("WRONG STATE")
 				debug.Println(newNode)
 				debug.Println(depth)
-				// *isStateWrong = true
 				break
 			}
-
 		}
 
 		if *isStateWrong {
@@ -378,7 +367,6 @@ func loopSolveRecursion(n *utils.Node, g *utils.Graph, cost int, isSolutionFound
 	updateAvailableMoves(n, g)
 
 	debug.Println("RETURN")
-
 }
 
 /* Solver preparation */
@@ -392,8 +380,6 @@ func LoopSolve(g *utils.Graph) {
 	}
 
 	g.CalculateStartMoves()
-
-	// return
 
 	g.VisitedNodes = stack.New()
 	isSolutionFound := new(bool)
@@ -453,6 +439,4 @@ func LoopSolve(g *utils.Graph) {
 
 		newNode.IsInLoop = true
 	}
-
-	// g.PrintBoard(false)
 }

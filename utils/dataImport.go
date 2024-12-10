@@ -83,9 +83,7 @@ func constructSquaresBoard(board *Graph, puzzleContent string) {
 		nextNode.Neighbours[2] = thisNode
 
 		thisNode = nextNode
-
 	}
-
 	thisNode = board.Root
 
 	/* Setting content and preparing rest of the nodes */
@@ -102,9 +100,7 @@ func constructSquaresBoard(board *Graph, puzzleContent string) {
 		}
 
 		for i := 0; i < nodesCounter; i++ {
-
 			if n < board.SizeY-1 {
-
 				/* Connect this node with bottom one and vice versa*/
 				bottomNode := &Node{
 					Value:    -1,
@@ -140,7 +136,6 @@ func constructHexBoard(board *Graph, puzzleContent string) {
 	lastLineNode := thisNode
 	m := 0
 	n := 0
-
 	board.MaxDegree = 6
 	thisNode.Neighbours = make([]*Node, board.MaxDegree)
 
@@ -163,7 +158,6 @@ func constructHexBoard(board *Graph, puzzleContent string) {
 	}
 
 	thisNode = board.Root
-
 	direction := 0
 
 	/* Setting content and preparing rest of the nodes */
@@ -214,7 +208,6 @@ func constructHexBoard(board *Graph, puzzleContent string) {
 					thisNode.Neighbours[2].Neighbours[0] = bottomNode
 				}
 			}
-			// fmt.Println(thisNode)
 
 			/* Calculating next position */
 			m++
@@ -246,7 +239,6 @@ func constructTriangleBoard(board *Graph, puzzleContent string) {
 	row2 := make([]*Node, width-1)
 	content := make([]int8, noNodes)
 	board.FieldsCount = noNodes
-
 	board.MaxDegree = 3
 
 	/* Setting content*/
@@ -271,13 +263,8 @@ func constructTriangleBoard(board *Graph, puzzleContent string) {
 		}
 	}
 
-	// fmt.Println(content)
-
-	_ = row
-
 	n = 0
 	for i := 0; i < (board.SizeY+1)/2; i++ {
-
 		if i != board.SizeY/2 || board.SizeY%2 == 0 {
 			prevNode := row[0]
 			for j := 0; j < width; j++ {
@@ -326,7 +313,6 @@ func constructTriangleBoard(board *Graph, puzzleContent string) {
 				row[j].Neighbours[2] = thisNode
 
 				row[j] = thisNode
-				// fmt.Println(row[j])
 			}
 
 			for j := 0; j < width-1; j++ {
@@ -343,8 +329,6 @@ func constructTriangleBoard(board *Graph, puzzleContent string) {
 				row[j+1].Neighbours[0] = thisNode
 
 				row2[j] = thisNode
-
-				// fmt.Println(thisNode)
 			}
 		} else {
 			prevNode := row[0]
@@ -390,7 +374,6 @@ func constructTriangleBoard(board *Graph, puzzleContent string) {
 }
 
 func ConstructBoardFromData(puzzleType string, puzzleSizeX int, puzzleSizeY int, puzzleContent string) *Graph {
-
 	board := new(Graph)
 	var thisNode *Node
 	thisNode = &Node{

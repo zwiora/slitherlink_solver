@@ -271,7 +271,6 @@ func (n *Node) findNumberTemplatesSquare(g *Graph) bool {
 			}
 
 			return false
-
 		}
 		if !n.IsDecided && n.Value != 2 {
 			stateList := make(map[any][]int)
@@ -295,7 +294,6 @@ func (n *Node) findNumberTemplatesSquare(g *Graph) bool {
 					}
 				}
 			}
-
 		}
 		if n.Value == 2 {
 			stateList := make(map[any][]int)
@@ -366,11 +364,9 @@ func (n *Node) findNumberTemplatesSquare(g *Graph) bool {
 						}
 					}
 				}
-
 			}
 		}
 	}
-
 	return isChangeMade
 }
 
@@ -491,7 +487,6 @@ func (n *Node) findNumberTemplatesTriangle(g *Graph) bool {
 						}
 					}
 				}
-
 				if addNodeToOppositeGroup(firstNode, secondNode, g) {
 					isChangeMade = true
 				}
@@ -523,12 +518,10 @@ func (n *Node) findNumberTemplatesTriangle(g *Graph) bool {
 						}
 					}
 				}
-
 				if addNodeToOppositeGroup(firstNode, secondNode, g) {
 					isChangeMade = true
 				}
 			}
-
 			return false
 		}
 
@@ -555,7 +548,6 @@ func (n *Node) findNumberTemplatesTriangle(g *Graph) bool {
 					}
 				}
 			}
-
 		}
 	}
 
@@ -570,7 +562,6 @@ func (n *Node) findNumberTemplates(g *Graph) bool {
 	} else if g.Shape == "honeycomb" {
 		return n.findNumberTemplatesHoneycomb(g)
 	}
-
 	return false
 }
 
@@ -612,7 +603,6 @@ func (n *Node) findContinousSquareTemplates(g *Graph) bool {
 						}
 					}
 				}
-
 			}
 		}
 	}
@@ -667,11 +657,9 @@ func (n *Node) find33Templates(g *Graph) bool {
 					isChangeMade = true
 				}
 			}
-
 		}
 	} else if g.Shape == "honeycomb" {
 		if n.Value == 5 {
-
 			for i := 0; i < 3; i++ {
 				m := n.Neighbours[i]
 				if m != nil && m.Value == 5 && !(n.IsDecided && m.IsDecided) {
@@ -704,7 +692,6 @@ func (n *Node) find33Templates(g *Graph) bool {
 					}
 				}
 			}
-
 		}
 	} else if g.Shape == "triangle" {
 		if n.Value == 2 {
@@ -827,7 +814,6 @@ func (n *Node) find33CornerTemplates(g *Graph) bool {
 	} else if g.Shape == "triangle" {
 		if n.Value == 2 {
 			for k := 0; k < 3; k++ {
-
 				i := k
 				tmp := n.Neighbours[i]
 				var m *Node
@@ -864,7 +850,6 @@ func (n *Node) find33CornerTemplates(g *Graph) bool {
 							}
 							break
 						}
-
 					}
 				}
 
@@ -1022,7 +1007,6 @@ func (n *Node) findloopReachingNumberTemplates(g *Graph) bool {
 		}
 	} else if g.Shape == "triangle" {
 		if n.Value == 2 {
-
 			for k := 0; k < 3; k++ {
 				i := k
 				tmp := n.Neighbours[i]
@@ -1113,7 +1097,6 @@ func (n *Node) findloopReachingNumberTemplates(g *Graph) bool {
 			}
 		}
 	}
-
 	return isChangeMade
 }
 
