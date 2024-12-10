@@ -64,7 +64,7 @@ func main() {
 		// return
 		solvers.LoopSolve(g)
 		fmt.Println()
-		g.PrintBoard(false)
+		g.PrintBoard(true)
 		fmt.Println()
 
 		utils.AvgDepth /= float64(utils.NoVisitedStates)

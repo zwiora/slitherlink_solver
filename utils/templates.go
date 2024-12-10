@@ -194,7 +194,7 @@ func (n *Node) findZeroTemplates(g *Graph) bool {
 	return false
 }
 
-func (n *Node) findNumberTemplates(g *Graph) bool {
+func (n *Node) findNumberTemplatesSquare(g *Graph) bool {
 
 	isChangeMade := false
 
@@ -374,6 +374,128 @@ func (n *Node) findNumberTemplates(g *Graph) bool {
 	}
 
 	return isChangeMade
+}
+
+func (n *Node) findNumberTemplatesTriangle(g *Graph) bool {
+
+	isChangeMade := false
+
+	if n.Value != -1 && n.Value != 0 {
+		/* Based on the state of n */
+		if n.IsDecided || n.TemplateGroup != nil {
+			nState := nodeState(n)
+
+			stateList := make(map[any][]int)
+			for k, v := range n.Neighbours {
+				vState := nodeState(v)
+				stateList[vState] = append(stateList[vState], k)
+			}
+
+			if len(stateList[nState]) == len(n.Neighbours)-int(n.Value) {
+				for key, slice := range stateList {
+					if key != nState {
+						for v := range slice {
+							if addNodeToOppositeGroup(n, n.Neighbours[slice[v]], g) {
+								isChangeMade = true
+							}
+						}
+					}
+				}
+			} else if n.Value == 1 && len(stateList[nState]) == 2 {
+				var firstNode *Node
+				var secondNode *Node
+				for key, slice := range stateList {
+					if key != nState {
+						for v := range slice {
+							if firstNode == nil {
+								firstNode = n.Neighbours[slice[v]]
+							} else {
+								secondNode = n.Neighbours[slice[v]]
+							}
+						}
+					}
+				}
+
+				if addNodeToOppositeGroup(firstNode, secondNode, g) {
+					isChangeMade = true
+				}
+			}
+
+			oppositeState := nodeOppositeState(n)
+
+			if oppositeState != nil && len(stateList[oppositeState]) == int(n.Value) {
+				for key, slice := range stateList {
+					if key != oppositeState {
+						for v := range slice {
+							if addNodeToGroup(n, n.Neighbours[slice[v]], g) {
+								isChangeMade = true
+							}
+						}
+					}
+				}
+			} else if n.Value == 2 && len(stateList[oppositeState]) == 2 {
+				var firstNode *Node
+				var secondNode *Node
+				for key, slice := range stateList {
+					if key != oppositeState {
+						for v := range slice {
+							if firstNode == nil {
+								firstNode = n.Neighbours[slice[v]]
+							} else {
+								secondNode = n.Neighbours[slice[v]]
+							}
+						}
+					}
+				}
+
+				if addNodeToOppositeGroup(firstNode, secondNode, g) {
+					isChangeMade = true
+				}
+			}
+
+			return false
+		}
+
+		/* Based on the state of neighbours */
+		if !n.IsDecided {
+			stateList := make(map[any][]int)
+			for k, v := range n.Neighbours {
+				vState := nodeState(v)
+				if vState != nil {
+					stateList[vState] = append(stateList[vState], k)
+				}
+			}
+
+			for key, slice := range stateList {
+				if key != nil && len(slice) >= 2 {
+					if n.Value == 1 {
+						if addNodeToGroup(n, n.Neighbours[slice[0]], g) {
+							isChangeMade = true
+						}
+					} else if n.Value == 2 {
+						if addNodeToOppositeGroup(n, n.Neighbours[slice[0]], g) {
+							isChangeMade = true
+						}
+					}
+				}
+			}
+
+		}
+	}
+
+	return isChangeMade
+}
+
+func (n *Node) findNumberTemplates(g *Graph) bool {
+	if g.Shape == "square" {
+		return n.findNumberTemplatesSquare(g)
+	} else if g.Shape == "triangle" {
+		return n.findNumberTemplatesTriangle(g)
+	} else if g.Shape == "honeycomb" {
+
+	}
+
+	return false
 }
 
 func (n *Node) findContinousSquareTemplates(g *Graph) bool {
