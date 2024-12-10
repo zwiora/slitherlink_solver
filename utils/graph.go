@@ -867,8 +867,6 @@ func (g *Graph) FindTemplates() {
 			thisNode.IsVisited = true
 
 			if thisNode.findNumberTemplates(g) {
-				fmt.Println(thisNode)
-				// time.Sleep(time.Minute)
 				newTemplatesFound++
 			}
 

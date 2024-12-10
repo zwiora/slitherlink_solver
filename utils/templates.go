@@ -375,7 +375,6 @@ func (n *Node) findNumberTemplatesSquare(g *Graph) bool {
 }
 
 func (n *Node) findNumberTemplatesHoneycomb(g *Graph) bool {
-
 	isChangeMade := false
 	if n.Value != -1 && n.Value != 0 {
 		/* Based on the state of n */
