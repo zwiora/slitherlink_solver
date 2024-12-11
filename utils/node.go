@@ -140,12 +140,12 @@ func (n *Node) SetNodeCost(g *Graph) {
 						groupSize += n.TemplateGroup.OppositeList.Length
 					}
 				}
-				n.QueuePriority = 1000 + newCost*20 + groupSize
+				n.QueuePriority = newCost*50 + groupSize
 			} else {
 				n.QueuePriority = newCost
 			}
 		} else {
-			n.QueuePriority = newCost
+			n.QueuePriority = newCost * 50
 		}
 	}
 }
@@ -191,12 +191,12 @@ func (n *Node) UpdateNodeCost(g *Graph) {
 							groupSize += n.TemplateGroup.OppositeList.Length
 						}
 					}
-					g.AvailableMoves.update(n, 1000+newCost*20+groupSize)
+					g.AvailableMoves.update(n, newCost*50+groupSize)
 				} else {
 					g.AvailableMoves.update(n, newCost)
 				}
 			} else {
-				g.AvailableMoves.update(n, newCost)
+				g.AvailableMoves.update(n, newCost*50)
 			}
 		}
 	}
