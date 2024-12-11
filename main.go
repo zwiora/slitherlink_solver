@@ -14,7 +14,7 @@ func main() {
 	dataFile := ""
 
 	if args[1] == "s" {
-		dataFile = "square_easy"
+		dataFile = "square_hard"
 	} else if args[1] == "h" {
 		dataFile = "hexagon"
 	} else if args[1] == "t" {

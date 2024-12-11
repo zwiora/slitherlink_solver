@@ -131,6 +131,16 @@ func (n *Node) SetNodeCost(g *Graph) {
 					}
 				}
 				n.QueuePriority = 1000 + groupSize*10 + newCost
+			} else if HeuristicType == 5 {
+				groupSize := 0
+				if n.TemplateGroup != nil {
+					groupSize += n.TemplateGroup.Length
+
+					if n.TemplateGroup.OppositeList != nil {
+						groupSize += n.TemplateGroup.OppositeList.Length
+					}
+				}
+				n.QueuePriority = 1000 + newCost*20 + groupSize
 			} else {
 				n.QueuePriority = newCost
 			}
@@ -172,6 +182,16 @@ func (n *Node) UpdateNodeCost(g *Graph) {
 						}
 					}
 					g.AvailableMoves.update(n, 1000+groupSize*10+newCost)
+				} else if HeuristicType == 5 {
+					groupSize := 0
+					if n.TemplateGroup != nil {
+						groupSize += n.TemplateGroup.Length
+
+						if n.TemplateGroup.OppositeList != nil {
+							groupSize += n.TemplateGroup.OppositeList.Length
+						}
+					}
+					g.AvailableMoves.update(n, 1000+newCost*20+groupSize)
 				} else {
 					g.AvailableMoves.update(n, newCost)
 				}
