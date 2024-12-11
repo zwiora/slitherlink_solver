@@ -14,7 +14,7 @@ func main() {
 	dataFile := ""
 
 	if args[1] == "s" {
-		dataFile = "square_hard"
+		dataFile = "square_hard_short"
 	} else if args[1] == "h" {
 		dataFile = "hexagon"
 	} else if args[1] == "t" {
@@ -45,6 +45,8 @@ func main() {
 	sizeY := 0
 	code := ""
 	var err error
+
+	sum := 0
 
 	if len(args) > 4 {
 		i, err := strconv.Atoi(args[4])
@@ -95,6 +97,8 @@ func main() {
 			fmt.Print(";", utils.MaxDepth)
 			fmt.Println()
 			g.CheckIfSolutionOk()
+
+			sum += utils.NoVisitedStates
 
 			if !g.CheckIfSolutionOk() {
 				fmt.Println("WRONG SOLUTION")

@@ -145,7 +145,11 @@ func (n *Node) SetNodeCost(g *Graph) {
 				n.QueuePriority = newCost
 			}
 		} else {
-			n.QueuePriority = newCost * 50
+			if HeuristicType == 5 {
+				n.QueuePriority = newCost * 50
+			} else {
+				n.QueuePriority = newCost
+			}
 		}
 	}
 }
@@ -196,7 +200,11 @@ func (n *Node) UpdateNodeCost(g *Graph) {
 					g.AvailableMoves.update(n, newCost)
 				}
 			} else {
-				g.AvailableMoves.update(n, newCost*50)
+				if HeuristicType == 5 {
+					g.AvailableMoves.update(n, newCost*50)
+				} else {
+					g.AvailableMoves.update(n, newCost)
+				}
 			}
 		}
 	}
