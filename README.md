@@ -1,2 +1,3 @@
 # slitherlink_solver
-Praca inżynierska
+
+Instrukcja uruchomienia znajduje się w dodatku A pracy inżynierskiej

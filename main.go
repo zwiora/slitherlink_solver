@@ -14,7 +14,7 @@ func main() {
 	dataFile := ""
 
 	if args[1] == "s" {
-		dataFile = "square_easy"
+		dataFile = "square"
 	} else if args[1] == "h" {
 		dataFile = "hexagon"
 	} else if args[1] == "t" {
@@ -59,8 +59,9 @@ func main() {
 		utils.Check(err)
 		code = data[i][3]
 		g := utils.ConstructBoardFromData(boardType, sizeX, sizeY, code)
-		g.PrintBoard(false)
 		fmt.Println()
+
+		fmt.Print("Time: ")
 
 		// return
 		solvers.LoopSolve(g)
